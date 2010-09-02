@@ -18,7 +18,7 @@ class Hello(settingsd.service.NativeObject) :
 
 class Service(settingsd.service.Service) :
 	def initService(self) :
-		self.addObject(Hello("hello", self))
+		self.addSharedObject(Hello("hello"))
 
 	def closeService(self) :
 		pass

@@ -5,31 +5,33 @@ import dbus.service
 import dbus.glib
 import gobject
 
-import settingsd.config
+from settingsd import const
+from settingsd import config
 
 
 if __name__ == "__main__" :
-	# future config init here
+	config.loadConfigFiles()
 
-	bus_name = dbus.service.BusName(settingsd.config.GlobalConfig["service_name"], bus = dbus.SessionBus())
+	if config.value("service", "bus_type") == const.CONFIG_SERVICE_BUS_TYPE_SYSTEM :
+		bus = dbus.SystemBus()
+	else :
+		bus = dbus.SessionBus()
+	bus_name = dbus.service.BusName(config.value("service", "name"), bus = bus)
+	config.setValue("runtime", "bus_name", bus_name)
 
-	main_parent_class = type("MainParent", (object,), {})
-	setattr(main_parent_class, "busName", lambda self : bus_name)
-	main_parent = main_parent_class()
-
-	sys.path.append("plugins")
+	sys.path.append(const.PLUGINS_DIR)
 	services_list = []
-	for module_name in [ item[:-3] for item in os.listdir("plugins") if item.endswith(".py") ] :
-		services_list.append(__import__(module_name, globals(), locals(), [""]).Service(main_parent))
+	for module_name in [ item[:-3] for item in os.listdir(const.PLUGINS_DIR) if item.endswith(".py") ] :
+		services_list.append(__import__(module_name, globals(), locals(), [""]).Service())
 		services_list[-1].initService()
-		print "Initialized \"%s\"" % (module_name)
 
 	main_loop = gobject.MainLoop()
+	print >> sys.stderr, "Initialized"
 	try :
 		main_loop.run()
 	except KeyboardInterrupt :
 		for services_list_item in services_list :
 			services_list_item.closeService()
-			print "Closed \"%s\"" % (module_name)
 		main_loop.quit()
+	print >> sys.stderr, "\nClosed"
 

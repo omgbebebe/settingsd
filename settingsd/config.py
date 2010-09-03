@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import ConfigParser
 
@@ -5,6 +7,7 @@ import const
 import config
 
 
+#####
 ConfigDictObject = {
 	"service" : {
 		"name" : (const.DEFAULT_CONFIG_SERVICE_NAME, str, None),
@@ -14,6 +17,7 @@ ConfigDictObject = {
 }
 
 
+#####
 class ValidatorError(Exception) :
 	pass
 
@@ -21,6 +25,7 @@ class ValueError(Exception) :
 	pass
 
 
+##### Public #####
 def setValue(section, option, value, validator = None, valid_values_list = None) :
 	global ConfigDictObject
 

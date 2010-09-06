@@ -5,9 +5,11 @@ import dbus.service
 import dbus.glib
 import abc
 
+import const
 import config
 import shared
 import dbus_tools
+import logger
 
 
 #####
@@ -57,9 +59,21 @@ class ActionObject(CustomObject) :
 
 
 ######
+def tracer(function) :
+	def wrapper(self, *args_list, **kwargs_dict) :
+		return_value = function(self, *args_list, **kwargs_dict)
+		logger.message(const.LOG_LEVEL_DEBUG, "Called \"%s::%s\" with args (%s, %s) --> %s" % (
+			self.__class__.__name__, function.__name__, str(args_list), str(kwargs_dict),  str(return_value) ))
+		return return_value
+
+	wrapper.__dict__ = function.__dict__
+	wrapper.__name__ = function.__name__
+
+	return wrapper
+
 def customMethod(interface_name) :
 	def decorator(function) :
-		return dbus.service.method(interface_name)(function)
+		return tracer(dbus.service.method(interface_name)(function))
 	return decorator
 
 def functionMethod(interface_name) :

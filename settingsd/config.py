@@ -15,7 +15,7 @@ ConfigDictObject = {
 		"name" : (const.DEFAULT_SERVICE_NAME, str),
 		"path" : (const.DEFAULT_SERVICE_PATH, str),
 		"bus_type" : (const.DEFAULT_SERVICE_BUS_TYPE, ( lambda arg : validators.validRange(arg, const.ALL_SERVICE_BUS_TYPES_LIST) )),
-		"log_level" : (const.DEFAULT_LOG_LEVEL, ( lambda arg : int(validators.validRange(arg, const.ALL_LOG_LEVELS_LIST)) ))
+		"log_level" : (const.DEFAULT_LOG_LEVEL, ( lambda arg : validators.validRange(int(arg), const.ALL_LOG_LEVELS_LIST) ))
 	}
 }
 
@@ -34,7 +34,7 @@ def setValue(section, option, value, validator = None) :
 		try :
 			value = validator(value)
 		except Exception, err1 :
-			raise validators.ValidatorError("Incorrect config option \"%s :: %s = %s\"" % (section, option, value, str(err1)))
+			raise validators.ValidatorError("Incorrect config option \"%s :: %s = %s\": %s" % (section, option, value, str(err1)))
 
 	ConfigDictObject[section][option] = (value, validator)
 

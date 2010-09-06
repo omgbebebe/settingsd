@@ -1,7 +1,6 @@
 import sys
 sys.path.append("..") # path hook
 import settingsd.service
-import settingsd.validators
 
 
 class Hello(settingsd.service.FunctionObject) :
@@ -25,7 +24,7 @@ class Requisites(settingsd.service.Requisites) :
 	@classmethod
 	def options(self) :
 		return [
-			("hello", "hello_string", "Hello, World!", settingsd.validators.string)
+			("hello", "hello_string", "Hello, World!", str)
 		]
 
 class Service(settingsd.service.Service) :

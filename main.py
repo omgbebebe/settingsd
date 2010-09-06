@@ -1,17 +1,19 @@
 import sys
 import os
 
+from settingsd import const
 from settingsd import application
+from settingsd import logger
 
 
 if __name__ == "__main__" :
 	app = application.Application()
 	app.init()
 
-	print >> sys.stderr, "Initialized"
+	logger.message(const.LOG_LEVEL_INFO, "Initialized")
 	try :
 		app.run()
 	except KeyboardInterrupt :
 		app.close()
-	print >> sys.stderr, "\nClosed"
-
+	logger.message(const.LOG_LEVEL_INFO, "Closed")
+	

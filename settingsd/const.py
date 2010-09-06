@@ -3,7 +3,8 @@
 
 MY_NAME = "settingsd"
 
-PLUGINS_DIR = "plugins"
+FUNCTIONS_DIR = "functions"
+ACTIONS_DIR = "actions"
 CONFIGS_DIR = "configs"
 CONFIG_FILE_POSTFIX = ".conf"
 

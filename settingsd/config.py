@@ -1,32 +1,27 @@
 # -*- coding: utf-8 -*-
 
+
 import os
 import ConfigParser
 
 import const
 import config
+import validators
 
 
 #####
 ConfigDictObject = {
 	"service" : {
-		"name" : (const.DEFAULT_CONFIG_SERVICE_NAME, str, None),
-		"path" : (const.DEFAULT_CONFIG_SERVICE_PATH, str, None),
-		"bus_type" : (const.DEFAULT_CONFIG_SERVICE_BUS_TYPE, str, const.CONFIG_VALID_SERVICE_BUS_TYPES_LIST)
+		"name" : (const.DEFAULT_CONFIG_SERVICE_NAME, validators.string),
+		"path" : (const.DEFAULT_CONFIG_SERVICE_PATH, validators.string),
+		"bus_type" : ( const.DEFAULT_CONFIG_SERVICE_BUS_TYPE,
+			( lambda arg : validators.validRange(arg, const.CONFIG_VALID_SERVICE_BUS_TYPES_LIST) ) )
 	}
 }
 
 
-#####
-class ValidatorError(Exception) :
-	pass
-
-class ValueError(Exception) :
-	pass
-
-
 ##### Public #####
-def setValue(section, option, value, validator = None, valid_values_list = None) :
+def setValue(section, option, value, validator = None) :
 	global ConfigDictObject
 
 	if not ConfigDictObject.has_key(section) :
@@ -34,18 +29,14 @@ def setValue(section, option, value, validator = None, valid_values_list = None)
 
 	if ConfigDictObject[section].has_key(option) :
 		validator = ConfigDictObject[section][option][1]
-		valid_values_list = ConfigDictObject[section][option][2]
 
-	if valid_values_list != None and not value in valid_values_list :
-		raise ValueError("Option \"%s::%s = %s\" not in list %s" % (section, option, value, valid_values_list))
 	if validator != None :
 		try :
 			value = validator(value)
 		except Exception, err1 :
-			raise ValidatorError("Incorrect option \"%s::%s = %s\" by validator \"%s\": %s" % (
-				section, option, value, validator.__name__, str(err1) ))
+			raise validators.ValidatorError("Incorrect config option \"%s :: %s = %s\"" % (section, option, value, str(err1)))
 
-	ConfigDictObject[section][option] = (value, validator, valid_values_list)
+	ConfigDictObject[section][option] = (value, validator)
 
 def value(section, option) :
 	return ConfigDictObject[section][option][0]
@@ -53,10 +44,7 @@ def value(section, option) :
 def validator(section, option) :
 	return ConfigDictObject[section][option][1]
 
-def validValues(section, option) :
-	return ConfigDictObject[section][option][2]
-
-def loadConfigFiles() :
+def loadConfig() :
 	for config_files_list_item in os.listdir(const.CONFIGS_DIR) :
 		if not config_files_list_item.endswith(const.CONFIG_FILE_POSTFIX) :
 			continue
@@ -67,6 +55,4 @@ def loadConfigFiles() :
 		for section in config_parser.sections() :
 			for option in config_parser.options(section):
 				setValue(section, option, config_parser.get(section, option))
-
-	print ConfigDictObject
 

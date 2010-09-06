@@ -69,7 +69,7 @@ class Application(object) :
 		config.loadConfig()
 
 	def initBus(self) :
-		if config.value("service", "bus_type") == const.CONFIG_SERVICE_BUS_TYPE_SYSTEM :
+		if config.value("service", "bus_type") == const.SERVICE_BUS_TYPE_SYSTEM :
 			bus = dbus.SystemBus()
 		else :
 			bus = dbus.SessionBus()

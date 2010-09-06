@@ -12,10 +12,10 @@ import validators
 #####
 ConfigDictObject = {
 	"service" : {
-		"name" : (const.DEFAULT_CONFIG_SERVICE_NAME, validators.string),
-		"path" : (const.DEFAULT_CONFIG_SERVICE_PATH, validators.string),
-		"bus_type" : ( const.DEFAULT_CONFIG_SERVICE_BUS_TYPE,
-			( lambda arg : validators.validRange(arg, const.CONFIG_VALID_SERVICE_BUS_TYPES_LIST) ) )
+		"name" : (const.DEFAULT_SERVICE_NAME, str),
+		"path" : (const.DEFAULT_SERVICE_PATH, str),
+		"bus_type" : (const.DEFAULT_SERVICE_BUS_TYPE, ( lambda arg : validators.validRange(arg, const.ALL_SERVICE_BUS_TYPES_LIST) )),
+		"log_level" : (const.DEFAULT_LOG_LEVEL, ( lambda arg : int(validators.validRange(arg, const.ALL_LOG_LEVELS_LIST)) ))
 	}
 }
 

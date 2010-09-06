@@ -7,9 +7,6 @@ class ValidatorError(Exception) :
 
 
 ##### Public #####
-def string(arg) :
-	return str(arg)
-
 def validBool(arg) :
 	arg = str(arg).lower()
 	true_args_list = ("1", "true", "yes")

@@ -87,8 +87,9 @@ def tracer(function) :
 				self.__class__.__name__, function.__name__, str(args_list), str(kwargs_dict),  str(return_value) ))
 		return return_value
 
-	wrapper.__dict__ = function.__dict__
 	wrapper.__name__ = function.__name__
+	wrapper.__dict__ = function.__dict__
+	wrapper.__doc__ = functions.__doc__
 
 	return wrapper
 

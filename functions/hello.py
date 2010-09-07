@@ -22,7 +22,10 @@ class Hello(settingsd.service.FunctionObject) :
 		settingsd.shared.Functions.Hello.removeFromConnection()
 		settingsd.shared.Functions.removeSharedObject("Hello")
 
-class Requisites(settingsd.service.Requisites) :
+class Service(settingsd.service.Service) :
+	def initService(self) :
+		self.Functions.addSharedObject("Hello", Hello(self.serviceName()))
+
 	@classmethod
 	def serviceName(self) :
 		return "hello"
@@ -30,13 +33,6 @@ class Requisites(settingsd.service.Requisites) :
 	@classmethod
 	def options(self) :
 		return [
-			("hello", "hello_string", "Hello, World!", str)
+			(self.serviceName(), "hello_string", "Hello, World!", str)
 		]
-
-class Service(settingsd.service.Service) :
-	def init(self) :
-		self.Functions.addSharedObject("Hello", Hello("hello"))
-
-	def close(self) :
-		pass
 

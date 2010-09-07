@@ -13,17 +13,6 @@ import logger
 
 
 #####
-class Requisites(object) :
-	@classmethod
-	def serviceName(self) :
-		return None
-
-	@classmethod
-	def options(self) :
-		return []
-
-
-#####
 class Service(object) :
 	__metaclass__ = abc.ABCMeta
 
@@ -31,17 +20,26 @@ class Service(object) :
 	Actions = shared.Actions
 
 	@abc.abstractmethod
-	def init(self) :
+	def initService(self) :
 		pass
 
-	def close(self) :
+	def closeService(self) :
 		pass
+
+	@classmethod
+	@abc.abstractmethod
+	def serviceName(self) :
+		pass
+
+	@classmethod
+	def options(self) :
+		return []
 
 
 #####
 class CustomObject(dbus.service.Object) :
 	def __init__(self, object_path) :
-		dbus.service.Object.__init__(self, config.value("runtime", "bus_name"), object_path)
+		dbus.service.Object.__init__(self, config.value(const.RUNTIME_NAME, "bus_name"), object_path)
 
 		self._object_path = object_path
 
@@ -56,18 +54,18 @@ class CustomObject(dbus.service.Object) :
 
 class FunctionObject(CustomObject) :
 	def __init__(self, object_path) :
-		CustomObject.__init__(self, dbus_tools.joinPath(config.value("service", "path"), "functions", object_path))
+		CustomObject.__init__(self, dbus_tools.joinPath(config.value(const.MY_NAME, "service_path"), "functions", object_path))
 
 class ActionObject(CustomObject) :
 	def __init__(self, object_path) :
-		CustomObject.__init__(self, dbus_tools.joinPath(config.value("service", "path"), "actions", object_path))
+		CustomObject.__init__(self, dbus_tools.joinPath(config.value(const.MY_NAME, "service_path"), "actions", object_path))
 
 
 ######
 def tracer(function) :
 	def wrapper(self, *args_list, **kwargs_dict) :
 		return_value = function(self, *args_list, **kwargs_dict)
-		if config.value("service", "log_level") == const.LOG_LEVEL_DEBUG :
+		if config.value(const.MY_NAME, "log_level") == const.LOG_LEVEL_DEBUG :
 			logger.message(logger.DEBUG_MESSAGE, "Called \"%s::%s\" with args (%s, %s) --> %s" % (
 				self.__class__.__name__, function.__name__, str(args_list), str(kwargs_dict),  str(return_value) ))
 		return return_value
@@ -84,11 +82,11 @@ def customMethod(interface_name) :
 
 def functionMethod(interface_name) :
 	def decorator(function) :
-		return customMethod(dbus_tools.joinMethod(config.value("service", "name"), "functions", interface_name))(function)
+		return customMethod(dbus_tools.joinMethod(config.value(const.MY_NAME, "service_name"), "functions", interface_name))(function)
 	return decorator
 
 def actionsMethod(interface_name) :
 	def decorator(function) :
-		return customMethod(dbus_tools.joinMethod(config.value("service", "name"), "actions", interface_name))(function)
+		return customMethod(dbus_tools.joinMethod(config.value(const.MY_NAME, "service_name"), "actions", interface_name))(function)
 	return decorator
 

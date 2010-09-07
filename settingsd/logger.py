@@ -37,7 +37,7 @@ def message(message_type, message) :
 	else :
 		raise UnknownMessageType("Message type \"%d\" not in list %s" % (message_type, ALL_MESSAGES_LIST))
 
-	if log_level <= config.value("service", "log_level") :
+	if log_level <= config.value(const.MY_NAME, "log_level") :
 		text_log_levels_list = (
 			"%s [ Info ]:" % (const.MY_NAME),
 			"%s [ Details ]:" % (const.MY_NAME), 

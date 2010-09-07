@@ -1,6 +1,7 @@
 import sys
 sys.path.append("..") # path hook
 import settingsd.service
+import settingsd.shared
 
 
 class Hello(settingsd.service.FunctionObject) :
@@ -15,6 +16,11 @@ class Hello(settingsd.service.FunctionObject) :
 	@settingsd.service.customMethod("org.liksys.settingsd")
 	def dump(self) :
 		return str(self)
+
+	@settingsd.service.customMethod("org.liksys.settingsd")
+	def die(self) :
+		settingsd.shared.Functions.Hello.removeFromConnection()
+		settingsd.shared.Functions.removeSharedObject("Hello")
 
 class Requisites(settingsd.service.Requisites) :
 	@classmethod

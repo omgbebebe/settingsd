@@ -34,7 +34,6 @@ class Service(object) :
 	def init(self) :
 		pass
 
-	@abc.abstractmethod
 	def close(self) :
 		pass
 
@@ -48,6 +47,12 @@ class CustomObject(dbus.service.Object) :
 
 	def objectPath(self) :
 		self._object_path
+
+	def addToConnection(self, connection = None, path = None) :
+		self.add_to_connection(connection, path)
+
+	def removeFromConnection(self, conneciton = None, path = None) :
+		self.remove_from_connection(conneciton, path)
 
 class FunctionObject(CustomObject) :
 	def __init__(self, object_path) :

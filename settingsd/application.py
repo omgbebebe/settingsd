@@ -11,6 +11,7 @@ import gobject
 import const
 import config
 import validators
+import logger
 
 
 #####
@@ -24,6 +25,15 @@ class Application(object) :
 		self._services_dict = {}
 
 		self._main_loop = gobject.MainLoop()
+
+	def exec_(self) :
+		self.init()
+		logger.message(const.LOG_LEVEL_INFO, "Initialized")
+		try :
+			self.run()
+		except KeyboardInterrupt :
+			self.close()
+		logger.message(const.LOG_LEVEL_INFO, "Closed")
 
 	def init(self) :
 		self.loadModules()

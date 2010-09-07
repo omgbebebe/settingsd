@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-#####
+##### Exceptions #####
 class SharedConflict(Exception) :
 	pass
 
@@ -9,10 +9,13 @@ class SharedNotExist(Exception) :
 	pass
 
 
-#####
+##### Private meta #####
 class SharedMeta(type) :
 	def __init__(cls, name, bases_list, attrs_dict) :
 		cls._shared_objects_dict = {}
+
+
+	### Public ###
 
 	def addSharedObject(cls, shared_object_name, shared_object) :
 		if cls._shared_objects_dict.has_key(shared_object_name) :
@@ -37,6 +40,8 @@ class SharedMeta(type) :
 	def sharedObjectsList(cls) :
 		return cls._shared_objects_dict
 
+
+##### Public classes #####
 class Functions(object) :
 	__metaclass__ = SharedMeta
 

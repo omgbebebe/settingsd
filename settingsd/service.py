@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 import dbus
 import dbus.service
 import dbus.glib
@@ -12,12 +13,12 @@ import dbus_tools
 import logger
 
 
-#####
-class Service(object) :
+##### Private classes #####
+class ServiceInterface(object) :
 	__metaclass__ = abc.ABCMeta
 
-	Functions = shared.Functions
-	Actions = shared.Actions
+
+	### Public ###
 
 	@abc.abstractmethod
 	def initService(self) :
@@ -26,14 +27,26 @@ class Service(object) :
 	def closeService(self) :
 		pass
 
+class ServiceRequisitesInterface(object) :
+	__metaclass__ = abc.ABCMeta
+
+
+	### Public ###
+
 	@classmethod
 	@abc.abstractmethod
 	def serviceName(self) :
 		pass
 
 	@classmethod
-	def options(self) :
+	def optionsList(self) :
 		return []
+
+
+##### Public classes #####
+class Service(ServiceInterface, ServiceRequisitesInterface) :
+	Functions = shared.Functions
+	Actions = shared.Actions
 
 
 #####
@@ -42,6 +55,9 @@ class CustomObject(dbus.service.Object) :
 		dbus.service.Object.__init__(self, config.value(const.RUNTIME_NAME, "bus_name"), object_path)
 
 		self._object_path = object_path
+
+
+	### Public ###
 
 	def objectPath(self) :
 		self._object_path
@@ -52,6 +68,7 @@ class CustomObject(dbus.service.Object) :
 	def removeFromConnection(self, conneciton = None, path = None) :
 		self.remove_from_connection(conneciton, path)
 
+
 class FunctionObject(CustomObject) :
 	def __init__(self, object_path) :
 		CustomObject.__init__(self, dbus_tools.joinPath(config.value(const.MY_NAME, "service_path"), "functions", object_path))
@@ -61,7 +78,7 @@ class ActionObject(CustomObject) :
 		CustomObject.__init__(self, dbus_tools.joinPath(config.value(const.MY_NAME, "service_path"), "actions", object_path))
 
 
-######
+##### Private decorators #####
 def tracer(function) :
 	def wrapper(self, *args_list, **kwargs_dict) :
 		return_value = function(self, *args_list, **kwargs_dict)
@@ -75,6 +92,8 @@ def tracer(function) :
 
 	return wrapper
 
+
+##### Public decorators #####
 def customMethod(interface_name) :
 	def decorator(function) :
 		return tracer(dbus.service.method(interface_name)(function))

@@ -31,7 +31,7 @@ class Service(settingsd.service.Service) :
 		return "hello"
 
 	@classmethod
-	def options(self) :
+	def optionsList(self) :
 		return [
 			(self.serviceName(), "hello_string", "Hello, World!", str)
 		]

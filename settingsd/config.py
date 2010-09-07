@@ -9,7 +9,7 @@ import config
 import validators
 
 
-#####
+##### Private objects #####
 ConfigDictObject = {
 	const.MY_NAME : {
 		"service_name" : (const.DEFAULT_SERVICE_NAME, str),
@@ -20,7 +20,7 @@ ConfigDictObject = {
 }
 
 
-##### Public #####
+##### Public methods #####
 def setValue(section, option, value, validator = None) :
 	global ConfigDictObject
 

@@ -14,7 +14,7 @@ import validators
 import logger
 
 
-#####
+##### Public classes #####
 class Application(object) :
 	def __init__(self) :
 		object.__init__(self)
@@ -26,6 +26,9 @@ class Application(object) :
 
 		self._main_loop = gobject.MainLoop()
 
+
+	### Public ###
+
 	def exec_(self) :
 		self.init()
 		logger.message(const.LOG_LEVEL_INFO, "Initialized")
@@ -34,6 +37,9 @@ class Application(object) :
 		except KeyboardInterrupt :
 			self.close()
 		logger.message(const.LOG_LEVEL_INFO, "Closed")
+
+
+	### Private ###
 
 	def init(self) :
 		self.loadModules()
@@ -65,7 +71,7 @@ class Application(object) :
 
 	def loadConfigs(self) :
 		for service_name in self._services_dict.keys() :
-			service_options_list = list(self._services_dict[service_name]["service_class"].options())
+			service_options_list = list(self._services_dict[service_name]["service_class"].optionsList())
 			service_options_list.append((service_name, "enabled", "no", validators.validBool))
 
 			for service_options_list_item in service_options_list :

@@ -7,7 +7,7 @@ import const
 import config
 
 
-#####
+##### Public constants #####
 ERROR_MESSAGE = 0
 INFO_MESSAGE = 1
 VERBOSE_MESSAGE = 2
@@ -21,12 +21,12 @@ ALL_MESSAGES_LIST = (
 )
 
 
-#####
+##### Exceptions #####
 class UnknownMessageType(Exception) :
 	pass
 
 
-#####
+##### Public methods #####
 def message(message_type, message) :
 	if message_type in (ERROR_MESSAGE, INFO_MESSAGE) :
 		log_level = const.LOG_LEVEL_INFO

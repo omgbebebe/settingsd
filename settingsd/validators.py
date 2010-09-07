@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
-#####
+##### Exceptions #####
 class ValidatorError(Exception) :
 	pass
 
 
-##### Public #####
+##### Public methods #####
 def validBool(arg) :
 	arg = str(arg).lower()
 	true_args_list = ("1", "true", "yes")

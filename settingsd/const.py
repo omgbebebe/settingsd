@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+##### Public constants #####
 MY_NAME = "settingsd"
 RUNTIME_NAME = "runtime"
 

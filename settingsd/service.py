@@ -89,7 +89,7 @@ def tracer(function) :
 
 	wrapper.__name__ = function.__name__
 	wrapper.__dict__ = function.__dict__
-	wrapper.__doc__ = functions.__doc__
+	wrapper.__doc__ = function.__doc__
 
 	return wrapper
 

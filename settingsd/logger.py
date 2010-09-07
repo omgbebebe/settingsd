@@ -2,6 +2,7 @@
 
 
 import sys
+import traceback
 
 import const
 import config
@@ -29,20 +30,24 @@ class UnknownMessageType(Exception) :
 ##### Public methods #####
 def message(message_type, message) :
 	if message_type in (ERROR_MESSAGE, INFO_MESSAGE) :
-		log_level = const.LOG_LEVEL_INFO
+		message_level = const.LOG_LEVEL_INFO
 	elif message_type == VERBOSE_MESSAGE :
-		log_level = const.LOG_LEVEL_VERBOSE
+		message_level = const.LOG_LEVEL_VERBOSE
 	elif message_type == DEBUG_MESSAGE :
-		log_level = const.LOG_LEVEL_DEBUG
+		message_level = const.LOG_LEVEL_DEBUG
 	else :
 		raise UnknownMessageType("Message type \"%d\" not in list %s" % (message_type, ALL_MESSAGES_LIST))
 
-	if log_level <= config.value(const.MY_NAME, "log_level") :
-		text_log_levels_list = (
+	if message_level <= config.value(const.MY_NAME, "log_level") :
+		message_level_prefixes_list = (
+			"%s [ Error ]:" % (const.MY_NAME),
 			"%s [ Info ]:" % (const.MY_NAME),
-			"%s [ Details ]:" % (const.MY_NAME), 
+			"%s [ Details ]:" % (const.MY_NAME),
 			"%s [ Debug ]:" % (const.MY_NAME)
 		)
+		print >> sys.stderr, message_level_prefixes_list[message_type], message
 
-		print >> sys.stderr, text_log_levels_list[log_level], message
+def attachException() :
+	for line in traceback.format_exc().splitlines() :
+		message(ERROR_MESSAGE, line)
 

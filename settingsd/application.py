@@ -31,12 +31,12 @@ class Application(object) :
 
 	def exec_(self) :
 		self.init()
-		logger.message(const.LOG_LEVEL_INFO, "Initialized")
+		logger.message(logger.INFO_MESSAGE, "Initialized")
 		try :
 			self.run()
 		except KeyboardInterrupt :
 			self.close()
-		logger.message(const.LOG_LEVEL_INFO, "Closed")
+		logger.message(logger.INFO_MESSAGE, "Closed")
 
 
 	### Private ###
@@ -60,7 +60,12 @@ class Application(object) :
 
 		for modules_path_list_item in (const.FUNCTIONS_DIR, const.ACTIONS_DIR) :
 			for module_name in [ item[:-3] for item in os.listdir(modules_path_list_item) if item.endswith(".py") ] :
-				self._modules_list.append(__import__(module_name, globals(), locals(), [""]))
+				try :
+					self._modules_list.append(__import__(module_name, globals(), locals(), [""]))
+				except Exception :
+					logger.message(logger.ERROR_MESSAGE, "Import error on module \"%s\"" % (module_name))
+					logger.attachException()
+					continue
 				self._services_dict[self._modules_list[-1].Service.serviceName()] = {
 					"service_class" : self._modules_list[-1].Service,
 					"service" : None

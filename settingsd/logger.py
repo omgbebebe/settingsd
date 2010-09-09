@@ -3,20 +3,25 @@
 
 import sys
 import traceback
+import syslog
 
 import const
 import config
 
 
 ##### Public constants #####
-ERROR_MESSAGE = 0
-INFO_MESSAGE = 1
-VERBOSE_MESSAGE = 2
-DEBUG_MESSAGE = 3
+ERROR_MESSAGE = (0, syslog.LOG_ERR, const.LOG_LEVEL_INFO)
+WARNING_MESSAGE = (1, syslog.LOG_WARNING, const.LOG_LEVEL_INFO)
+NOTICE_MESSAGE = (2, syslog.LOG_NOTICE, const.LOG_LEVEL_INFO)
+INFO_MESSAGE = (3, syslog.LOG_INFO, const.LOG_LEVEL_INFO)
+VERBOSE_MESSAGE = (4, syslog.LOG_INFO, const.LOG_LEVEL_VERBOSE)
+DEBUG_MESSAGE = (5, syslog.LOG_INFO, const.LOG_LEVEL_DEBUG) # syslog.LOG_DEBUG
 
 ALL_MESSAGES_LIST = (
 	ERROR_MESSAGE,
 	INFO_MESSAGE,
+	NOTICE_MESSAGE,
+	WARNING_MESSAGE,
 	VERBOSE_MESSAGE,
 	DEBUG_MESSAGE
 )
@@ -29,25 +34,19 @@ class UnknownMessageType(Exception) :
 
 ##### Public methods #####
 def message(message_type, message) :
-	if message_type in (ERROR_MESSAGE, INFO_MESSAGE) :
-		message_level = const.LOG_LEVEL_INFO
-	elif message_type == VERBOSE_MESSAGE :
-		message_level = const.LOG_LEVEL_VERBOSE
-	elif message_type == DEBUG_MESSAGE :
-		message_level = const.LOG_LEVEL_DEBUG
-	else :
+	if not message_type in ALL_MESSAGES_LIST :
 		raise UnknownMessageType("Message type \"%d\" not in list %s" % (message_type, ALL_MESSAGES_LIST))
 
-	if message_level <= config.value(const.MY_NAME, "log_level") :
-		message_level_prefixes_list = (
-			"%s [ Error ]:" % (const.MY_NAME),
-			"%s [ Info ]:" % (const.MY_NAME),
-			"%s [ Details ]:" % (const.MY_NAME),
-			"%s [ Debug ]:" % (const.MY_NAME)
-		)
-		print >> sys.stderr, message_level_prefixes_list[message_type], message
+	if message_type[2] <= config.value(const.MY_NAME, "log_level") :
+		message_type_texts_list = ("Error", "Warning", "Notice", "Info", "Details", "Debug")
+		message = "[ %s ]: %s" % (message_type_texts_list[message_type[0]], message)
 
-def attachException() :
+		print >> sys.stderr, const.MY_NAME, message
+
+		if config.value(const.RUNTIME, "use_syslog") :
+			syslog.syslog(message_type[1], message)
+
+def attachException(message_type = ERROR_MESSAGE) :
 	for line in traceback.format_exc().splitlines() :
-		message(ERROR_MESSAGE, line)
+		message(message_type, line)
 

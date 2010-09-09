@@ -16,6 +16,10 @@ ConfigDictObject = {
 		"service_path" : (const.DEFAULT_SERVICE_PATH, str),
 		"bus_type" : (const.DEFAULT_BUS_TYPE, ( lambda arg : validators.validRange(arg, const.ALL_BUS_TYPES_LIST) )),
 		"log_level" : (const.DEFAULT_LOG_LEVEL, ( lambda arg : validators.validRange(int(arg), const.ALL_LOG_LEVELS_LIST) ))
+	},
+	const.RUNTIME_NAME : {
+		"bus_name" : None,
+		"use_syslog" : False
 	}
 }
 
@@ -53,6 +57,9 @@ def loadConfig() :
 		config_parser.read(os.path.join(const.CONFIGS_DIR, config_files_list_item))
 
 		for section in config_parser.sections() :
+			if section == const.RUNTIME_NAME :
+				continue
+
 			for option in config_parser.options(section):
 				setValue(section, option, config_parser.get(section, option))
 

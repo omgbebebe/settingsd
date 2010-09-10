@@ -6,11 +6,13 @@ import signal
 import errno
 import resource
 
+import const
 import logger
 
 
 ##### Private methods #####
-def pidOfPythonProc(proc_name, uid = 0) :
+def pidsListOfPythonProc(proc_name, without_options_list = [], uid = 0) :
+	proc_pids_list = []
 	for proc_list_item in os.listdir("/proc") :
 		try :
 			proc_pid = int(proc_list_item)
@@ -18,18 +20,23 @@ def pidOfPythonProc(proc_name, uid = 0) :
 			continue
 
 		cmdline_file_path = os.path.join("/proc", proc_list_item, "cmdline")
-		if os.stat(cmdline_file_path).st_mode != uid :
+		if os.stat(cmdline_file_path).st_uid != uid :
 			continue
 
 		cmdline_file = open(cmdline_file_path)
 		cmdline_list = cmdline_file.read().split("\0")
 
 		if len(cmdline_list) >= 2 and os.path.basename(cmdline_list[1]) == proc_name :
-			cmdline_file.close()
-			return proc_pid
+			ignore_flag = False
+			for without_options_list_item in without_options_list :
+				if without_options_list_item in cmdline_list :
+					ignore_flag = True
+					break
+			if not ignore_flag :
+				proc_pids_list.append(proc_pid)
 
 		cmdline_file.close()
-	return None
+	return proc_pids_list
 
 def maxFd() :
 	max_fd = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
@@ -57,14 +64,13 @@ def closeFd(fd, retries_count = 5) :
 
 
 ##### Public methods #####
-def startDaemon(init_function, close_function, work_dir_path = None, umask = None) :
+def startDaemon(function, work_dir_path = None, umask = None) :
 	pid = os.fork()
 	if pid > 0 :
 		try :
 			os.waitpid(pid, 0)
 		except OSError :
 			pass
-		os._exit(0)
 	elif pid == 0 :
 		logger.verbose("First fork() to %d as session lead" % (os.getpid()))
 
@@ -88,25 +94,18 @@ def startDaemon(init_function, close_function, work_dir_path = None, umask = Non
 			for fd in (0, 1, 2) :
 				os.dup2(null_fd, fd)
 
-			try :
-				init_function()
-			except (SystemExit, KeyboardInterrupt) :
-				close_function()
-			except :
-				try :
-					close_function()
-				except :
-					pass
-				os._exit(1) # FIXME
+			function()
 		else :
-			os._exit(1) # FIXME
+			os._exit(1)
 	else :
-		os._exit(1) # FIXME
+		os._exit(1)
 
 def killDaemon() :
-	pid = pidOfPythonProc("main.py", os.getuid()) # FIXME
-	if pid != None :
-		os.kill(pid, signal.SIGTERM)
+	pids_list = pidsListOfPythonProc("main.py", ["-k", "--kill"], os.getuid()) # FIXME
+	if len(pids_list) != 0 :
+		for pids_list_item in pids_list :
+			os.kill(pids_list_item, signal.SIGTERM)
+			logger.info("SIGTERM has been sended to \"%s\" with pid \"%d\"" % (const.MY_NAME, pids_list_item))
 	else :
 		logger.error("Cannot determine a daemon process of \"%s\"" % ("main.py")) # FIXME
 

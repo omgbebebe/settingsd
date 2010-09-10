@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 import signal
 import syslog
 
@@ -8,7 +9,7 @@ import const
 import config
 import logger
 import application
-#import daemon # TODO
+import daemon
 
 
 ##### Public classes #####
@@ -62,9 +63,7 @@ class Startup(object) :
 		if self._log_level != None :
 			config.setValue(config.APPLICATION_SECTION, "log_level", self._log_level)
 
-	###
-
-	def runInteractive(self) :
+	def load(self) :
 		try :
 			self._app.loadModules()
 			self._app.loadServicesConfigs()
@@ -76,26 +75,37 @@ class Startup(object) :
 			logger.attachException()
 			sys.exit(1)
 
+	###
+
+	def runInteractive(self) :
+		self.load()
+
+		signal.signal(signal.SIGTERM, self.quit)
+		signal.signal(signal.SIGQUIT, self.quit)
+
 		try :
 			self._app.runLoop()
 		except (SystemExit, KeyboardInterrupt) :
-			try :
-				self._app.closeServices()
-			except :
-				logger.error("Critical error on services closing, abort all processes and go boom")
-			self._app.quitLoop()
-			logger.info("Closed")
+			self.quit()
 		except :
 			logger.error("Runtime error, trying to close services")
 			logger.attachException()
-			try :
-				self._app.closeServices()
-			except :
-				logger.error("Critical error on services closing, abort all processes and go boom")
-			self._app.quitLoop()
-			logger.error("Closed")
+			self.quit()
 			sys.exit(1)
 
 	def runDaemon(self) :
-		print "TODO" # TODO
+		work_dir_path = ( "/" if os.getuid() == 0 else None )
+		umask = ( 077 if os.getuid() == 0 else None )
+		daemon.startDaemon(self.runInteractive, work_dir_path, umask)
+
+
+	### Handlers ###
+
+	def quit(self, signum = None, frame = None) :
+		if signum != None :
+			logger.info("Recieved signal %d, closing..." % (signum))
+
+		self._app.closeServices()
+		self._app.quitLoop()
+		logger.info("Closed")
 

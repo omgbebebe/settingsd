@@ -37,6 +37,8 @@ class Application(object) :
 		self._main_loop.quit()
 		logger.verbose("GObject loop closed")
 
+	###
+
 	def loadModules(self) :
 		sys.path.append(const.FUNCTIONS_DIR)
 		sys.path.append(const.ACTIONS_DIR)
@@ -60,6 +62,8 @@ class Application(object) :
 		sys.path.remove(const.FUNCTIONS_DIR)
 		sys.path.remove(const.ACTIONS_DIR)
 
+	###
+
 	def loadApplicationConfigs(self) :
 		config.loadConfigs(only_sections_list = (config.APPLICATION_SECTION,))
 
@@ -77,6 +81,8 @@ class Application(object) :
 
 		config.loadConfigs(exclude_sections_list = (config.APPLICATION_SECTION,))
 
+	###
+
 	def initBus(self) :
 		bus_type = config.value(config.APPLICATION_SECTION, "bus_type")
 		service_name = config.value(config.APPLICATION_SECTION, "service_name")
@@ -90,6 +96,8 @@ class Application(object) :
 			raise
 
 		logger.verbose("Connected to D-Bus \"%s\" as \"%s\"" % (bus_type, service_name))
+
+	###
 
 	def initServices(self) :
 		for service_name in self._services_dict.keys() :

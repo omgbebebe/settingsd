@@ -32,6 +32,21 @@ class UnknownMessageType(Exception) :
 	pass
 
 
+##### Private methods #####
+def log(message_type, message) :
+	if not message_type in ALL_MESSAGES_LIST :
+		raise UnknownMessageType("Message type \"%d\" not in list %s" % (message_type, ALL_MESSAGES_LIST))
+
+	if message_type[2] <= config.value(config.APPLICATION_SECTION, "log_level") :
+		message_type_texts_list = ("Error", "Warning", "Notice", "Info", "Details", "Debug")
+		message = "[ %s ]: %s" % (message_type_texts_list[message_type[0]], message)
+
+		print >> sys.stderr, const.MY_NAME, message
+
+		if config.value(config.RUNTIME_SECTION, "use_syslog") :
+			syslog.syslog(message_type[1], message)
+
+
 ##### Public methods #####
 def error(message) :
 	log(ERROR_MESSAGE, message)
@@ -54,19 +69,4 @@ def debug(message) :
 def attachException(message_type = ERROR_MESSAGE) :
 	for line in traceback.format_exc().splitlines() :
 		log(message_type, line)
-
-
-##### Private methods #####
-def log(message_type, message) :
-	if not message_type in ALL_MESSAGES_LIST :
-		raise UnknownMessageType("Message type \"%d\" not in list %s" % (message_type, ALL_MESSAGES_LIST))
-
-	if message_type[2] <= config.value(config.APPLICATION_SECTION, "log_level") :
-		message_type_texts_list = ("Error", "Warning", "Notice", "Info", "Details", "Debug")
-		message = "[ %s ]: %s" % (message_type_texts_list[message_type[0]], message)
-
-		print >> sys.stderr, const.MY_NAME, message
-
-		if config.value(config.RUNTIME_SECTION, "use_syslog") :
-			syslog.syslog(message_type[1], message)
 

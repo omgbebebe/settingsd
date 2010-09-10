@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-##### Public methods #####
-def joinPath(first, *others_list) :
-	return joinItems("/", first, *others_list)
-
-def joinMethod(first, *others_list) :
-	return joinItems(".", first, *others_list)
-
-
 ##### Private methods #####
 def joinItems(separator, first, *others_list) :
 	for others_list_item in others_list :
@@ -17,4 +9,12 @@ def joinItems(separator, first, *others_list) :
 		else :
 			first += separator + others_list_item
 	return first
+
+
+##### Public methods #####
+def joinPath(first, *others_list) :
+	return joinItems("/", first, *others_list)
+
+def joinMethod(first, *others_list) :
+	return joinItems(".", first, *others_list)
 

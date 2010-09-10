@@ -55,7 +55,7 @@ class Startup(object) :
 		except :
 			logger.error("Initialization error")
 			logger.attachException()
-			sys.exit(1)
+			raise
 
 		if self._bus_type != None :
 			config.setValue(config.APPLICATION_SECTION, "bus_type", self._bus_type)
@@ -63,7 +63,7 @@ class Startup(object) :
 		if self._log_level != None :
 			config.setValue(config.APPLICATION_SECTION, "log_level", self._log_level)
 
-	def load(self) :
+	def runInteractive(self) :
 		try :
 			self._app.loadModules()
 			self._app.loadServicesConfigs()
@@ -73,15 +73,14 @@ class Startup(object) :
 		except :
 			logger.error("Initialization error")
 			logger.attachException()
-			sys.exit(1)
+			raise
 
-	###
-
-	def runInteractive(self) :
-		self.load()
-
-		signal.signal(signal.SIGTERM, self.quit)
-		signal.signal(signal.SIGQUIT, self.quit)
+		try :
+			signal.signal(signal.SIGTERM, self.quit)
+			signal.signal(signal.SIGQUIT, self.quit)
+		except :
+			logger.error("signal() error")
+			logger.attachException()
 
 		try :
 			self._app.runLoop()
@@ -91,7 +90,7 @@ class Startup(object) :
 			logger.error("Runtime error, trying to close services")
 			logger.attachException()
 			self.quit()
-			sys.exit(1)
+			raise
 
 	def runDaemon(self) :
 		work_dir_path = ( "/" if os.getuid() == 0 else None )

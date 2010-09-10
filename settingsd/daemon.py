@@ -95,10 +95,6 @@ def startDaemon(function, work_dir_path = None, umask = None) :
 				os.dup2(null_fd, fd)
 
 			function()
-		else :
-			os._exit(1)
-	else :
-		os._exit(1)
 
 def killDaemon() :
 	pids_list = pidsListOfPythonProc("main.py", ["-k", "--kill"], os.getuid()) # FIXME

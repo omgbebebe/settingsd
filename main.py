@@ -6,10 +6,8 @@ import syslog
 import getopt
 
 from settingsd import const
-from settingsd import config
-from settingsd import logger
 from settingsd import validators
-from settingsd import application
+from settingsd import startup
 #from settingsd import daemon # TODO
 
 
@@ -80,54 +78,6 @@ if __name__ == "__main__" :
 
 	#####
 
-	if not daemon_mode_flag :
-		app = application.Application()
-
-		try :
-			app.loadApplicationConfigs()
-		except :
-			logger.error("Initialization error")
-			logger.attachException()
-			sys.exit(1)
-
-		if bus_type != None :
-			config.setValue(config.APPLICATION_SECTION, "bus_type", bus_type)
-		if log_level != None :
-			config.setValue(config.APPLICATION_SECTION, "log_level", log_level)
-		if use_syslog_flag :
-			syslog.openlog(config.APPLICATION_SECTION, syslog.LOG_PID, syslog.LOG_USER)
-			config.setValue(config.RUNTIME_SECTION, "use_syslog", True)
-
-		try :
-			app.loadModules()
-			app.loadServicesConfigs()
-			app.initBus()
-			app.initServices()
-			logger.info("Initialized")
-		except :
-			logger.error("Initialization error")
-			logger.attachException()
-			sys.exit(1)
-
-		try :
-			app.runLoop()
-		except (SystemExit, KeyboardInterrupt) :
-			try :
-				app.closeServices()
-			except :
-				logger.error("Critical error on services closing, abort all processes and go boom")
-			app.quitLoop()
-			logger.info("Closed")
-		except :
-			logger.error("Runtime error, trying to close services")
-			logger.attachException()
-			try :
-				app.closeServices()
-			except :
-				logger.error("Critical error on services closing, abort all processes and go boom")
-			app.quitLoop()
-			logger.info("Closed")
-			sys.exit(1)
-	else :
-		print "TODO"
+	startup_proc = startup.Startup(log_level, use_syslog_flag, bus_type, daemon_mode_flag)
+	startup_proc.run()
 

@@ -61,7 +61,7 @@ class Application(object) :
 		sys.path.remove(const.ACTIONS_DIR)
 
 	def loadApplicationConfigs(self) :
-		config.loadConfigs(only_sections_list = (const.MY_NAME,))
+		config.loadConfigs(only_sections_list = (config.APPLICATION_SECTION,))
 
 	def loadServicesConfigs(self) :
 		for service_name in self._services_dict.keys() :
@@ -75,14 +75,14 @@ class Application(object) :
 					logger.error("Error on set options tuple %s" % (str(service_options_list_item)))
 					logger.attachException()
 
-		config.loadConfigs(exclude_sections_list = (const.MY_NAME,))
+		config.loadConfigs(exclude_sections_list = (config.APPLICATION_SECTION,))
 
 	def initBus(self) :
-		bus_type = config.value(const.MY_NAME, "bus_type")
-		service_name = config.value(const.MY_NAME, "service_name")
+		bus_type = config.value(config.APPLICATION_SECTION, "bus_type")
+		service_name = config.value(config.APPLICATION_SECTION, "service_name")
 
 		try :
-			config.setValue(const.RUNTIME_NAME, "bus_name", dbus.service.BusName(service_name,
+			config.setValue(config.RUNTIME_SECTION, "bus_name", dbus.service.BusName(service_name,
 				( dbus.SystemBus() if bus_type == const.BUS_TYPE_SYSTEM else dbus.SessionBus() )))
 		except :
 			logger.error("Could not connect to D-Bus \"%s\"" % (bus_type))

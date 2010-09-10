@@ -87,15 +87,16 @@ if __name__ == "__main__" :
 			app.loadApplicationConfigs()
 		except :
 			logger.error("Initialization error")
+			logger.attachException()
 			sys.exit(1)
 
 		if bus_type != None :
-			config.setValue(const.MY_NAME, "bus_type", bus_type)
+			config.setValue(config.APPLICATION_SECTION, "bus_type", bus_type)
 		if log_level != None :
-			config.setValue(const.MY_NAME, "log_level", log_level)
+			config.setValue(config.APPLICATION_SECTION, "log_level", log_level)
 		if use_syslog_flag :
-			syslog.openlog(const.MY_NAME, syslog.LOG_PID, syslog.LOG_USER)
-			config.setValue(const.RUNTIME_NAME, "use_syslog", True)
+			syslog.openlog(config.APPLICATION_SECTION, syslog.LOG_PID, syslog.LOG_USER)
+			config.setValue(config.RUNTIME_SECTION, "use_syslog", True)
 
 		try :
 			app.loadModules()
@@ -105,6 +106,7 @@ if __name__ == "__main__" :
 			logger.info("Initialized")
 		except :
 			logger.error("Initialization error")
+			logger.attachException()
 			sys.exit(1)
 
 		try :

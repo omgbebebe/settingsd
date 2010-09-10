@@ -52,7 +52,7 @@ class Service(ServiceInterface, ServiceRequisitesInterface) :
 #####
 class CustomObject(dbus.service.Object) :
 	def __init__(self, object_path) :
-		dbus.service.Object.__init__(self, config.value(const.RUNTIME_NAME, "bus_name"), object_path)
+		dbus.service.Object.__init__(self, config.value(config.RUNTIME_SECTION, "bus_name"), object_path)
 
 		self._object_path = object_path
 
@@ -71,18 +71,20 @@ class CustomObject(dbus.service.Object) :
 
 class FunctionObject(CustomObject) :
 	def __init__(self, object_path) :
-		CustomObject.__init__(self, dbus_tools.joinPath(config.value(const.MY_NAME, "service_path"), "functions", object_path))
+		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION,
+			"service_path"), "functions", object_path))
 
 class ActionObject(CustomObject) :
 	def __init__(self, object_path) :
-		CustomObject.__init__(self, dbus_tools.joinPath(config.value(const.MY_NAME, "service_path"), "actions", object_path))
+		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION,
+			"service_path"), "actions", object_path))
 
 
 ##### Private decorators #####
 def tracer(function) :
 	def wrapper(self, *args_list, **kwargs_dict) :
 		return_value = function(self, *args_list, **kwargs_dict)
-		if config.value(const.MY_NAME, "log_level") == const.LOG_LEVEL_DEBUG :
+		if config.value(config.APPLICATION_SECTION, "log_level") == const.LOG_LEVEL_DEBUG :
 			logger.debug("Called \"%s::%s\" with args (%s, %s) --> %s" % (self.__class__.__name__, function.__name__,
 				str(args_list), str(kwargs_dict),  str(return_value) ))
 		return return_value
@@ -102,11 +104,13 @@ def customMethod(interface_name) :
 
 def functionMethod(interface_name) :
 	def decorator(function) :
-		return customMethod(dbus_tools.joinMethod(config.value(const.MY_NAME, "service_name"), "functions", interface_name))(function)
+		return customMethod(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION,
+			"service_name"), "functions", interface_name))(function)
 	return decorator
 
 def actionsMethod(interface_name) :
 	def decorator(function) :
-		return customMethod(dbus_tools.joinMethod(config.value(const.MY_NAME, "service_name"), "actions", interface_name))(function)
+		return customMethod(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION,
+			"service_name"), "actions", interface_name))(function)
 	return decorator
 

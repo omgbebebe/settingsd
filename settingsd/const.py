@@ -3,7 +3,6 @@
 
 ##### Public constants #####
 MY_NAME = "settingsd"
-RUNTIME_NAME = "runtime"
 
 VERSION = "0.1"
 

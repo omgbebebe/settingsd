@@ -8,7 +8,7 @@ import getopt
 from settingsd import const
 from settingsd import validators
 from settingsd import startup
-#from settingsd import daemon # TODO
+from settingsd import daemon
 
 
 ##### Private methods #####
@@ -57,6 +57,7 @@ if __name__ == "__main__" :
 					use_syslog_flag = validators.validBool(args_list_item)
 				except Exception, err1 :
 					print "Incorrect option \"%s\": %s" % (opts_list_item, str(err1))
+					sys.exit(1)
 
 			elif opts_list_item in ("--bus-type") :
 				try :
@@ -69,7 +70,12 @@ if __name__ == "__main__" :
 				daemon_mode_flag = True
 
 			elif opts_list_item in ("-k", "--kill") :
-				pass # TODO
+				try :
+					daemon.killDaemon()
+					sys.exit(0)
+				except Exception, err1 :
+					print "Daemon kill error: %s" % (str(err1))
+					sys.exit(1)
 
 			else :
 				print "Unknown option \"%s\"" % (opts_list_item)

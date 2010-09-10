@@ -83,8 +83,8 @@ def tracer(function) :
 	def wrapper(self, *args_list, **kwargs_dict) :
 		return_value = function(self, *args_list, **kwargs_dict)
 		if config.value(const.MY_NAME, "log_level") == const.LOG_LEVEL_DEBUG :
-			logger.message(logger.DEBUG_MESSAGE, "Called \"%s::%s\" with args (%s, %s) --> %s" % (
-				self.__class__.__name__, function.__name__, str(args_list), str(kwargs_dict),  str(return_value) ))
+			logger.debug("Called \"%s::%s\" with args (%s, %s) --> %s" % (self.__class__.__name__, function.__name__,
+				str(args_list), str(kwargs_dict),  str(return_value) ))
 		return return_value
 
 	wrapper.__name__ = function.__name__

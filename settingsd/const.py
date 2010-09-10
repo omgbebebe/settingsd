@@ -5,6 +5,8 @@
 MY_NAME = "settingsd"
 RUNTIME_NAME = "runtime"
 
+VERSION = "0.1"
+
 FUNCTIONS_DIR = "functions"
 ACTIONS_DIR = "actions"
 CONFIGS_DIR = "configs"

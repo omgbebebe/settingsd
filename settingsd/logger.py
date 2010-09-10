@@ -33,7 +33,31 @@ class UnknownMessageType(Exception) :
 
 
 ##### Public methods #####
-def message(message_type, message) :
+def error(message) :
+	log(ERROR_MESSAGE, message)
+
+def info(message) :
+	log(INFO_MESSAGE, message)
+
+def notice(message) :
+	log(NOTICE_MESSAGE, message)
+
+def warning(message) :
+	log(WARNING_MESSAGE, message)
+
+def verbose(message) :
+	log(VERBOSE_MESSAGE, message)
+
+def debug(message) :
+	log(DEBUG_MESSAGE, message)
+
+def attachException(message_type = ERROR_MESSAGE) :
+	for line in traceback.format_exc().splitlines() :
+		log(message_type, line)
+
+
+##### Private methods #####
+def log(message_type, message) :
 	if not message_type in ALL_MESSAGES_LIST :
 		raise UnknownMessageType("Message type \"%d\" not in list %s" % (message_type, ALL_MESSAGES_LIST))
 
@@ -43,10 +67,6 @@ def message(message_type, message) :
 
 		print >> sys.stderr, const.MY_NAME, message
 
-		if config.value(const.RUNTIME, "use_syslog") :
+		if config.value(const.RUNTIME_NAME, "use_syslog") :
 			syslog.syslog(message_type[1], message)
-
-def attachException(message_type = ERROR_MESSAGE) :
-	for line in traceback.format_exc().splitlines() :
-		message(message_type, line)
 

@@ -41,9 +41,11 @@ if __name__ == "__main__" :
 		for (opts_list_item, args_list_item) in opts_list :
 			if opts_list_item in ("-h", "--help") :
 				help()
+				sys.exit(0)
 
 			elif opts_list_item in ("-v", "--version") :
 				version()
+				sys.exit(0)
 
 			elif opts_list_item in ("--log-level") :
 				try :

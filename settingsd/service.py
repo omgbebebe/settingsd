@@ -104,13 +104,32 @@ def customMethod(interface_name) :
 
 def functionMethod(interface_name) :
 	def decorator(function) :
-		return customMethod(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION,
-			"service_name"), "functions", interface_name))(function)
+		return customMethod(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
+			"functions", interface_name))(function)
 	return decorator
 
 def actionsMethod(interface_name) :
 	def decorator(function) :
-		return customMethod(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION,
-			"service_name"), "actions", interface_name))(function)
+		return customMethod(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
+			"actions", interface_name))(function)
+	return decorator
+
+###
+
+def customSignal(interface_name) :
+	def decorator(function) :
+		return dbus.service.signal(interface_name)(function)
+	return decorator
+
+def functionSignal(interface_name) :
+	def decorator(function) :
+		return customSignal(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
+			 "functions", interface_name))(function)
+	return decorator
+
+def actionsSignal(interface_name) :
+	def decorator(function) :
+		return customSignal(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
+			"actions", interface_name))(function)
 	return decorator
 

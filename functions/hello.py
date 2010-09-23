@@ -22,6 +22,17 @@ class Hello(settingsd.service.FunctionObject) :
 		settingsd.shared.Functions.Hello.removeFromConnection()
 		settingsd.shared.Functions.removeSharedObject("Hello")
 
+	###
+
+	@settingsd.service.functionMethod("dbus")
+	def dbusEcho(self, text) :
+		self.dbusEchoSignal(text)
+
+	@settingsd.service.functionSignal("dbus")
+	def dbusEchoSignal(self, text) :
+		pass
+
+
 class Service(settingsd.service.Service) :
 	def initService(self) :
 		self.Functions.addSharedObject("Hello", Hello(self.serviceName()))

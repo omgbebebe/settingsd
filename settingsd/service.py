@@ -90,8 +90,13 @@ def tracer(function, statics_list=[0]) :
 				self._object_path, dbus_tools.joinMethod(function._dbus_interface, function.__name__) ))
 
 			statics_list[0] += 1
-			return_value = function(self, *args_list, **kwargs_dict)
-			statics_list[0] -= 1
+			try :
+				return_value = function(self, *args_list, **kwargs_dict)
+			except :
+				logger.attachException()
+			finally :
+				statics_list[0] -= 1
+				raise
 
 			logger.debug("%s... executed as %s::%s(%s, %s) --> %s" % ( "    "*statics_list[0],
 				self.__class__.__name__, function.__name__, str(args_list), str(kwargs_dict),  str(return_value) ))

@@ -47,12 +47,12 @@ def log(message_type, message) :
 			( "\033[36mDetails\033[0m" if use_colors_flag else "Details" ),
 			"Debug"
 		)
-		message = "[ %s ]: %s" % (message_type_texts_list[message_type[0]], message)
 
-		print >> sys.stderr, const.MY_NAME, message
-
-		if config.value(config.RUNTIME_SECTION, "use_syslog") :
-			syslog.syslog(message_type[1], message)
+		for message_list_item in message.split("\n") :
+			message_list_item = "[ %s ]: %s" % (message_type_texts_list[message_type[0]], message_list_item)
+			print >> sys.stderr, const.MY_NAME, message_list_item
+			if config.value(config.RUNTIME_SECTION, "use_syslog") :
+				syslog.syslog(message_type[1], message_list_item)
 
 
 ##### Public methods #####

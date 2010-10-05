@@ -5,7 +5,6 @@ import os
 import ConfigParser
 
 import const
-import config
 import validators
 
 

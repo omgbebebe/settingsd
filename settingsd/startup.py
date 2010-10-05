@@ -63,6 +63,11 @@ class Startup(object) :
 		if self._log_level != None :
 			config.setValue(config.APPLICATION_SECTION, "log_level", self._log_level)
 
+		config.setValue(config.RUNTIME_SECTION, "application", self._app)
+		config.setValue(config.RUNTIME_SECTION, "startup", self)
+
+	###
+
 	def runInteractive(self) :
 		try :
 			self._app.loadModules()
@@ -97,8 +102,7 @@ class Startup(object) :
 		umask = ( 077 if os.getuid() == 0 else None )
 		daemon.startDaemon(self.runInteractive, work_dir_path, umask)
 
-
-	### Handlers ###
+	###
 
 	def quit(self, signum = None, frame = None) :
 		if signum != None :

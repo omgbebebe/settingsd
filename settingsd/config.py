@@ -28,6 +28,8 @@ ConfigDictObject = {
 		"log_use_colors" :(const.DEFAULT_LOG_USE_COLORS_FLAG, validators.validBool)
 	},
 	RUNTIME_SECTION : {
+		"application" : (None, None),
+		"startup" : (None, None),
 		"bus_name" : (None, None),
 		"use_syslog" : (False, None)
 	}

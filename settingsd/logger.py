@@ -38,7 +38,15 @@ def log(message_type, message) :
 		raise UnknownMessageType("Message type \"%d\" not in list %s" % (message_type, ALL_MESSAGES_LIST))
 
 	if message_type[2] <= config.value(config.APPLICATION_SECTION, "log_level") :
-		message_type_texts_list = ("Error", "Warning", "Notice", "Info", "Details", "Debug")
+		use_colors_flag = sys.stderr.isatty() and config.value(config.APPLICATION_SECTION, "log_use_colors")
+		message_type_texts_list = (
+			( "\033[31mError\033[0m" if use_colors_flag else "Error" ),
+			( "\033[33mWarning\033[0m" if use_colors_flag else "Warning" ),
+			( "\033[32mNotice\033[0m" if use_colors_flag else "Notice" ),
+			( "\033[32mInfo\033[0m" if use_colors_flag else "Info" ),
+			( "\033[36mDetails\033[0m" if use_colors_flag else "Details" ),
+			"Debug"
+		)
 		message = "[ %s ]: %s" % (message_type_texts_list[message_type[0]], message)
 
 		print >> sys.stderr, const.MY_NAME, message

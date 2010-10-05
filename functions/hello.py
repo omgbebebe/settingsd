@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+
+
 import sys
-sys.path.append("..") # path hook
+
 import settingsd.service
 import settingsd.shared
 

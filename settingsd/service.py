@@ -77,6 +77,8 @@ class CustomObject(dbus.service.Object) :
 	def service(self) :
 		return self._service
 
+	###
+
 	def addToConnection(self, connection = None, path = None) :
 		self.add_to_connection(connection, path)
 
@@ -86,11 +88,11 @@ class CustomObject(dbus.service.Object) :
 
 class FunctionObject(CustomObject) :
 	def __init__(self, object_path, shared_path, service) :
-		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION,
-			"service_path"), "functions", object_path), shared_path, service)
+		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION, "service_path"),
+			"functions", object_path), shared_path, service)
 
 class ActionObject(CustomObject) :
 	def __init__(self, object_path, shared_path, service) :
-		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION,
-			"service_path"), "actions", object_path), shared_path, service)
+		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION, "service_path"),
+			"actions", object_path), shared_path, service)
 

@@ -30,7 +30,7 @@ class Service(service.Service) :
 	### Public ###
 
 	def initService(self) :
-		shared.Functions.addSharedObject("Settingsd", Settingsd(const.DEFAULT_SERVICE_PATH))
+		shared.Functions.addSharedObject("Settingsd", Settingsd(const.DEFAULT_SERVICE_PATH, "Settingsd", self))
 
 	@classmethod
 	def serviceName(self) :

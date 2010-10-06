@@ -3,120 +3,115 @@
 
 import sys
 import os
-import dbus
-import dbus.service
-import dbus.glib
-import gobject
+import signal
+import syslog
 
 import const
 import config
-import validators
 import logger
+import server
+import daemon
 
 
 ##### Public classes #####
 class Application(object) :
-	def __init__(self) :
+	def __init__(self, log_level, use_syslog_flag, bus_type, daemon_mode_flag) :
 		object.__init__(self)
 
 		#####
 
-		self._modules_list = []
-		self._services_dict = {}
+		self._log_level = log_level
+		self._use_syslog_flag = use_syslog_flag
+		self._bus_type = bus_type
+		self._daemon_mode_flag = daemon_mode_flag
 
-		self._main_loop = gobject.MainLoop()
+		#####
+
+		self._server = server.Server()
 
 
 	### Public ###
 
-	def runLoop(self) :
-		logger.verbose("Running GObject loop...")
-		self._main_loop.run()
+	def run(self) :
+		self.prepare()
+		if self._daemon_mode_flag :
+			self.runDaemon()
+		else :
+			self.runInteractive()
 
-	def quitLoop(self) :
-		self._main_loop.quit()
-		logger.verbose("GObject loop closed")
-
-	###
-
-	def loadModules(self) :
-		sys.path.append(const.FUNCTIONS_DIR)
-		sys.path.append(const.ACTIONS_DIR)
-
-		for modules_path_list_item in (const.FUNCTIONS_DIR, const.ACTIONS_DIR) :
-			for module_name in [ item[:-3] for item in os.listdir(modules_path_list_item) if item.endswith(".py") ] :
-				try :
-					self._modules_list.append(__import__(module_name, globals(), locals(), [""]))
-				except :
-					logger.error("Import error on module \"%s\"" % (module_name))
-					logger.attachException()
-					continue
-
-				self._services_dict[self._modules_list[-1].Service.serviceName()] = {
-					"service_class" : self._modules_list[-1].Service,
-					"service" : None
-				}
-
-				logger.verbose("Loaded module: %s" % (module_name))
-
-		sys.path.remove(const.FUNCTIONS_DIR)
-		sys.path.remove(const.ACTIONS_DIR)
+	def server(self) :
+		return self._server
 
 	###
 
-	def loadApplicationConfigs(self) :
-		config.loadConfigs(only_sections_list = (config.APPLICATION_SECTION,))
+	def quit(self, signum = None, frame = None) :
+		if signum != None :
+			logger.info("Recieved signal %d, closing..." % (signum))
 
-	def loadServicesConfigs(self) :
-		for service_name in self._services_dict.keys() :
-			service_options_list = list(self._services_dict[service_name]["service_class"].optionsList())
-			service_options_list.append((service_name, "enabled", "no", validators.validBool))
+		self._server.closeServices()
+		self._server.quitLoop()
+		logger.info("Closed")
 
-			for service_options_list_item in service_options_list :
-				try :
-					config.setValue(*service_options_list_item)
-				except :
-					logger.error("Error on set options tuple %s" % (str(service_options_list_item)))
-					logger.attachException()
 
-		config.loadConfigs(exclude_sections_list = (config.APPLICATION_SECTION,))
+	### Private ###
 
-	###
-
-	def initBus(self) :
-		bus_type = config.value(config.APPLICATION_SECTION, "bus_type")
-		service_name = config.value(config.APPLICATION_SECTION, "service_name")
+	def prepare(self) :
+		if self._use_syslog_flag == None :
+			if self._daemon_mode_flag :
+				syslog.openlog(const.MY_NAME, syslog.LOG_PID, syslog.LOG_DAEMON)
+				config.setValue(config.RUNTIME_SECTION, "use_syslog", True)
+		else :
+			syslog.openlog(const.MY_NAME, syslog.LOG_PID, ( syslog.LOG_DAEMON if self._daemon_mode_flag else syslog.LOG_USER ))
+			config.setValue(config.RUNTIME_SECTION, "use_syslog", True)
 
 		try :
-			config.setValue(config.RUNTIME_SECTION, "bus_name", dbus.service.BusName(service_name,
-				( dbus.SystemBus() if bus_type == const.BUS_TYPE_SYSTEM else dbus.SessionBus() )))
+			self._server.loadServerConfigs()
 		except :
-			logger.error("Could not connect to D-Bus \"%s\"" % (bus_type))
+			logger.error("Initialization error")
 			logger.attachException()
 			raise
 
-		logger.verbose("Connected to D-Bus \"%s\" as \"%s\"" % (bus_type, service_name))
+		if self._bus_type != None :
+			config.setValue(config.APPLICATION_SECTION, "bus_type", self._bus_type)
+
+		if self._log_level != None :
+			config.setValue(config.APPLICATION_SECTION, "log_level", self._log_level)
+
+		config.setValue(config.RUNTIME_SECTION, "application", self)
 
 	###
 
-	def initServices(self) :
-		for service_name in self._services_dict.keys() :
-			if config.value(service_name, "enabled") :
-				try :
-					self._services_dict[service_name]["service"] = self._services_dict[service_name]["service_class"]()
-					self._services_dict[service_name]["service"].initService()
-				except :
-					logger.error("Cannot initialize service \"%s\"" % (service_name))
-					logger.attachException()
+	def runInteractive(self) :
+		try :
+			self._server.loadModules()
+			self._server.loadServicesConfigs()
+			self._server.initBus()
+			self._server.initServices()
+			logger.info("Initialized")
+		except :
+			logger.error("Initialization error")
+			logger.attachException()
+			raise
 
-	def closeServices(self) :
-		for service_name in self._services_dict.keys() :
-			if self._services_dict[service_name]["service"] != None :
-				try :
-					self._services_dict[service_name]["service"].closeService()
-					del self._services_dict[service_name]["service"]
-				except :
-					logger.error("Cannot close service \"%s\"" % (service_name))
-					logger.attachException()
-				self._services_dict[service_name]["service"] = None
+		try :
+			signal.signal(signal.SIGTERM, self.quit)
+			signal.signal(signal.SIGQUIT, self.quit)
+		except :
+			logger.error("signal() error")
+			logger.attachException()
+
+		try :
+			self._server.runLoop()
+		except (SystemExit, KeyboardInterrupt) :
+			self.quit()
+		except :
+			logger.error("Runtime error, trying to close services")
+			logger.attachException()
+			self.quit()
+			raise
+
+	def runDaemon(self) :
+		work_dir_path = ( "/" if os.getuid() == 0 else None )
+		umask = ( 077 if os.getuid() == 0 else None )
+		daemon.startDaemon(self.runInteractive, work_dir_path, umask)
 

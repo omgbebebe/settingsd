@@ -29,7 +29,6 @@ ConfigDictObject = {
 	},
 	RUNTIME_SECTION : {
 		"application" : (None, None),
-		"startup" : (None, None),
 		"bus_name" : (None, None),
 		"use_syslog" : (False, None)
 	}

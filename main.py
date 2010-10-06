@@ -7,7 +7,7 @@ import getopt
 
 from settingsd import const
 from settingsd import validators
-from settingsd import startup
+from settingsd import application
 from settingsd import daemon
 
 
@@ -86,6 +86,6 @@ if __name__ == "__main__" :
 
 	#####
 
-	startup_proc = startup.Startup(log_level, use_syslog_flag, bus_type, daemon_mode_flag)
-	startup_proc.run()
+	app = application.Application(log_level, use_syslog_flag, bus_type, daemon_mode_flag)
+	app.run()
 

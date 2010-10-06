@@ -45,22 +45,29 @@ class ServiceRequisitesInterface(object) :
 
 ##### Public classes #####
 class Service(ServiceInterface, ServiceRequisitesInterface) :
-	Functions = shared.Functions
-	Actions = shared.Actions
+	pass
 
 
 #####
 class CustomObject(dbus.service.Object) :
-	def __init__(self, object_path) :
+	def __init__(self, object_path, shared_path, service) :
 		dbus.service.Object.__init__(self, config.value(config.RUNTIME_SECTION, "bus_name"), object_path)
 
 		self._object_path = object_path
+		self._shared_path = shared_path
+		self._service = service
 
 
 	### Public ###
 
 	def objectPath(self) :
-		self._object_path
+		return self._object_path
+
+	def sharedPath(self) :
+		return self._shared_path
+
+	def service(self) :
+		return self._service
 
 	def addToConnection(self, connection = None, path = None) :
 		self.add_to_connection(connection, path)
@@ -70,14 +77,14 @@ class CustomObject(dbus.service.Object) :
 
 
 class FunctionObject(CustomObject) :
-	def __init__(self, object_path) :
+	def __init__(self, object_path, shared_path, service) :
 		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION,
-			"service_path"), "functions", object_path))
+			"service_path"), "functions", object_path), shared_path, service)
 
 class ActionObject(CustomObject) :
-	def __init__(self, object_path) :
+	def __init__(self, object_path, shared_path, service) :
 		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION,
-			"service_path"), "actions", object_path))
+			"service_path"), "actions", object_path), shared_path, service)
 
 
 ##### Private decorators #####

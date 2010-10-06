@@ -2,49 +2,91 @@
 
 
 ##### Exceptions #####
-class SharedConflict(Exception) :
+class SharedsConflict(Exception) :
 	pass
 
-class SharedNotExist(Exception) :
+class SharedNotExists(Exception) :
+	pass
+
+class SharedObjectsConflict(Exception) :
+	pass
+
+class SharedObjectNotExists(Exception) :
 	pass
 
 
-##### Private meta #####
-class SharedMeta(type) :
-	def __init__(cls, name, bases_list, attrs_dict) :
-		cls._shared_objects_dict = {}
+##### Private classes #####
+class SharedAbstract :
+	def __init__(entity) :
+		entity._shareds_dict = {}
+		entity._shared_objects_dict = {}
 
 
 	### Public ###
 
-	def addSharedObject(cls, shared_object_name, shared_object) :
-		if cls._shared_objects_dict.has_key(shared_object_name) :
-			raise SharedConflict("Shared \"%s\" is already exists in collection \"%s\"" % (shared_object_name, cls.__name__))
+	def addShared(entity, shared_name) :
+		if entity._shareds_dict.has_key(shared_name) :
+			raise SharedsConflict("Shared \"%s\" is already exists in collection \"%s\"" % (shared_name, entity.__name__))
 
-		cls._shared_objects_dict[shared_object_name] = shared_object
-		setattr(cls, shared_object_name, shared_object)
+		entity._shareds_dict[shared_name] = Shared()
+		setattr(entity, shared_name, entity._shareds_dict[shared_name])
 
-	def removeSharedObject(cls, shared_object_name) :
-		if not cls._shared_objects_dict.has_key(shared_object_name) :
-			raise SharedNotExist("Shared \"%s\" does not exist in collection \"%s\"" % (shared_object_name, cls.__name__))
+	def removeShared(entity, shared_name) :
+		if not entity._shareds_dict.has_key(shared_name) :
+			raise SharedNotExists("Shared \"%s\" does not exist in collection \"%s\"" % (shared_name, entity.__name__))
 
-		cls._shared_objects_dict.pop(shared_object_name)
-		delattr(cls, shared_object_name)
+		entity._shareds_dict.pop(shared_name)
+		delattr(entity, shared_name)
 
-	def hasSharedObject(cls, shared_object) :
-		return ( shared_object in cls._shared_objects_dict.keys() or shared_object in cls._shared_objects_dict.values() )
+	def hasShared(entity, shared_name) :
+		return entity._shareds_dict.has_key(shared_name)
 
-	def sharedObject(cls, shared_object_name) :
-		return cls._shared_objects_dict[shared_object_name]
+	def shared(entity, shared_name) :
+		return entity._shareds_dict[shared_name]
 
-	def sharedObjectsList(cls) :
-		return cls._shared_objects_dict
+	def shareds(entity) :
+		return entity._shareds_dict
+
+	###
+
+	def addSharedObject(entity, shared_object_name, shared_object) :
+		if entity._shared_objects_dict.has_key(shared_object_name) :
+			raise SharedObjectsConflict("Shared object \"%s\" is already exists in collection \"%s\"" % (shared_object_name, entity.__name__))
+
+		entity._shared_objects_dict[shared_object_name] = shared_object
+		setattr(entity, shared_object_name, entity._shared_objects_dict[shared_object_name])
+
+	def removeSharedObject(entity, shared_object_name) :
+		if not entity._shared_objects_dict.has_key(shared_object_name) :
+			raise SharedObjectNotExists("Shared object \"%s\" does not exist in collection \"%s\"" % (shared_object_name, entity.__name__))
+
+		entity._shared_objects_dict.pop(shared_object_name)
+		delattr(entity, shared_object_name)
+
+	def hasSharedObject(entity, shared_object) :
+		return ( entity._shared_objects_dict.has_key(shared_object) or shared_object in entity._shared_objects_dict.values() )
+
+	def sharedObject(entity, shared_object_name) :
+		return entity, entity._shared_objects_dict[shared_object_name]
+
+	def sharedObjects(entity) :
+		return entity._shared_objects_dict
+
+class SharedRootMeta(type, SharedAbstract) :
+	def __init__(cls, name, bases_list, attrs_dict) :
+		type.__init__(cls, name, bases_list, attrs_dict)
+		SharedAbstract.__init__(cls)
+
+class Shared(object, SharedAbstract) :
+	def __init__(self) :
+		object.__init__(self)
+		SharedAbstract.__init__(self)
 
 
 ##### Public classes #####
 class Functions(object) :
-	__metaclass__ = SharedMeta
+	__metaclass__ = SharedRootMeta
 
 class Actions(object) :
-	__metaclass__ = SharedMeta
+	__metaclass__ = SharedRootMeta
 

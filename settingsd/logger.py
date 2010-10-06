@@ -40,17 +40,17 @@ def log(message_type, message) :
 	if message_type[2] <= config.value(config.APPLICATION_SECTION, "log_level") :
 		use_colors_flag = sys.stderr.isatty() and config.value(config.APPLICATION_SECTION, "log_use_colors")
 		message_type_texts_list = (
-			( "\033[31mError\033[0m" if use_colors_flag else "Error" ),
+			( "\033[31mError  \033[0m" if use_colors_flag else "Error  " ),
 			( "\033[33mWarning\033[0m" if use_colors_flag else "Warning" ),
-			( "\033[32mNotice\033[0m" if use_colors_flag else "Notice" ),
-			( "\033[32mInfo\033[0m" if use_colors_flag else "Info" ),
+			( "\033[32mNotice \033[0m" if use_colors_flag else "Notice " ),
+			( "\033[32mInfo   \033[0m" if use_colors_flag else "Info   " ),
 			( "\033[36mDetails\033[0m" if use_colors_flag else "Details" ),
 			"Debug"
 		)
 
 		for message_list_item in message.split("\n") :
 			message_list_item = "[ %s ]: %s" % (message_type_texts_list[message_type[0]], message_list_item)
-			print >> sys.stderr, const.MY_NAME, message_list_item
+			print >> sys.stderr, message_list_item
 			if config.value(config.RUNTIME_SECTION, "use_syslog") :
 				syslog.syslog(message_type[1], message_list_item)
 

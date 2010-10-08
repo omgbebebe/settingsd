@@ -6,6 +6,7 @@ import time
 from settingsd import config
 from settingsd import service
 from settingsd import shared
+from settingsd import dbus_tools
 
 
 ##### Private classes #####
@@ -21,14 +22,20 @@ class Example(service.FunctionObject) :
 	def echo(self, text) :
 		return text
 
+	@service.functionMethod("example")
 	def time(self) :
 		return time.ctime()
 
-	@service.customMethod("com.example.settingsd")
+	###
+
+	@service.customMethod("com.example.settingsd.sharedObject")
 	def die(self) :
-		shared.Functions.Test.Example.removeFromConnection()
-		shared.Functions.Test.removeSharedObject("Example")
-		return self.sharedPath()
+		self.removeFromConnection() # shared.Functions.Test.Example.removeFromConnection()
+		self.shared().removeSharedObject(self.name()) # shared.Functions.Test.removeSharedObject("Example")
+
+	@service.customMethod("com.example.settingsd.sharedObject")
+	def path(self) :
+		return service.FunctionObject.path(self)
 
 	###
 
@@ -45,7 +52,7 @@ class Example(service.FunctionObject) :
 class Service(service.Service) :
 	def initService(self) :
 		shared.Functions.addShared("Test")
-		shared.Functions.Test.addSharedObject("Example", Example(self.serviceName(), "Test.Example", self))
+		shared.Functions.Test.addSharedObject("Example", Example(self.serviceName(), self))
 
 	@classmethod
 	def serviceName(self) :

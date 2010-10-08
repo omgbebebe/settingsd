@@ -6,7 +6,6 @@ import time
 from settingsd import config
 from settingsd import service
 from settingsd import shared
-from settingsd import dbus_tools
 
 
 ##### Private classes #####

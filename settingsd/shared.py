@@ -21,20 +21,44 @@ class SharedAbstract :
 		entity._shareds_dict = {}
 		entity._shared_objects_dict = {}
 
+		#####
+
+		entity._parent_shared = None
+
 
 	### Public ###
+
+	def setParentShared(entity, shared) :
+		entity._parent_shared = shared
+
+	def parentShared(entity) :
+		return entity._parent_shared
+
+	###
+
+	def name(entity) :
+		if entity.parentShared() == None :
+			return None
+		for (shared_name, shared) in entity.parentShared().shareds().items() :
+			if shared == entity :
+				return shared_name
+		return None
+
+	###
 
 	def addShared(entity, shared_name) :
 		if entity._shareds_dict.has_key(shared_name) :
 			raise SharedsConflict("Shared \"%s\" is already exists in collection \"%s\"" % (shared_name, entity.__name__))
 
 		entity._shareds_dict[shared_name] = Shared()
+		entity._shareds_dict[shared_name].setParentShared(entity)
 		setattr(entity, shared_name, entity._shareds_dict[shared_name])
 
 	def removeShared(entity, shared_name) :
 		if not entity._shareds_dict.has_key(shared_name) :
 			raise SharedNotExists("Shared \"%s\" does not exist in collection \"%s\"" % (shared_name, entity.__name__))
 
+		entity._shareds_dict[shared_name].setParentShared(None)
 		entity._shareds_dict.pop(shared_name)
 		delattr(entity, shared_name)
 
@@ -54,12 +78,14 @@ class SharedAbstract :
 			raise SharedObjectsConflict("Shared object \"%s\" is already exists in collection \"%s\"" % (shared_object_name, entity.__name__))
 
 		entity._shared_objects_dict[shared_object_name] = shared_object
+		entity._shared_objects_dict[shared_object_name].setShared(entity)
 		setattr(entity, shared_object_name, entity._shared_objects_dict[shared_object_name])
 
 	def removeSharedObject(entity, shared_object_name) :
 		if not entity._shared_objects_dict.has_key(shared_object_name) :
 			raise SharedObjectNotExists("Shared object \"%s\" does not exist in collection \"%s\"" % (shared_object_name, entity.__name__))
 
+		entity._shared_objects_dict[shared_object_name].setShared(None)
 		entity._shared_objects_dict.pop(shared_object_name)
 		delattr(entity, shared_object_name)
 
@@ -87,6 +113,19 @@ class Shared(object, SharedAbstract) :
 class Functions(object) :
 	__metaclass__ = SharedRootMeta
 
+
+	### Public ###
+
+	@classmethod
+	def name(self) :
+		return "Functions"
+
 class Actions(object) :
 	__metaclass__ = SharedRootMeta
 
+
+	### Public ###
+
+	@classmethod
+	def name(self) :
+		return "Actions"

@@ -58,24 +58,51 @@ class Service(ServiceInterface, ServiceRequisitesInterface) :
 
 #####
 class CustomObject(dbus.service.Object) :
-	def __init__(self, object_path, shared_path, service) :
+	def __init__(self, object_path, service = None) :
 		dbus.service.Object.__init__(self, config.value(config.RUNTIME_SECTION, "bus_name"), object_path)
 
 		self._object_path = object_path
-		self._shared_path = shared_path
 		self._service = service
+
+		#####
+
+		self._shared = None
 
 
 	### Public ###
 
+	def name(self) :
+		if self.shared() == None :
+			return None
+		for (shared_object_name, shared_object) in self.shared().sharedObjects().items() :
+			if shared_object == self :
+				return shared_object_name
+		return None
+
+	def path(self) :
+		def build_path(shared) :
+			if shared != None :
+				path = build_path(shared.parentShared())
+				return ( shared.name() if path == None else dbus_tools.joinMethod(path, shared.name()) )
+			return None
+		return build_path(self.shared())
+
 	def objectPath(self) :
 		return self._object_path
 
-	def sharedPath(self) :
-		return self._shared_path
+	###
+
+	def setService(self, service) :
+		self._service = service
 
 	def service(self) :
 		return self._service
+
+	def setShared(self, shared) :
+		self._shared = shared
+
+	def shared(self) :
+		return self._shared
 
 	###
 
@@ -87,12 +114,12 @@ class CustomObject(dbus.service.Object) :
 
 
 class FunctionObject(CustomObject) :
-	def __init__(self, object_path, shared_path, service) :
+	def __init__(self, object_path, service = None) :
 		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION, "service_path"),
-			"functions", object_path), shared_path, service)
+			"functions", object_path), service)
 
 class ActionObject(CustomObject) :
-	def __init__(self, object_path, shared_path, service) :
+	def __init__(self, object_path, service = None) :
 		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION, "service_path"),
-			"actions", object_path), shared_path, service)
+			"actions", object_path), service)
 

@@ -12,13 +12,7 @@ import shared
 import dbus_tools
 import logger
 
-from service_decorators import customMethod
-from service_decorators import functionMethod
-from service_decorators import actionMethod
-
-from service_decorators import customSignal
-from service_decorators import functionSignal
-from service_decorators import actionSignal
+from service_decorators import *
 
 
 ##### Private classes #####
@@ -58,11 +52,11 @@ class Service(ServiceInterface, ServiceRequisitesInterface) :
 
 #####
 class CustomObject(dbus.service.Object) :
-	def __init__(self, object_path, service = None) :
+	def __init__(self, object_path, service_object = None) :
 		dbus.service.Object.__init__(self, config.value(config.RUNTIME_SECTION, "bus_name"), object_path)
 
 		self._object_path = object_path
-		self._service = service
+		self._service_object = service_object
 
 		#####
 
@@ -92,11 +86,11 @@ class CustomObject(dbus.service.Object) :
 
 	###
 
-	def setService(self, service) :
-		self._service = service
+	def setService(self, service_object) :
+		self._service_object = service_object
 
 	def service(self) :
-		return self._service
+		return self._service_object
 
 	def setShared(self, shared) :
 		self._shared = shared
@@ -114,12 +108,12 @@ class CustomObject(dbus.service.Object) :
 
 
 class FunctionObject(CustomObject) :
-	def __init__(self, object_path, service = None) :
+	def __init__(self, object_path, service_object = None) :
 		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION, "service_path"),
-			"functions", object_path), service)
+			"functions", object_path), service_object)
 
 class ActionObject(CustomObject) :
-	def __init__(self, object_path, service = None) :
+	def __init__(self, object_path, service_object = None) :
 		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION, "service_path"),
-			"actions", object_path), service)
+			"actions", object_path), service_object)
 

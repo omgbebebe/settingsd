@@ -48,21 +48,21 @@ def tracer(function, statics_list=[0]) :
 
 
 ##### Public decorators #####
-def customMethod(interface_name) :
+def customMethod(interface_name, **kwargs_dict) :
 	def decorator(function) :
-		return tracer(dbus.service.method(interface_name)(function))
+		return tracer(dbus.service.method(interface_name, **kwargs_dict)(function))
 	return decorator
 
-def functionMethod(interface_name) :
+def functionMethod(interface_name, **kwargs_dict) :
 	def decorator(function) :
 		return customMethod(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
-			"functions", interface_name))(function)
+			"functions", interface_name), **kwargs_dict)(function)
 	return decorator
 
-def actionMethod(interface_name) :
+def actionMethod(interface_name, **kwargs_dict) :
 	def decorator(function) :
 		return customMethod(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
-			"actions", interface_name))(function)
+			"actions", interface_name), **kwargs_dict)(function)
 	return decorator
 
 ###

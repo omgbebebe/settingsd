@@ -38,21 +38,20 @@ def log(message_type, message) :
 		raise UnknownMessageType("Message type \"%d\" not in list %s" % (message_type, ALL_MESSAGES_LIST))
 
 	if message_type[2] <= config.value(config.APPLICATION_SECTION, "log_level") :
-		use_colors_flag = sys.stderr.isatty() and config.value(config.APPLICATION_SECTION, "log_use_colors")
 		message_type_texts_list = (
-			( "\033[31m Error \033[0m" if use_colors_flag else " Error " ),
-			( "\033[33mWarning\033[0m" if use_colors_flag else "Warning" ),
-			( "\033[32mNotice \033[0m" if use_colors_flag else "Notice " ),
-			( "\033[32m Info  \033[0m" if use_colors_flag else " Info  " ),
-			( "\033[36mDetails\033[0m" if use_colors_flag else "Details" ),
-			" Debug "
+			(" Error ", "\033[31m Error \033[0m"),
+			("Warning", "\033[33mWarning\033[0m"),
+			("Notice ", "\033[32mNotice \033[0m"),
+			(" Info  ", "\033[32m Info  \033[0m"),
+			("Details", "\033[36mDetails\033[0m"),
+			(" Debug ", " Debug ")
 		)
 
+		colored_index = int(sys.stderr.isatty() and config.value(config.APPLICATION_SECTION, "log_use_colors"))
 		for message_list_item in message.split("\n") :
-			message_list_item = "[ %s ]: %s" % (message_type_texts_list[message_type[0]], message_list_item)
-			print >> sys.stderr, message_list_item
+			print >> sys.stderr, "[ %s ]: %s" % (message_type_texts_list[message_type[0]][colored_index], message_list_item)
 			if config.value(config.RUNTIME_SECTION, "use_syslog") :
-				syslog.syslog(message_type[1], message_list_item)
+				syslog.syslog(message_type[1], "[ %s ]: %s" % (message_type_texts_list[message_type[0]][0], message_list_item))
 
 
 ##### Public methods #####

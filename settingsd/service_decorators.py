@@ -67,20 +67,20 @@ def actionMethod(interface_name, **kwargs_dict) :
 
 ###
 
-def customSignal(interface_name) :
+def customSignal(interface_name, **kwargs_dict) :
 	def decorator(function) :
-		return tracer(dbus.service.signal(interface_name)(function))
+		return tracer(dbus.service.signal(interface_name, **kwargs_dict)(function))
 	return decorator
 
-def functionSignal(interface_name) :
+def functionSignal(interface_name, **kwargs_dict) :
 	def decorator(function) :
 		return customSignal(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
-			 "functions", interface_name))(function)
+			 "functions", interface_name), **kwargs_dict)(function)
 	return decorator
 
-def actionSignal(interface_name) :
+def actionSignal(interface_name, **kwargs_dict) :
 	def decorator(function) :
 		return customSignal(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
-			"actions", interface_name))(function)
+			"actions", interface_name), **kwargs_dict)(function)
 	return decorator
 

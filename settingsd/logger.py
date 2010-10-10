@@ -3,8 +3,9 @@
 
 import sys
 import traceback
-import inspect
 import syslog
+import inspect
+import time
 
 import const
 import config
@@ -37,6 +38,7 @@ ALL_MESSAGES_TEXTS_LIST = (
 )
 
 MODULE_CALLER_NAME_TAG = "{mod}"
+CURRENT_TIME_TAG = "{time}"
 
 
 ##### Exceptions #####
@@ -54,12 +56,14 @@ def log(message_type, message) :
 			try :
 				message = message.replace(MODULE_CALLER_NAME_TAG, inspect.getmodule(inspect.currentframe().f_back.f_back).__name__)
 			except : pass
+		if CURRENT_TIME_TAG in message :
+			message = message.replace(CURRENT_TIME_TAG, time.ctime())
 
 		colored_index = int(sys.stderr.isatty() and config.value(config.APPLICATION_SECTION, "log_use_colors"))
 		for message_list_item in message.split("\n") :
-			print >> sys.stderr, "[ %s ]: %s" % (ALL_MESSAGES_TEXTS_LIST[message_type[0]][colored_index], message_list_item)
+			print >> sys.stderr, "[ %s ] %s" % (ALL_MESSAGES_TEXTS_LIST[message_type[0]][colored_index], message_list_item)
 			if config.value(config.RUNTIME_SECTION, "use_syslog") :
-				syslog.syslog(message_type[1], "[ %s ]: %s" % (ALL_MESSAGES_TEXTS_LIST[message_type[0]][0], message_list_item))
+				syslog.syslog(message_type[1], "[ %s ] %s" % (ALL_MESSAGES_TEXTS_LIST[message_type[0]][0], message_list_item))
 
 
 ##### Public methods #####

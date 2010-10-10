@@ -3,6 +3,7 @@
 
 import sys
 import traceback
+import inspect
 import syslog
 
 import const
@@ -26,6 +27,17 @@ ALL_MESSAGES_LIST = (
 	DEBUG_MESSAGE
 )
 
+ALL_MESSAGES_TEXTS_LIST = (
+	(" Error ", "\033[31m Error \033[0m"),
+	("Warning", "\033[33mWarning\033[0m"),
+	("Notice ", "\033[32mNotice \033[0m"),
+	(" Info  ", "\033[32m Info  \033[0m"),
+	("Details", "\033[36mDetails\033[0m"),
+	(" Debug ", " Debug ")
+)
+
+MODULE_CALLER_NAME_TAG = "{mod}"
+
 
 ##### Exceptions #####
 class UnknownMessageType(Exception) :
@@ -38,20 +50,16 @@ def log(message_type, message) :
 		raise UnknownMessageType("Message type \"%d\" not in list %s" % (message_type, ALL_MESSAGES_LIST))
 
 	if message_type[2] <= config.value(config.APPLICATION_SECTION, "log_level") :
-		message_type_texts_list = (
-			(" Error ", "\033[31m Error \033[0m"),
-			("Warning", "\033[33mWarning\033[0m"),
-			("Notice ", "\033[32mNotice \033[0m"),
-			(" Info  ", "\033[32m Info  \033[0m"),
-			("Details", "\033[36mDetails\033[0m"),
-			(" Debug ", " Debug ")
-		)
+		if MODULE_CALLER_NAME_TAG in message :
+			try :
+				message = message.replace(MODULE_CALLER_NAME_TAG, inspect.getmodule(inspect.currentframe().f_back.f_back).__name__)
+			except : pass
 
 		colored_index = int(sys.stderr.isatty() and config.value(config.APPLICATION_SECTION, "log_use_colors"))
 		for message_list_item in message.split("\n") :
-			print >> sys.stderr, "[ %s ]: %s" % (message_type_texts_list[message_type[0]][colored_index], message_list_item)
+			print >> sys.stderr, "[ %s ]: %s" % (ALL_MESSAGES_TEXTS_LIST[message_type[0]][colored_index], message_list_item)
 			if config.value(config.RUNTIME_SECTION, "use_syslog") :
-				syslog.syslog(message_type[1], "[ %s ]: %s" % (message_type_texts_list[message_type[0]][0], message_list_item))
+				syslog.syslog(message_type[1], "[ %s ]: %s" % (ALL_MESSAGES_TEXTS_LIST[message_type[0]][0], message_list_item))
 
 
 ##### Public methods #####

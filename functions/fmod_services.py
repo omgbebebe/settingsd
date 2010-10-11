@@ -118,7 +118,7 @@ class SystemService(service.FunctionObject) :
 			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
 			env={ "LC_ALL" : "C" })
 		(proc_stdout, proc_stderr) = proc.communicate()
-		logger.debug("{mod}: Child process \"%s\" finished, return code = %d" % (proc_args, proc.returncode))
+		logger.debug("{mod}: Child process \"%s\" finished, return_code=%d" % (proc_args, proc.returncode))
 
 		return (proc_stdout, proc_stderr, proc.returncode)
 
@@ -151,7 +151,7 @@ class Service(service.Service) :
 			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
 			env={ "LC_ALL" : "C" })
 		(proc_stdout, proc_stderr) = proc.communicate()
-		logger.debug("{mod}: Child process \"%s\" finished, return code = %d" % (proc_args, proc.returncode))
+		logger.debug("{mod}: Child process \"%s\" finished, return_code=%d" % (proc_args, proc.returncode))
 
 		if proc.returncode != 0 :
 			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s" % (proc_args, proc_stdout, proc_stderr))

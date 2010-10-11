@@ -41,7 +41,7 @@ class ServiceRequisitesInterface(object) :
 		pass
 
 	@classmethod
-	def optionsList(self) :
+	def options(self) :
 		return []
 
 

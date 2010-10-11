@@ -58,7 +58,7 @@ class Service(service.Service) :
 		return "example"
 
 	@classmethod
-	def optionsList(self) :
+	def options(self) :
 		return [
 			(self.serviceName(), "hello_string", "Hello, World!", str)
 		]

@@ -178,7 +178,7 @@ class Service(service.Service) :
 		return SERVICE_NAME
 
 	@classmethod
-	def optionsList(self) :
+	def options(self) :
 		return [
 			(SERVICE_NAME, "initd_dir_path", "/etc/init.d", str),
 			(SERVICE_NAME, "chkconfig_prog_path", "/sbin/chkconfig", str)

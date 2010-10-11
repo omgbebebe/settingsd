@@ -35,8 +35,10 @@ class Application(object) :
 	def run(self) :
 		self.prepare()
 		if self._daemon_mode_flag :
+			logger.info("Run server in daemon mode")
 			self.runDaemon()
 		else :
+			logger.info("Run server in interactive mode")
 			self.runInteractive()
 
 	def server(self) :
@@ -60,9 +62,11 @@ class Application(object) :
 			if self._daemon_mode_flag :
 				syslog.openlog(const.MY_NAME, syslog.LOG_PID, syslog.LOG_DAEMON)
 				config.setValue(config.RUNTIME_SECTION, "use_syslog", True)
+				logger.verbose("Logger used syslog")
 		else :
 			syslog.openlog(const.MY_NAME, syslog.LOG_PID, ( syslog.LOG_DAEMON if self._daemon_mode_flag else syslog.LOG_USER ))
 			config.setValue(config.RUNTIME_SECTION, "use_syslog", True)
+			logger.verbose("Logger used syslog")
 
 		try :
 			self._server.loadServerConfigs()
@@ -70,6 +74,7 @@ class Application(object) :
 			logger.error("Initialization error")
 			logger.attachException()
 			raise
+		logger.verbose("Preparing complete")
 
 		if self._bus_type != None :
 			config.setValue(config.APPLICATION_SECTION, "bus_type", self._bus_type)
@@ -107,11 +112,20 @@ class Application(object) :
 		except :
 			logger.error("Runtime error, trying to close services")
 			logger.attachException()
-			self.quit()
+			try :
+				self.quit()
+			except :
+				logger.attachException()
+				raise
 			raise
 
 	def runDaemon(self) :
 		work_dir_path = ( "/" if os.getuid() == 0 else None )
 		umask = ( 077 if os.getuid() == 0 else None )
+
+		logger.info("Run server as daemon: uid=%d, dir=%s, umask=%s" % ( os.getuid(),
+			( work_dir_path if work_dir_path != None else os.getcwd() ),
+			( str(umask) if umask != None else "%.4x" % os.umask(-1) ) ))
+
 		daemon.startDaemon(self.runInteractive, work_dir_path, umask)
 

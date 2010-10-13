@@ -108,6 +108,7 @@ class Server(object) :
 				except :
 					logger.error("Cannot initialize service \"%s\"" % (service_name))
 					logger.attachException()
+				logger.verbose("Initialized service: %s" % (service_name))
 
 	def closeServices(self) :
 		for service_name in self._services_dict.keys() :

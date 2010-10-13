@@ -8,18 +8,23 @@ from settingsd import shared
 from settingsd import dbus_tools
 
 
+##### Private constants #####
+SETTINGSD_LOGGER_METHODS_NAMESPACE = dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME, "logger")
+SETTINGSD_APPLICATION_METHODS_NAMESPACE = dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME, "application")
+
+
 ##### Private classes #####
 class Settingsd(service.CustomObject) :
 
 	### DBus methods ###
 
-	@service.customMethod(dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME, "logger"))
+	@service.customMethod(SETTINGSD_LOGGER_METHODS_NAMESPACE, in_signature="i")
 	def setLogLevel(self, log_level) :
 		config.setValue(config.APPLICATION_SECTION, "log_level", log_level)
 
 	###
 
-	@service.customMethod(dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME, "application"))
+	@service.customMethod(SETTINGSD_APPLICATION_METHODS_NAMESPACE)
 	def quit(self) :
 		config.value(config.RUNTIME_SECTION, "application").quit()
 

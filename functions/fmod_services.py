@@ -14,7 +14,6 @@ from settingsd import logger
 
 ##### Private constants #####
 SERVICE_NAME = "services"
-SHARED_SERVICE_NAME = "Services"
 
 RUNLEVELS = "0123456"
 
@@ -157,15 +156,15 @@ class Service(service.Service) :
 			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s" % (proc_args, proc_stdout, proc_stderr))
 
 		system_service_count = 0
-		shared.Functions.addShared(SHARED_SERVICE_NAME)
+		shared.Functions.addShared(SERVICE_NAME)
 		for system_service_record in proc_stdout.split("\n") :
 			system_service_record_list = re.split(r"\s+", system_service_record)
 			if len(system_service_record_list) != len(RUNLEVELS) + 1 :
 				continue
 
 			system_service_name = system_service_record_list[0]
-			dbus_system_service_name = system_service_name.replace("-", "_").replace(".", "_")
-			shared.Functions.shared(SHARED_SERVICE_NAME).addSharedObject(dbus_system_service_name, SystemService(system_service_name,
+			dbus_system_service_name = re.sub(r"-|\.", "_", system_service_name)
+			shared.Functions.shared(SERVICE_NAME).addSharedObject(dbus_system_service_name, SystemService(system_service_name,
 				dbus_tools.joinPath(SERVICE_NAME, dbus_system_service_name), self))
 
 			system_service_count += 1

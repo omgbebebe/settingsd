@@ -8,6 +8,10 @@ from settingsd import service
 from settingsd import shared
 
 
+##### Private constants #####
+SERVICE_NAME = "example"
+
+
 ##### Private classes #####
 class Example(service.FunctionObject) :
 
@@ -29,8 +33,8 @@ class Example(service.FunctionObject) :
 
 	@service.customMethod("com.example.settingsd.sharedObject")
 	def die(self) :
-		self.removeFromConnection() # shared.Functions.Test.Example.removeFromConnection()
-		self.shared().removeSharedObject(self.name()) # shared.Functions.Test.removeSharedObject("Example")
+		self.removeFromConnection() # shared.Functions.test.example.removeFromConnection()
+		self.shared().removeSharedObject(self.name()) # shared.Functions.test.removeSharedObject("example")
 
 	@service.customMethod("com.example.settingsd.sharedObject")
 	def path(self) :
@@ -50,16 +54,16 @@ class Example(service.FunctionObject) :
 ##### Public classes #####
 class Service(service.Service) :
 	def initService(self) :
-		shared.Functions.addShared("Test")
-		shared.Functions.Test.addSharedObject("Example", Example(self.serviceName(), self))
+		shared.Functions.addShared("test")
+		shared.Functions.test.addSharedObject(SERVICE_NAME, Example(SERVICE_NAME, self))
 
 	@classmethod
 	def serviceName(self) :
-		return "example"
+		return SERVICE_NAME
 
 	@classmethod
 	def options(self) :
 		return [
-			(self.serviceName(), "hello_string", "Hello, World!", str)
+			(SERVICE_NAME, "hello_string", "Hello, World!", str)
 		]
 

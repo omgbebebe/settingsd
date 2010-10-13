@@ -13,7 +13,9 @@ from settingsd import logger
 
 
 ##### Private constants #####
-SERVICE_NAME = "services"
+SERVICE_NAME = "system_services"
+
+SYSTEM_SERVICE_METHODS_NAMESPACE = "systemService"
 
 RUNLEVELS = "0123456"
 
@@ -36,15 +38,15 @@ class SystemService(service.FunctionObject) :
 
 	### DBus methods ###
 
-	@service.functionMethod("service", in_signature="s", out_signature="i")
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def on(self, levels = None) :
 		return self.setLevels(levels, True)
 
-	@service.functionMethod("service", in_signature="s", out_signature="i")
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def off(self, levels = None) :
 		return self.setLevels(levels, False)
 
-	@service.functionMethod("service", out_signature="s")
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
 	def levelsMap(self) :
 		proc_args =  "%s --list %s" % (config.value(SERVICE_NAME, "chkconfig_prog_path"), self.systemServiceName())
 		(proc_stdout, proc_stderr, proc_returncode) = self.execProcess(proc_args)
@@ -62,27 +64,27 @@ class SystemService(service.FunctionObject) :
 
 	###
 
-	@service.functionMethod("service", out_signature="s")
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
 	def shortDescription(self) :
 		return "" # TODO: /usr/lib/python2.6/site-packages/scservices/core/servicesinfo.py in RHEL
 
-	@service.functionMethod("service", out_signature="s")
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
 	def description(self) :
 		return "" # TODO: /usr/lib/python2.6/site-packages/scservices/core/servicesinfo.py in RHEL
 
 	###
 
-	@service.functionMethod("service", out_signature="i")
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def start(self) :
 		logger.verbose("{mod}: Request to start service \"%s\"" % (self.systemServiceName()))
 		return self.execProcess("%s start" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
 
-	@service.functionMethod("service", out_signature="i")
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def stop(self) :
 		return self.execProcess("%s stop" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
 		logger.verbose("{mod}: Request to stop service \"%s\"" % (self.systemServiceName()))
 
-	@service.functionMethod("service", out_signature="i")
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def status(self) :
 		return self.execProcess("%s status" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
 

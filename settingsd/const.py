@@ -8,6 +8,7 @@ VERSION = "0.1"
 
 FUNCTIONS_DIR = "functions"
 ACTIONS_DIR = "actions"
+CUSTOMS_DIR = "customs"
 CONFIGS_DIR = "configs"
 CONFIG_FILE_POSTFIX = ".conf"
 

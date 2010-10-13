@@ -129,3 +129,14 @@ class Actions(object) :
 	@classmethod
 	def name(self) :
 		return "Actions"
+
+class Customs(object) :
+	__metaclass__ = SharedRootMeta
+
+
+	### Public ###
+
+	@classmethod
+	def name(self) :
+		return "Customs"
+

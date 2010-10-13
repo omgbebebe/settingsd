@@ -40,10 +40,10 @@ class Server(object) :
 	###
 
 	def loadModules(self) :
-		sys.path.append(const.FUNCTIONS_DIR)
-		sys.path.append(const.ACTIONS_DIR)
+		for modules_path_list_item in (const.FUNCTIONS_DIR, const.ACTIONS_DIR, const.CUSTOMS_DIR) :
+			logger.debug("Processing directory \"%s\"..." % (modules_path_list_item))
+			sys.path.append(modules_path_list_item)
 
-		for modules_path_list_item in (const.FUNCTIONS_DIR, const.ACTIONS_DIR) :
 			for module_name in [ item[:-3] for item in os.listdir(modules_path_list_item) if item.endswith(".py") ] :
 				try :
 					self._modules_list.append(__import__(module_name, globals(), locals(), [""]))
@@ -59,8 +59,7 @@ class Server(object) :
 
 				logger.verbose("Loaded module: %s" % (module_name))
 
-		sys.path.remove(const.FUNCTIONS_DIR)
-		sys.path.remove(const.ACTIONS_DIR)
+			sys.path.remove(modules_path_list_item)
 
 	###
 

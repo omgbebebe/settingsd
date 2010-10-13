@@ -19,6 +19,6 @@ def validBool(arg) :
 
 def validRange(arg, valid_args_list) :
 	if not arg in valid_args_list :
-		raise ValidatorError("Argument \"%s\" not in list %s" % (arg, valid_args_list))
+		raise ValidatorError("Argument \"%s\" not in range %s" % (arg, str(valid_args_list)))
 	return arg
 

@@ -52,7 +52,8 @@ class SystemService(service.FunctionObject) :
 		(proc_stdout, proc_stderr, proc_returncode) = self.execProcess(proc_args)
 
 		if proc_returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s" % (proc_args, proc_stdout, proc_stderr))
+			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
+				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		service_record_list = re.split(r"\s+", proc_stdout.split("\n")[0])
 		levels_list = ["0"]*(len(service_record_list) - 1)
@@ -107,7 +108,8 @@ class SystemService(service.FunctionObject) :
 		(proc_stdout, proc_stderr, proc_returncode) = self.execProcess(proc_args)
 
 		if proc_returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s" % (proc_args, proc_stdout, proc_stderr))
+			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
+				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		return proc_returncode
 
@@ -155,7 +157,8 @@ class Service(service.Service) :
 		logger.debug("{mod}: Child process \"%s\" finished, return_code=%d" % (proc_args, proc.returncode))
 
 		if proc.returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s" % (proc_args, proc_stdout, proc_stderr))
+			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
+				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc.returncode ))
 
 		system_service_count = 0
 		shared.Functions.addShared(SERVICE_NAME)

@@ -103,7 +103,8 @@ class CommonInfo(service.FunctionObject) :
 		(proc_stdout, proc_stderr, proc_returncode) = self.execProcess(proc_args)
 
 		if proc_returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s" % (proc_args, proc_stdout, proc_stderr))
+			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
+				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		return ":".join(proc_stdout.split(":")[1:]).strip()
 
@@ -112,7 +113,8 @@ class CommonInfo(service.FunctionObject) :
 		(proc_stdout, proc_stderr, proc_returncode) = self.execProcess(proc_args)
 
 		if proc_returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s" % (proc_args, proc_stdout, proc_stderr))
+			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
+				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		return proc_stdout.strip()
 

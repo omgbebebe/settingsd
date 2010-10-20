@@ -12,7 +12,7 @@ from settingsd import shared
 SERVICE_NAME = "example"
 
 EXAMPLE_METHODS_NAMESPACE = "example"
-SETTINGSD_SHARED_OBJECT_METHODS_NAMESPACE = "com.example.settingsd.sharedObject"
+SHARED_OBJECT_METHODS_NAMESPACE = "com.example.settingsd.sharedObject"
 DBUS_METHODS_NAMESPACE = "dbus"
 
 
@@ -35,12 +35,12 @@ class Example(service.FunctionObject) :
 
 	###
 
-	@service.customMethod(SETTINGSD_SHARED_OBJECT_METHODS_NAMESPACE)
+	@service.customMethod(SHARED_OBJECT_METHODS_NAMESPACE)
 	def die(self) :
 		self.removeFromConnection() # shared.Functions.test.example.removeFromConnection()
 		self.shared().removeSharedObject(self.name()) # shared.Functions.test.removeSharedObject("example")
 
-	@service.customMethod(SETTINGSD_SHARED_OBJECT_METHODS_NAMESPACE, out_signature="s")
+	@service.customMethod(SHARED_OBJECT_METHODS_NAMESPACE, out_signature="s")
 	def path(self) :
 		return service.FunctionObject.path(self)
 

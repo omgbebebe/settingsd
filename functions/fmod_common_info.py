@@ -12,9 +12,9 @@ from settingsd import logger
 ##### Private constants #####
 SERVICE_NAME = "common_info"
 
-COMMON_INFO_LSB_RELASE_METHODS_NAMESPACE = "commonInfo.lsb.release"
-COMMON_INFO_UNAME_METHODS_NAMESPACE = "commonInfo.uname"
-COMMON_INFO_TIME_METHODS_NAMESPACE = "commonInfo.time"
+LSB_RELASE_METHODS_NAMESPACE = "commonInfo.lsb.release"
+UNAME_METHODS_NAMESPACE = "commonInfo.uname"
+TIME_METHODS_NAMESPACE = "commonInfo.time"
 
 LSB_OPTION_VERSION = "--version"
 LSB_OPTION_ID = "--id"
@@ -42,63 +42,63 @@ class CommonInfo(service.FunctionObject) :
 
 	### DBus methods ###
 
-	@service.functionMethod(COMMON_INFO_LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
 	def version(self) :
 		return self.lsbOption(LSB_OPTION_VERSION)
 
-	@service.functionMethod(COMMON_INFO_LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
 	def id(self) :
 		return self.lsbOption(LSB_OPTION_ID)
 
-	@service.functionMethod(COMMON_INFO_LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
 	def description(self) :
 		return self.lsbOption(LSB_OPTION_DESCRIPTION)
 
-	@service.functionMethod(COMMON_INFO_LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
 	def release(self) :
 		return self.lsbOption(LSB_OPTION_RELEASE)
 
-	@service.functionMethod(COMMON_INFO_LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
 	def codeName(self) :
 		return self.lsbOption(LSB_OPTION_CODE_NAME)
 
 	###
 
-	@service.functionMethod(COMMON_INFO_UNAME_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(UNAME_METHODS_NAMESPACE, out_signature="s")
 	def kernelName(self) :
 		return self.unameOption(UNAME_OPTION_KERNEL_NAME)
 
-	@service.functionMethod(COMMON_INFO_UNAME_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(UNAME_METHODS_NAMESPACE, out_signature="s")
 	def kernelVersion(self) :
 		return self.unameOption(UNAME_OPTION_KERNEL_VERSION)
 
-	@service.functionMethod(COMMON_INFO_UNAME_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(UNAME_METHODS_NAMESPACE, out_signature="s")
 	def nodeName(self) :
 		return self.unameOption(UNAME_OPTION_NODE_NAME)
 
-	@service.functionMethod(COMMON_INFO_UNAME_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(UNAME_METHODS_NAMESPACE, out_signature="s")
 	def release(self) :
 		return self.unameOption(UNAME_OPTION_RELEASE)
 
-	@service.functionMethod(COMMON_INFO_UNAME_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(UNAME_METHODS_NAMESPACE, out_signature="s")
 	def machine(self) :
 		return self.unameOption(UNAME_OPTION_MACHINE)
 
-	@service.functionMethod(COMMON_INFO_UNAME_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(UNAME_METHODS_NAMESPACE, out_signature="s")
 	def processor(self) :
 		return self.unameOption(UNAME_OPTION_PROCESSOR)
 
-	@service.functionMethod(COMMON_INFO_UNAME_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(UNAME_METHODS_NAMESPACE, out_signature="s")
 	def hardwarePlatform(self) :
 		return self.unameOption(UNAME_OPTION_HARDWARE_PLATFORM)
 
-	@service.functionMethod(COMMON_INFO_UNAME_METHODS_NAMESPACE, out_signature="s")
+	@service.functionMethod(UNAME_METHODS_NAMESPACE, out_signature="s")
 	def operatingSystem(self) :
 		return self.unameOption(UNAME_OPTION_OPERATING_SYSTEM)
 
 	###
 
-	@service.functionMethod(COMMON_INFO_TIME_METHODS_NAMESPACE, out_signature="d")
+	@service.functionMethod(TIME_METHODS_NAMESPACE, out_signature="d")
 	def uptime(self) :
 		uptime_file = open("/proc/uptime")
 		uptime = float(uptime_file.read().split()[0])

@@ -14,7 +14,6 @@ SERVICE_NAME = "common_info"
 
 LSB_RELASE_METHODS_NAMESPACE = "commonInfo.lsb.release"
 UNAME_METHODS_NAMESPACE = "commonInfo.uname"
-TIME_METHODS_NAMESPACE = "commonInfo.time"
 
 LSB_OPTION_VERSION = "--version"
 LSB_OPTION_ID = "--id"
@@ -95,17 +94,6 @@ class CommonInfo(service.FunctionObject) :
 	@service.functionMethod(UNAME_METHODS_NAMESPACE, out_signature="s")
 	def operatingSystem(self) :
 		return self.unameOption(UNAME_OPTION_OPERATING_SYSTEM)
-
-	###
-
-	@service.functionMethod(TIME_METHODS_NAMESPACE, out_signature="d")
-	def uptime(self) :
-		uptime_file = open("/proc/uptime")
-		uptime = float(uptime_file.read().split()[0])
-		try :
-			uptime_file.close()
-		except : pass
-		return uptime
 
 
 	### Private ###

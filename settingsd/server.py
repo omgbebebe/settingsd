@@ -44,7 +44,9 @@ class Server(object) :
 			logger.debug("Processing directory \"%s\"..." % (modules_path_list_item))
 			sys.path.append(modules_path_list_item)
 
-			for module_name in [ item[:-3] for item in os.listdir(modules_path_list_item) if item.endswith(".py") ] :
+			for module_name in [ item[:-3] for item in os.listdir(modules_path_list_item)
+				if item.endswith(".py") and not item.startswith(".") ] :
+
 				try :
 					self._modules_list.append(__import__(module_name, globals(), locals(), [""]))
 				except :

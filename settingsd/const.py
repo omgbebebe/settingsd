@@ -6,9 +6,9 @@ MY_NAME = "settingsd"
 
 VERSION = "0.1"
 
-FUNCTIONS_DIR = "functions"
-ACTIONS_DIR = "actions"
-CUSTOMS_DIR = "customs"
+FUNCTIONS_DIR = "plugins/functions"
+ACTIONS_DIR = "plugins/actions"
+CUSTOMS_DIR = "plugins/customs"
 CONFIGS_DIR = "configs"
 CONFIG_FILE_POSTFIX = ".conf"
 

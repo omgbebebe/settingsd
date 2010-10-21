@@ -12,7 +12,7 @@ from settingsd import logger
 ##### Private constants #####
 SERVICE_NAME = "common_info"
 
-LSB_RELASE_METHODS_NAMESPACE = "commonInfo.lsb.release"
+LSB_RELASE_METHODS_NAMESPACE = "commonInfo.lsbRelease"
 UNAME_METHODS_NAMESPACE = "commonInfo.uname"
 
 LSB_OPTION_VERSION = "--version"

@@ -106,6 +106,18 @@ def killDaemon() :
 			os.kill(pids_list_item, signal.SIGTERM)
 			logger.info("SIGTERM has been sended to %s process \"%s\" with pid \"%d\"" % (
 				const.MY_NAME, os.path.basename(sys.argv[0]), pids_list_item ))
+		return 0
 	else :
 		logger.error("Cannot determine a %s daemon process of \"%s\"" % (const.MY_NAME, os.path.basename(sys.argv[0])))
+		return -1
+
+def daemonStatus() :
+	pids_list = pidsListOfPythonProc(sys.argv[0], ["-s", "--status"], os.getuid())
+	if len(pids_list) != 0 :
+		for pids_list_item in pids_list :
+			logger.info("%s daemon has been founded with pid \"%d\"" % (const.MY_NAME, pids_list_item))
+		return 0
+	else :
+		logger.error("Cannot determine a %s daemon process of \"%s\"" % (const.MY_NAME, os.path.basename(sys.argv[0])))
+		return -1
 

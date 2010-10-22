@@ -13,6 +13,8 @@ import logger
 
 ##### Private methods #####
 def pidsListOfPythonProc(proc_name, without_options_list = [], uid = 0) :
+	proc_name = os.path.basename(proc_name)
+
 	proc_pids_list = []
 	for proc_list_item in os.listdir("/proc") :
 		try :
@@ -102,7 +104,8 @@ def killDaemon() :
 	if len(pids_list) != 0 :
 		for pids_list_item in pids_list :
 			os.kill(pids_list_item, signal.SIGTERM)
-			logger.info("SIGTERM has been sended to %s process \"%s\" with pid \"%d\"" % (const.MY_NAME, sys.argv[0], pids_list_item))
+			logger.info("SIGTERM has been sended to %s process \"%s\" with pid \"%d\"" % (
+				const.MY_NAME, os.path.basename(sys.argv[0]), pids_list_item ))
 	else :
-		logger.error("Cannot determine a %s daemon process of \"%s\"" % (const.MY_NAME, sys.argv[0]))
+		logger.error("Cannot determine a %s daemon process of \"%s\"" % (const.MY_NAME, os.path.basename(sys.argv[0])))
 

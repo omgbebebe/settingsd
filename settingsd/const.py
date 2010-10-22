@@ -9,7 +9,7 @@ VERSION = "0.1"
 FUNCTIONS_DIR = "plugins/functions"
 ACTIONS_DIR = "plugins/actions"
 CUSTOMS_DIR = "plugins/customs"
-CONFIGS_DIR = "configs"
+CONFIGS_DIR = "configs/settingsd"
 CONFIG_FILE_POSTFIX = ".conf"
 
 

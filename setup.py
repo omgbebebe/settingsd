@@ -51,6 +51,7 @@ class SettingsdInstall(install) :
 				const_py_file_data = const_py_file_data.replace(replaces_list_item[0], replaces_list_item[1])
 
 		const_py_file.truncate()
+		const_py_file.seek(0)
 		const_py_file.write(const_py_file_data)
 
 		try :

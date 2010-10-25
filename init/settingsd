@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# Settingsd: Settingsd local server
+#
+# chkconfig: - 23 84
+# description: Settingsd - extensible service to control the operating system
+#
+### BEGIN INIT INFO
+# Required-Start: messagebus
+# Required-Stop: messagebus
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop Settingsd
+# Description: Settingsd - extensible service to control the operating system
+### END INIT INFO
+
+. /etc/init.d/functions
+
+
+RETVAL=0
+
+settingsd_status()
+{
+	settingsd-server.py --status && success || failure; echo
+	RETVAL="$?"
+}
+
+settingsd_start()
+{
+	echo -n "Starting Settingsd server: "
+	settingsd-server.py --status &>/dev/null && passed && echo && RETVAL="0" && return
+	settingsd-server.py --bus-type=system --daemon &>/dev/null
+	RETVAL="$?"
+	[ "$RETVAL" -eq "0" ] && success || failure; echo
+}
+
+settingsd_stop()
+{
+	echo -n "Stopping Settingsd server: "
+	settingsd-server.py --kill &>/dev/null
+	RETVAL="$?"
+	[ "$RETVAL" -eq "0" ] && success || failure; echo
+}
+
+
+case "$1" in
+	start) settingsd_start;;
+	stop) settingsd_stop;;
+	status) settingsd_status;;
+	restart) settingsd_stop; settingsd_start;;
+	*) echo $"Usage: $0 {start|stop|status|restart}";;
+esac
+exit $RETVAL
+

@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt1
+Release: alt2
 Summary: Settingsd - extensible service to control the operating system
 Group: System/Servers
 License: GPL
@@ -44,6 +44,10 @@ Requires: lsb-release
 
 
 %changelog
+* Mon Oct 25 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt2
+- Fixed build errors
+- Added startup init srcipt
+
 * Mon Oct 25 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt1
 - Initial build
 

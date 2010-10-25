@@ -1,2 +1,2 @@
-spec: .gear/settingsd.spec
+spec: .gear/settingsd-altlinux.spec
 tar: .

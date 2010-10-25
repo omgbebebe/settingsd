@@ -2,7 +2,7 @@ Name: settingsd
 Version: 0.1
 Release: alt1
 Summary: Settingsd - extensible service to control the operating system
-Group: System
+Group: System/Servers
 License: GPL
 URL: http://etersoft.ru
 #Git: git.eter:/people/mdevaev/packages/settingsd.git

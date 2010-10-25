@@ -29,6 +29,7 @@ Requires: lsb-release
 
 %install
 %python_install
+%__sed -i -e 's|%buildroot||g' %buildroot%python_sitelibdir/%name/const.py
 
 
 %files

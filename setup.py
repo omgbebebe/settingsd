@@ -39,6 +39,8 @@ class SettingsdInstall(install) :
 	### Private ###
 
 	def postInstallHooks(self) :
+		# FIXME: This is dirty hack. In normal realization, this code must be moved to build stage
+
 		log.info("running post-install hooks")
 
 		const_py_file = open(os.path.join(self.install_libbase, "settingsd/const.py"), "r+")
@@ -64,7 +66,7 @@ class SettingsdInstall(install) :
 setup(
 	name = "settingsd",
 	version = "0.1",
-	url = "http://etersoft.ru/", # FIXME
+	url = "http://etersoft.ru/", # FIXME: Add project url
 	license = "GPL",
 
 	author = "Devaev Maxim",

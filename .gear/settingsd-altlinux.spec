@@ -11,6 +11,7 @@ Packager: Devaev Maxim <mdevaev@etersoft.ru>
 Source: %name-%version.tar
 BuildArch: noarch
 BuildRequires: rpm-build-compat
+BuildRequires: python-dev
 
 Requires: python-module-dbus
 Requires: chkconfig, service, SysVinit, pm-utils

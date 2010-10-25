@@ -43,4 +43,5 @@ Requires: lsb-release
 
 %changelog
 * Mon Oct 25 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt1
+- Initial build
 

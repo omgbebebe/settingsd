@@ -49,7 +49,7 @@ class SettingsdInstall(install) :
 		for replaces_list_item in ( ("\"plugins/functions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/functions"))),
 			("\"plugins/actions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/actions"))),
 			("\"plugins/customs\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/customs"))),
-			("\"configs/settingsd\"", "\"%s\"" % (os.path.join(( self.root if self.root != None else "/" ), "etc/settingsd")) ) :
+			("\"configs/settingsd\"", "\"%s\"" % (os.path.join(( self.root if self.root != None else "/" ), "etc/settingsd"))) ) :
 				const_py_file_data = const_py_file_data.replace(replaces_list_item[0], replaces_list_item[1])
 
 		const_py_file.truncate()

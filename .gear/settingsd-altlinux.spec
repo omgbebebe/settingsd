@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt3
+Release: alt4
 
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 
@@ -32,7 +32,7 @@ Extensible service to control the operating system via D-Bus.
 
 %install
 %python_install
-# FIXME: hack to drop out buildroot
+# FIXME: Hack to drop out buildroot
 %__subst 's|%buildroot||g' %buildroot%python_sitelibdir/%name/const.py
 
 
@@ -48,6 +48,9 @@ Extensible service to control the operating system via D-Bus.
 
 
 %changelog
+* Tue Oct 26 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt4
+- Fixed build errors
+
 * Tue Oct 26 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt3
 - Fixed init script including into package
 

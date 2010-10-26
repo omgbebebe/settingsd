@@ -1,46 +1,49 @@
 Name: settingsd
 Version: 0.1
 Release: alt3
-Summary: Settingsd - extensible service to control the operating system
+
+Summary: Settingsd - extensible service to control the operating system via D-Bus
+
 Group: System/Servers
 License: GPL
 URL: http://etersoft.ru
-#Git: git.eter:/people/mdevaev/packages/settingsd.git
+
 Packager: Devaev Maxim <mdevaev@etersoft.ru>
 
+#Git: git.eter:/people/mdevaev/packages/settingsd.git
 Source: %name-%version.tar
+
 BuildArch: noarch
-BuildRequires: rpm-build-compat
+
 BuildRequires: python-dev
 
 Requires: python-module-dbus
 Requires: chkconfig, service, SysVinit, pm-utils
 Requires: lsb-release
-%description
-%summary
 
+%description
+Extensible service to control the operating system via D-Bus.
 
 %prep
 %setup
 
-
 %build
 %python_build
 
-
 %install
 %python_install
-%__sed -i -e 's|%buildroot||g' %buildroot%python_sitelibdir/%name/const.py
+# FIXME: hack to drop out buildroot
+%__subst 's|%buildroot||g' %buildroot%python_sitelibdir/%name/const.py
 
 
 %files
 %_bindir/settingsd-server.py
-%dir %_sysconfdir/%name
+%dir %_sysconfdir/%name/
 %config(noreplace) %_sysconfdir/%name/*.conf
-%_sysconfdir/init.d/%name
+%_initddir/%name
 %_sysconfdir/dbus-1/system.d/*.conf
-%_datadir/%name
-%python_sitelibdir/%name
+%_datadir/%name/
+%python_sitelibdir/%name/
 %python_sitelibdir/*.egg-info
 
 

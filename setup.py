@@ -15,7 +15,8 @@ packages_list = ["settingsd"]
 scripts_list = ["settingsd-server.py"]
 
 data_files_list = [
-	("/etc/dbus-1/system.d", ["configs/dbus/org.etersoft.settingsd.conf"])
+	("/etc/dbus-1/system.d", ["configs/dbus/org.etersoft.settingsd.conf"]),
+	("/etc/init.d/settingsd", ["init/settingsd"])
 ]
 for maps_list_item in ( ("share/settingsd/functions", "plugins/functions"),
 	("share/settingsd/actions", "plugins/actions"),

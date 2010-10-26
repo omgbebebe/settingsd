@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt2
+Release: alt3
 Summary: Settingsd - extensible service to control the operating system
 Group: System/Servers
 License: GPL
@@ -37,6 +37,7 @@ Requires: lsb-release
 %_bindir/settingsd-server.py
 %dir %_sysconfdir/%name
 %config(noreplace) %_sysconfdir/%name/*.conf
+%_sysconfdir/init.d/%name
 %_sysconfdir/dbus-1/system.d/*.conf
 %_datadir/%name
 %python_sitelibdir/%name
@@ -44,6 +45,9 @@ Requires: lsb-release
 
 
 %changelog
+* Tue Oct 26 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt3
+- Fixed init script including into package
+
 * Mon Oct 25 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt2
 - Fixed build errors
 - Added startup init srcipt

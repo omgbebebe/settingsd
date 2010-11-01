@@ -18,7 +18,7 @@ def tracer(function, statics_list=[0]) :
 			logger.debug("%s%s %s::%s" % ( "    "*statics_list[0],
 				str((function.__dict__.has_key("_dbus_is_method") and "Called method") or
 					(function.__dict__.has_key("_dbus_is_signal") and "Emited signal")),
-				self._object_path, dbus_tools.joinMethod(function._dbus_interface, function.__name__) ))
+				self.__object_path, dbus_tools.joinMethod(function._dbus_interface, function.__name__) ))
 
 			statics_list[0] += 1
 			try :

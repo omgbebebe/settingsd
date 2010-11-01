@@ -21,20 +21,20 @@ class Server(object) :
 
 		#####
 
-		self._modules_list = []
-		self._services_dict = {}
+		self.__modules_list = []
+		self.__services_dict = {}
 
-		self._main_loop = gobject.MainLoop()
+		self.__main_loop = gobject.MainLoop()
 
 
 	### Public ###
 
 	def runLoop(self) :
 		logger.verbose("Running GObject loop...")
-		self._main_loop.run()
+		self.__main_loop.run()
 
 	def quitLoop(self) :
-		self._main_loop.quit()
+		self.__main_loop.quit()
 		logger.verbose("GObject loop closed")
 
 	###
@@ -48,14 +48,14 @@ class Server(object) :
 				if item.endswith(".py") and not item.startswith(".") ] :
 
 				try :
-					self._modules_list.append(__import__(module_name, globals(), locals(), [""]))
+					self.__modules_list.append(__import__(module_name, globals(), locals(), [""]))
 				except :
 					logger.error("Import error on module \"%s\"" % (module_name))
 					logger.attachException()
 					continue
 
-				self._services_dict[self._modules_list[-1].Service.serviceName()] = {
-					"service_class" : self._modules_list[-1].Service,
+				self.__services_dict[self.__modules_list[-1].Service.serviceName()] = {
+					"service_class" : self.__modules_list[-1].Service,
 					"service" : None
 				}
 
@@ -69,8 +69,8 @@ class Server(object) :
 		config.loadConfigs(only_sections_list = (config.APPLICATION_SECTION,))
 
 	def loadServicesConfigs(self) :
-		for service_name in self._services_dict.keys() :
-			service_options_list = list(self._services_dict[service_name]["service_class"].options())
+		for service_name in self.__services_dict.keys() :
+			service_options_list = list(self.__services_dict[service_name]["service_class"].options())
 			service_options_list.append((service_name, "enabled", "no", validators.validBool))
 
 			for service_options_list_item in service_options_list :
@@ -101,24 +101,24 @@ class Server(object) :
 	###
 
 	def initServices(self) :
-		for service_name in self._services_dict.keys() :
+		for service_name in self.__services_dict.keys() :
 			if config.value(service_name, "enabled") :
 				try :
-					self._services_dict[service_name]["service"] = self._services_dict[service_name]["service_class"]()
-					self._services_dict[service_name]["service"].initService()
+					self.__services_dict[service_name]["service"] = self.__services_dict[service_name]["service_class"]()
+					self.__services_dict[service_name]["service"].initService()
 				except :
 					logger.error("Cannot initialize service \"%s\"" % (service_name))
 					logger.attachException()
 				logger.verbose("Initialized service: %s" % (service_name))
 
 	def closeServices(self) :
-		for service_name in self._services_dict.keys() :
-			if self._services_dict[service_name]["service"] != None :
+		for service_name in self.__services_dict.keys() :
+			if self.__services_dict[service_name]["service"] != None :
 				try :
-					self._services_dict[service_name]["service"].closeService()
-					del self._services_dict[service_name]["service"]
+					self.__services_dict[service_name]["service"].closeService()
+					del self.__services_dict[service_name]["service"]
 				except :
 					logger.error("Cannot close service \"%s\"" % (service_name))
 					logger.attachException()
-				self._services_dict[service_name]["service"] = None
+				self.__services_dict[service_name]["service"] = None
 

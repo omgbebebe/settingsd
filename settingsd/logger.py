@@ -49,7 +49,7 @@ class UnknownMessageType(Exception) :
 ##### Private methods #####
 def log(message_type, message) :
 	if not message_type in ALL_MESSAGES_LIST :
-		raise UnknownMessageType("Message type \"%d\" not in list %s" % (message_type, ALL_MESSAGES_LIST))
+		raise UnknownMessageType("Message type \"%s\" not in list %s" % (str(message_type), ALL_MESSAGES_LIST))
 
 	if message_type[2] <= config.value(config.APPLICATION_SECTION, "log_level") :
 		if MODULE_CALLER_NAME_TAG in message :
@@ -84,6 +84,8 @@ def verbose(message) :
 
 def debug(message) :
 	log(DEBUG_MESSAGE, message)
+
+###
 
 def attachException(message_type = ERROR_MESSAGE) :
 	for line in traceback.format_exc().splitlines() :

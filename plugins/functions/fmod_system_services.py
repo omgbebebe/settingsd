@@ -33,7 +33,7 @@ class SystemService(service.FunctionObject) :
 	def __init__(self, system_service_name, object_path, service_object = None) :
 		service.FunctionObject.__init__(self, object_path, service_object)
 
-		self._system_service_name = system_service_name
+		self.__system_service_name = system_service_name
 
 
 	### DBus methods ###
@@ -93,7 +93,7 @@ class SystemService(service.FunctionObject) :
 	### Private ###
 
 	def systemServiceName(self) :
-		return self._system_service_name
+		return self.__system_service_name
 
 	###
 

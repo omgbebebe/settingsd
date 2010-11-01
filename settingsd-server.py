@@ -29,7 +29,7 @@ def version() :
 	print "%s version %s" % (const.MY_NAME, const.VERSION)
 
 
-##### Main ######
+##### Main #####
 if __name__ == "__main__" :
 	log_level = None
 	use_syslog_flag = None
@@ -94,6 +94,5 @@ if __name__ == "__main__" :
 
 	#####
 
-	app = application.Application(log_level, use_syslog_flag, bus_type, daemon_mode_flag)
-	app.run()
+	application.Application(log_level, use_syslog_flag, bus_type, daemon_mode_flag).run()
 

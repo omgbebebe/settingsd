@@ -20,21 +20,21 @@ class Application(object) :
 
 		#####
 
-		self._log_level = log_level
-		self._use_syslog_flag = use_syslog_flag
-		self._bus_type = bus_type
-		self._daemon_mode_flag = daemon_mode_flag
+		self.__log_level = log_level
+		self.__use_syslog_flag = use_syslog_flag
+		self.__bus_type = bus_type
+		self.__daemon_mode_flag = daemon_mode_flag
 
 		#####
 
-		self._server = server.Server()
+		self.__server = server.Server()
 
 
 	### Public ###
 
 	def run(self) :
 		self.prepare()
-		if self._daemon_mode_flag :
+		if self.__daemon_mode_flag :
 			logger.info("Run server in daemon mode")
 			self.runDaemon()
 		else :
@@ -42,7 +42,7 @@ class Application(object) :
 			self.runInteractive()
 
 	def server(self) :
-		return self._server
+		return self.__server
 
 	###
 
@@ -50,37 +50,37 @@ class Application(object) :
 		if signum != None :
 			logger.info("Recieved signal %d, closing..." % (signum))
 
-		self._server.closeServices()
-		self._server.quitLoop()
+		self.__server.closeServices()
+		self.__server.quitLoop()
 		logger.info("Closed")
 
 
 	### Private ###
 
 	def prepare(self) :
-		if self._use_syslog_flag == None :
-			if self._daemon_mode_flag :
+		if self.__use_syslog_flag == None :
+			if self.__daemon_mode_flag :
 				syslog.openlog(const.MY_NAME, syslog.LOG_PID, syslog.LOG_DAEMON)
 				config.setValue(config.RUNTIME_SECTION, "use_syslog", True)
 				logger.verbose("Logger used syslog")
 		else :
-			syslog.openlog(const.MY_NAME, syslog.LOG_PID, ( syslog.LOG_DAEMON if self._daemon_mode_flag else syslog.LOG_USER ))
+			syslog.openlog(const.MY_NAME, syslog.LOG_PID, ( syslog.LOG_DAEMON if self.__daemon_mode_flag else syslog.LOG_USER ))
 			config.setValue(config.RUNTIME_SECTION, "use_syslog", True)
 			logger.verbose("Logger used syslog")
 
 		try :
-			self._server.loadServerConfigs()
+			self.__server.loadServerConfigs()
 		except :
 			logger.error("Initialization error")
 			logger.attachException()
 			raise
 		logger.verbose("Preparing complete")
 
-		if self._bus_type != None :
-			config.setValue(config.APPLICATION_SECTION, "bus_type", self._bus_type)
+		if self.__bus_type != None :
+			config.setValue(config.APPLICATION_SECTION, "bus_type", self.__bus_type)
 
-		if self._log_level != None :
-			config.setValue(config.APPLICATION_SECTION, "log_level", self._log_level)
+		if self.__log_level != None :
+			config.setValue(config.APPLICATION_SECTION, "log_level", self.__log_level)
 
 		config.setValue(config.RUNTIME_SECTION, "application", self)
 
@@ -88,10 +88,10 @@ class Application(object) :
 
 	def runInteractive(self) :
 		try :
-			self._server.loadModules()
-			self._server.loadServicesConfigs()
-			self._server.initBus()
-			self._server.initServices()
+			self.__server.loadModules()
+			self.__server.loadServicesConfigs()
+			self.__server.initBus()
+			self.__server.initServices()
 			logger.info("Initialized")
 		except :
 			logger.error("Initialization error")
@@ -106,7 +106,7 @@ class Application(object) :
 			logger.attachException()
 
 		try :
-			self._server.runLoop()
+			self.__server.runLoop()
 		except (SystemExit, KeyboardInterrupt) :
 			self.quit()
 		except :

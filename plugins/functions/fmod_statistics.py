@@ -93,14 +93,14 @@ class Cpu(service.FunctionObject) :
 	def __init__(self, cpu_name, object_path, service_object = None) :
 		service.FunctionObject.__init__(self, object_path, service_object)
 
-		self._cpu_name = cpu_name
+		self.__cpu_name = cpu_name
 
 		#####
 
-		self._previous_used = -1
-		self._previous_full = -1
+		self.__previous_used = -1
+		self.__previous_full = -1
 
-		self._cpuinfo_cache_dict = {}
+		self.__cpuinfo_cache_dict = {}
 
 		#####
 
@@ -145,13 +145,13 @@ class Cpu(service.FunctionObject) :
 				used = cpu + system + nice
 				full = cpu + nice + system + idle
 
-				if self._previous_full == -1 :
+				if self.__previous_full == -1 :
 					load_percent = 0
 				else :
-					load_percent = (100 * (used - self._previous_used)) / (full - self._previous_full)
+					load_percent = (100 * (used - self.__previous_used)) / (full - self.__previous_full)
 
-				self._previous_used = used
-				self._previous_full = full
+				self.__previous_used = used
+				self.__previous_full = full
 
 				return load_percent
 		return -1
@@ -160,13 +160,13 @@ class Cpu(service.FunctionObject) :
 	### Private ###
 
 	def cpuName(self) :
-		return self._cpu_name
+		return self.__cpu_name
 
 	###
 
 	def cpuinfoSection(self, section_name, use_cache_flag = False) :
-		if self._cpuinfo_cache_dict.has_key(section_name) and use_cache_flag :
-			return self._cpuinfo_cache_dict[section_name]
+		if self.__cpuinfo_cache_dict.has_key(section_name) and use_cache_flag :
+			return self.__cpuinfo_cache_dict[section_name]
 
 		cpu_id = self.cpuName().split("cpu")[1]
 
@@ -191,7 +191,7 @@ class Cpu(service.FunctionObject) :
 				if name == "processor" and value != cpu_id :
 					break
 				elif name == section_name :
-					self._cpuinfo_cache_dict[name] = value
+					self.__cpuinfo_cache_dict[name] = value
 					return value
 
 		return ""

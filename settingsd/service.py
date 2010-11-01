@@ -55,12 +55,12 @@ class CustomObject(dbus.service.Object) :
 	def __init__(self, object_path, service_object = None) :
 		dbus.service.Object.__init__(self, config.value(config.RUNTIME_SECTION, "bus_name"), object_path)
 
-		self._object_path = object_path
-		self._service_object = service_object
+		self.__object_path = object_path
+		self.__service_object = service_object
 
 		#####
 
-		self._shared = None
+		self.__shared = None
 
 
 	### Public ###
@@ -82,21 +82,21 @@ class CustomObject(dbus.service.Object) :
 		return build_path(self.shared())
 
 	def objectPath(self) :
-		return self._object_path
+		return self.__object_path
 
 	###
 
 	def setService(self, service_object) :
-		self._service_object = service_object
+		self.__service_object = service_object
 
 	def service(self) :
-		return self._service_object
+		return self.__service_object
 
 	def setShared(self, shared) :
-		self._shared = shared
+		self.__shared = shared
 
 	def shared(self) :
-		return self._shared
+		return self.__shared
 
 	###
 

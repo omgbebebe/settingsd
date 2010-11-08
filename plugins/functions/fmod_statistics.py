@@ -51,19 +51,19 @@ class Memory(service.FunctionObject) :
 
 	### DBus methods ###
 
-	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="d")
+	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="i")
 	def memoryFull(self) :
 		return self.meminfoSum("MemTotal")
 
-	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="d")
+	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="i")
 	def memoryFree(self) :
 		return self.meminfoSum("MemFree", "Buffers", "Cached")
 
-	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="d")
+	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="i")
 	def swapFull(self) :
 		return self.meminfoSum("SwapTotal")
 
-	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="d")
+	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="i")
 	def swapFree(self) :
 		return self.meminfoSum("SwapFree", "SwapCached")
 
@@ -77,14 +77,14 @@ class Memory(service.FunctionObject) :
 			meminfo_file.close()
 		except : pass
 
-		sum = 0.0
+		sum = 0
 		for meminfo_records_list_item in meminfo_records_list :
 			value_list = re.split(r"[\s:]+", meminfo_records_list_item)
 			if len(value_list) != 3 :
 				continue
 
 			if value_list[0] in args_list : 
-				sum += float(value_list[1])
+				sum += int(value_list[1])
 
 		return sum
 
@@ -218,7 +218,8 @@ class Service(service.Service) :
 
 		shared.Functions.shared(STATISTICS_SHARED_NAME).addShared(CPU_SHARED_NAME)
 		stat_file = open("/proc/stat")
-		cpu_names_list = [ re.split(r"\s+", stat_record)[0] for stat_record in stat_file.read().split("\n") if re.match(r"cpu\d+", stat_record)!=None ]
+		cpu_names_list = [ re.split(r"\s+", stat_record)[0] for stat_record in stat_file.read().split("\n")
+			if re.match(r"cpu\d+", stat_record)!=None ]
 		try :
 			stat_file.close()
 		except : pass

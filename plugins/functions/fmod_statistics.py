@@ -219,7 +219,7 @@ class Service(service.Service) :
 		shared.Functions.shared(STATISTICS_SHARED_NAME).addShared(CPU_SHARED_NAME)
 		stat_file = open("/proc/stat")
 		cpu_names_list = [ re.split(r"\s+", stat_record)[0] for stat_record in stat_file.read().split("\n")
-			if re.match(r"cpu\d+", stat_record)!=None ]
+			if re.match(r"cpu\d+", stat_record) != None ]
 		try :
 			stat_file.close()
 		except : pass

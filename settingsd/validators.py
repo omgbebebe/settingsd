@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
+import re
+
+
 ##### Exceptions #####
 class ValidatorError(Exception) :
 	pass
@@ -21,4 +24,7 @@ def validRange(arg, valid_args_list) :
 	if not arg in valid_args_list :
 		raise ValidatorError("Argument \"%s\" not in range %s" % (arg, str(valid_args_list)))
 	return arg
+
+def validList(arg) :
+	return re.split(r"[,\t ]+", str(arg))
 

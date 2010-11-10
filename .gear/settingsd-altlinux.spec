@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt4
+Release: alt5
 
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 
@@ -48,6 +48,16 @@ Extensible service to control the operating system via D-Bus.
 
 
 %changelog
+* Wed Nov 10 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt5
+- changed return value type of meminfo API from float to int
+- dBus policy for fmod_ntp_config
+- fixed bug with access to object_path
+- most verbosity server messages at loading and closing services
+- nTP configuration module
+- style fix
+- using closed variables instead private in classes, fixed small bugs in logger
+- validator for string list
+
 * Tue Oct 26 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt4
 - Fixed build errors
 

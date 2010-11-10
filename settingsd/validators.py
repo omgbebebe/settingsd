@@ -25,6 +25,6 @@ def validRange(arg, valid_args_list) :
 		raise ValidatorError("Argument \"%s\" not in range %s" % (arg, str(valid_args_list)))
 	return arg
 
-def validList(arg) :
+def validStringList(arg) :
 	return re.split(r"[,\t ]+", str(arg))
 

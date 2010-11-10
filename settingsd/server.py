@@ -103,17 +103,19 @@ class Server(object) :
 	def initServices(self) :
 		for service_name in self.__services_dict.keys() :
 			if config.value(service_name, "enabled") :
+				logger.verbose("Enabling service \"%s\"..." % (service_name))
 				try :
 					self.__services_dict[service_name]["service"] = self.__services_dict[service_name]["service_class"]()
 					self.__services_dict[service_name]["service"].initService()
 				except :
 					logger.error("Cannot initialize service \"%s\"" % (service_name))
 					logger.attachException()
-				logger.verbose("Initialized service: %s" % (service_name))
+				logger.info("Initialized service: %s" % (service_name))
 
 	def closeServices(self) :
 		for service_name in self.__services_dict.keys() :
 			if self.__services_dict[service_name]["service"] != None :
+				logger.verbose("Disabling service \"%s\"..." % (service_name))
 				try :
 					self.__services_dict[service_name]["service"].closeService()
 					del self.__services_dict[service_name]["service"]
@@ -121,4 +123,5 @@ class Server(object) :
 					logger.error("Cannot close service \"%s\"" % (service_name))
 					logger.attachException()
 				self.__services_dict[service_name]["service"] = None
+				logger.info("Closed service: %s" % (service_name))
 

@@ -8,17 +8,13 @@ from settingsd import config
 from settingsd import service
 from settingsd import shared
 from settingsd import logger
+from settingsd import tools
 
 
 ##### Private constants #####
 SERVICE_NAME = "ntp_config"
 
 NTP_METHODS_NAMESPACE = "time.ntp"
-
-
-##### Exceptions #####
-class SubprocessFailure(Exception) :
-	pass
 
 
 ##### Private classes #####
@@ -64,24 +60,11 @@ class NtpConfig(service.FunctionObject) :
 	@service.functionMethod(NTP_METHODS_NAMESPACE)
 	def request(self) :
 		proc_args =  "%s %s" % (config.value(SERVICE_NAME, "ntpdate_prog_path"), " ".join(self.servers()))
-		(proc_stdout, proc_stderr, proc_returncode) = self.execProcess(proc_args)
+		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
 
 		if proc_returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
+			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
 				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
-
-
-	### Private ###
-
-	def execProcess(self, proc_args) :
-		logger.debug("{mod}: Executing child process \"%s\"" % (proc_args))
-		proc = subprocess.Popen(proc_args, shell=True, bufsize=1024, close_fds=True,
-			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-			env={ "LC_ALL" : "C" })
-		(proc_stdout, proc_stderr) = proc.communicate()
-		logger.debug("{mod}: Child process \"%s\" finished, return_code=%d" % (proc_args, proc.returncode))
-
-		return (proc_stdout, proc_stderr, proc.returncode)
 
 
 ##### Public classes #####

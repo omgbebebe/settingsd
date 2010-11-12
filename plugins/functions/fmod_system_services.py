@@ -10,6 +10,8 @@ from settingsd import service
 from settingsd import shared
 from settingsd import dbus_tools
 from settingsd import logger
+from settingsd import tools
+from settingsd import validators
 
 
 ##### Private constants #####
@@ -18,14 +20,6 @@ SERVICE_NAME = "system_services"
 SYSTEM_SERVICE_METHODS_NAMESPACE = "systemService"
 
 RUNLEVELS = "0123456"
-
-
-##### Exceptions #####
-class SubprocessFailure(Exception) :
-	pass
-
-class IncorrectArgument(Exception) :
-	pass
 
 
 ##### Private classes #####
@@ -49,10 +43,10 @@ class SystemService(service.FunctionObject) :
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
 	def levelsMap(self) :
 		proc_args =  "%s --list %s" % (config.value(SERVICE_NAME, "chkconfig_prog_path"), self.systemServiceName())
-		(proc_stdout, proc_stderr, proc_returncode) = self.execProcess(proc_args)
+		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
 
 		if proc_returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
+			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
 				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		service_record_list = re.split(r"\s+", proc_stdout.split("\n")[0])
@@ -78,16 +72,16 @@ class SystemService(service.FunctionObject) :
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def start(self) :
 		logger.verbose("{mod}: Request to start service \"%s\"" % (self.systemServiceName()))
-		return self.execProcess("%s start" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
+		return tools.execProcess("%s start" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def stop(self) :
-		return self.execProcess("%s stop" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
+		return tools.execProcess("%s stop" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
 		logger.verbose("{mod}: Request to stop service \"%s\"" % (self.systemServiceName()))
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def status(self) :
-		return self.execProcess("%s status" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
+		return tools.execProcess("%s status" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
 
 
 	### Private ###
@@ -105,25 +99,13 @@ class SystemService(service.FunctionObject) :
 
 		proc_args =  "%s %s %s %s" % ( config.value(SERVICE_NAME, "chkconfig_prog_path"), ( "--level %s" % (levels) if levels != None else "" ),
 			self.systemServiceName(), ( "on" if enabled_flag else "off" ) )
-		(proc_stdout, proc_stderr, proc_returncode) = self.execProcess(proc_args)
+		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
 
 		if proc_returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
+			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
 				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		return proc_returncode
-
-	###
-
-	def execProcess(self, proc_args) :
-		logger.debug("{mod}: Executing child process \"%s\"" % (proc_args))
-		proc = subprocess.Popen(proc_args, shell=True, bufsize=1024, close_fds=True,
-			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-			env={ "LC_ALL" : "C" })
-		(proc_stdout, proc_stderr) = proc.communicate()
-		logger.debug("{mod}: Child process \"%s\" finished, return_code=%d" % (proc_args, proc.returncode))
-
-		return (proc_stdout, proc_stderr, proc.returncode)
 
 	###
 
@@ -133,11 +115,11 @@ class SystemService(service.FunctionObject) :
 				levels = None
 			for level in levels :
 				if not level in RUNLEVELS :
-					raise IncorrectArgument("Incorrect item \"%s\" in argument \"%s\"" % (level, levels))
+					raise validators.ValidatorError("Incorrect item \"%s\" in argument \"%s\"" % (level, levels))
 		elif type (levels).__name__ == "NoneType" :
 			pass
 		else :
-			raise IncorrectArgument("Incorrect type \"%s\" of argument" % (type(levels).__name__))
+			raise validators.ValidatorError("Incorrect type \"%s\" of argument" % (type(levels).__name__))
 		return levels
 
 
@@ -148,17 +130,7 @@ class Service(service.Service) :
 
 	def initService(self) :
 		proc_args = "%s --list" % (config.value(SERVICE_NAME, "chkconfig_prog_path"))
-
-		logger.debug("{mod}: Executing child process \"%s\"" % (proc_args))
-		proc = subprocess.Popen(proc_args, shell=True, bufsize=1024, close_fds=True,
-			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-			env={ "LC_ALL" : "C" })
-		(proc_stdout, proc_stderr) = proc.communicate()
-		logger.debug("{mod}: Child process \"%s\" finished, return_code=%d" % (proc_args, proc.returncode))
-
-		if proc.returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
-				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc.returncode ))
+		(proc_stdout, proc_sterr, proc_returncode) = tools.execProcess(proc_args)
 
 		system_service_count = 0
 		shared.Functions.addShared(SERVICE_NAME)

@@ -7,6 +7,7 @@ from settingsd import config
 from settingsd import service
 from settingsd import shared
 from settingsd import logger
+from settingsd import tools
 
 
 ##### Private constants #####
@@ -29,11 +30,6 @@ UNAME_OPTION_MACHINE = "--machine"
 UNAME_OPTION_PROCESSOR = "--processor"
 UNAME_OPTION_HARDWARE_PLATFORM = "--hardware-platform"
 UNAME_OPTION_OPERATING_SYSTEM = "--operating-system"
-
-
-##### Exceptions #####
-class SubprocessFailure(Exception) :
-	pass
 
 
 ##### Private classes #####
@@ -100,35 +96,23 @@ class CommonInfo(service.FunctionObject) :
 
 	def lsbOption(self, option) :
 		proc_args = "%s %s" % (config.value(SERVICE_NAME, "lsb_release_prog_path"), option)
-		(proc_stdout, proc_stderr, proc_returncode) = self.execProcess(proc_args)
+		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
 
 		if proc_returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
+			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
 				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		return ":".join(proc_stdout.split(":")[1:]).strip()
 
 	def unameOption(self, option) :
 		proc_args = "%s %s" % (config.value(SERVICE_NAME, "uname_prog_path"), option)
-		(proc_stdout, proc_stderr, proc_returncode) = self.execProcess(proc_args)
+		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
 
 		if proc_returncode != 0 :
-			raise SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
+			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
 				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		return proc_stdout.strip()
-
-	###
-
-	def execProcess(self, proc_args) :
-		logger.debug("{mod}: Executing child process \"%s\"" % (proc_args))
-		proc = subprocess.Popen(proc_args, shell=True, bufsize=1024, close_fds=True,
-			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-			env={ "LC_ALL" : "C" })
-		(proc_stdout, proc_stderr) = proc.communicate()
-		logger.debug("{mod}: Child process \"%s\" finished, return_code=%d" % (proc_args, proc.returncode))
-
-		return (proc_stdout, proc_stderr, proc.returncode)
 
 
 ##### Public classes #####

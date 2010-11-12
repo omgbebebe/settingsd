@@ -28,6 +28,7 @@ ALL_MESSAGES_LIST = (
 	DEBUG_MESSAGE
 )
 
+
 ALL_MESSAGES_TEXTS_LIST = (
 	(" Error ", "\033[31m Error \033[0m"),
 	("Warning", "\033[33mWarning\033[0m"),
@@ -37,8 +38,16 @@ ALL_MESSAGES_TEXTS_LIST = (
 	(" Debug ", " Debug ")
 )
 
+
 MODULE_CALLER_NAME_TAG = "{mod}"
+SUBMODULE_CALLER_NAME_TAG = "{submod}"
 CURRENT_TIME_TAG = "{time}"
+
+ALL_TAGS_LIST = (
+	MODULE_CALLER_NAME_TAG,
+	SUBMODULE_CALLER_NAME_TAG,
+	CURRENT_TIME_TAG
+)
 
 
 ##### Exceptions #####
@@ -52,12 +61,19 @@ def log(message_type, message) :
 		raise UnknownMessageType("Message type \"%s\" not in list %s" % (str(message_type), ALL_MESSAGES_LIST))
 
 	if message_type[2] <= config.value(config.APPLICATION_SECTION, "log_level") :
-		if MODULE_CALLER_NAME_TAG in message :
-			try :
-				message = message.replace(MODULE_CALLER_NAME_TAG, inspect.getmodule(inspect.currentframe().f_back.f_back).__name__)
-			except : pass
-		if CURRENT_TIME_TAG in message :
-			message = message.replace(CURRENT_TIME_TAG, time.ctime())
+		for all_tags_list_item in ALL_TAGS_LIST :
+			if all_tags_list_item == MODULE_CALLER_NAME_TAG :
+				try :
+					message = message.replace(MODULE_CALLER_NAME_TAG,
+						inspect.getmodule(inspect.currentframe().f_back.f_back).__name__)
+				except : pass
+			elif all_tags_list_item == SUBMODULE_CALLER_NAME_TAG :
+				try :
+					message = message.replace(SUBMODULE_CALLER_NAME_TAG,
+						inspect.getmodule(inspect.currentframe().f_back.f_back.f_back).__name__)
+				except : pass
+			elif all_tags_list_item == CURRENT_TIME_TAG :
+				message = message.replace(CURRENT_TIME_TAG, time.ctime())
 
 		colored_index = int(sys.stderr.isatty() and config.value(config.APPLICATION_SECTION, "log_use_colors"))
 		for message_list_item in message.split("\n") :

@@ -19,7 +19,9 @@ SERVICE_NAME = "disks_smart"
 
 DISKS_SMART_SHARED_NAME = "disks_smart"
 
-SMART_METHODS_NAMESPACE = "disk.smart"
+DISKS_SMART_OBJECT_NAME = "disks_smart"
+
+SMART_METHODS_NAMESPACE = "disks.smart"
 
 
 ##### Private classes #####
@@ -87,10 +89,23 @@ class Disk(service.FunctionObject) :
 		return disk_health_flag
 
 
+class DisksSmart(service.FunctionObject) :
+	@service.functionSignal(SMART_METHODS_NAMESPACE)
+	def devicesChanged(self) :
+		pass
+
+
 ##### Public classes #####
 class Service(service.Service) :
 	def initService(self) :
 		shared.Functions.addShared(DISKS_SMART_SHARED_NAME)
+
+		###
+
+		self.__disks_smart = DisksSmart(DISKS_SMART_SHARED_NAME, self)
+		shared.Functions.addSharedObject(DISKS_SMART_OBJECT_NAME, self.__disks_smart)
+
+		###
 
 		self.__udev_client = gudev.Client(["block"])
 
@@ -135,9 +150,12 @@ class Service(service.Service) :
 			if action == "add" and not device in registered_devices_list :
 				disks_smart_shared.addSharedObject(device_name, Disk(device_path,
 					dbus_tools.joinPath(DISKS_SMART_SHARED_NAME, device_name), self))
+				self.__disks_smart.devicesChanged()
 				logger.debug("{mod}: Added SMART disk \"%s\"" % (device_path))
+
 			elif device.get_action() == "remove" and device_name in registered_devices_list :
 				disks_smart_shared.sharedObject(device_name).removeFromConnection()
 				disks_smart_shared.removeSharedObject(device_name)
+				self.__disks_smart.devicesChanged()
 				logger.debug("{mod}: Removed SMART disk \"%s\"" % (device_path))
 

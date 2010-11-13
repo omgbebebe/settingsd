@@ -93,7 +93,7 @@ class SharedAbstract :
 		return ( entity._shared_objects_dict.has_key(shared_object) or shared_object in entity._shared_objects_dict.values() )
 
 	def sharedObject(entity, shared_object_name) :
-		return entity, entity._shared_objects_dict[shared_object_name]
+		return entity._shared_objects_dict[shared_object_name]
 
 	def sharedObjects(entity) :
 		return entity._shared_objects_dict

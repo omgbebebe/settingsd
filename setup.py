@@ -9,11 +9,15 @@ from distutils.core import setup
 from distutils.command.install import install
 from distutils import log
 
+from settingsd import const
+
 
 ##### Private constants #####
 packages_list = ["settingsd"]
 scripts_list = ["settingsd-server.py"]
 
+
+#####
 data_files_list = [
 	("/etc/dbus-1/system.d", ["configs/dbus/org.etersoft.settingsd.conf"]),
 	("/etc/rc.d/init.d", ["init/settingsd"])
@@ -25,6 +29,24 @@ for maps_list_item in ( ("share/settingsd/functions", "plugins/functions"),
 
 	data_files_list.append(( maps_list_item[0], [ os.path.join(maps_list_item[1], item)
 		for item in os.listdir(maps_list_item[1]) if not item in (".gitignore",) ] ))
+
+
+#####
+classifiers_list = [ # http://pypi.python.org/pypi?:action=list_classifiers
+	"Development Status :: 4 - Beta",
+	"Environment :: Console",
+	"Environment :: No Input/Output (Daemon)",
+	"License :: OSI Approved :: GNU General Public License (GPL)",
+	"Operating System :: POSIX",
+	"Programming Language :: Python",
+	"Topic :: System",
+	"Topic :: Utilities",
+	{
+		"alpha" : "Development Status :: 3 - Alpha",
+		"beta" : "Development Status :: 4 - Beta",
+		"stable" : "Development Status :: 5 - Production/Stable"
+	}[const.VERSION_STATUS]
+]
 
 
 ##### Private classes #####
@@ -64,8 +86,8 @@ class SettingsdInstall(install) :
 
 ##### Main #####
 setup(
-	name = "settingsd",
-	version = "0.1",
+	name = const.MY_NAME,
+	version = const.VERSION,
 	url = "http://etersoft.ru/", # FIXME: Add project url
 	license = "GPL",
 
@@ -82,15 +104,6 @@ setup(
 
 	cmdclass = { "install" : SettingsdInstall },
 
-	classifiers = [ # http://pypi.python.org/pypi?:action=list_classifiers
-		"Development Status :: 4 - Beta",
-		"Environment :: Console",
-		"Environment :: No Input/Output (Daemon)",
-		"License :: OSI Approved :: GNU General Public License (GPL)",
-		"Operating System :: POSIX",
-		"Programming Language :: Python",
-		"Topic :: System",
-		"Topic :: Utilities"
-	]
+	classifiers = classifiers_list
 )
 

@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt5
+Release: alt6
 
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 
@@ -48,6 +48,27 @@ Extensible service to control the operating system via D-Bus.
 
 
 %changelog
+* Mon Nov 15 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt6
+- added exception on process fail to fmod_system_services at first services loading
+- added module for check SMART status
+- added signal for disk changed to disks_smart
+- additional version constants: functionality level and development status
+- add simple SMART support checking
+- add tools module with execProcess()
+- aPI for determine settingsd version and functionality level
+- dBus policy for fmod_disks_smart
+- dynamic add and remove system services by inotify events on /etc/rc.d/init.d
+- enable GObject threads
+- fixed bug with getting dict of sharedObjects
+- installation info and dynamic classifiers from settingsd/const.py
+- merge branch 'master' of git.eter:/people/mdevaev/packages/settingsd
+- moved raising SubprocessFailure to tools module
+- new {submod} macros for logger
+- refactoring all function modules for using tools
+- removed unused modules
+- systemServices in shared
+- using constructor instead initService(), first run not emits signals
+
 * Wed Nov 10 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt5
 - changed return value type of meminfo API from float to int
 - dBus policy for fmod_ntp_config

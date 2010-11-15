@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-import subprocess
-
 from settingsd import config
 from settingsd import service
 from settingsd import shared

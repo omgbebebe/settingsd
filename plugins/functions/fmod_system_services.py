@@ -3,7 +3,6 @@
 
 import os
 import re
-import subprocess
 
 from settingsd import config
 from settingsd import service

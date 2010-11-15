@@ -24,6 +24,7 @@ class Server(object) :
 		self.__modules_list = []
 		self.__services_dict = {}
 
+		gobject.threads_init()
 		self.__main_loop = gobject.MainLoop()
 
 

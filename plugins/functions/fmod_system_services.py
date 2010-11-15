@@ -48,12 +48,8 @@ class SystemService(service.FunctionObject) :
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
 	def levelsMap(self) :
-		proc_args =  "%s --list %s" % (config.value(SERVICE_NAME, "chkconfig_prog_path"), self.systemServiceName())
+		proc_args =  "%s --list %s" % (config.value(SERVICE_NAME, "chkconfig_prog_path"), self.__system_service_name)
 		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
-
-		if proc_returncode != 0 :
-			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
-				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		service_record_list = re.split(r"\s+", proc_stdout.split("\n")[0])
 		levels_list = ["0"]*(len(service_record_list) - 1)
@@ -77,41 +73,30 @@ class SystemService(service.FunctionObject) :
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def start(self) :
-		logger.verbose("{mod}: Request to start service \"%s\"" % (self.systemServiceName()))
-		return tools.execProcess("%s start" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
+		logger.verbose("{mod}: Request to start service \"%s\"" % (self.__system_service_name))
+		return tools.execProcess("%s start" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.__system_service_name)))[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def stop(self) :
-		logger.verbose("{mod}: Request to stop service \"%s\"" % (self.systemServiceName()))
-		return tools.execProcess("%s stop" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
+		logger.verbose("{mod}: Request to stop service \"%s\"" % (self.__system_service_name))
+		return tools.execProcess("%s stop" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.__system_service_name)))[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def status(self) :
-		return tools.execProcess("%s status" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.systemServiceName())))[2]
+		return tools.execProcess("%s status" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.__system_service_name)))[2]
 
 
 	### Private ###
-
-	def systemServiceName(self) :
-		return self.__system_service_name
-
-	###
 
 	def setLevels(self, levels, enabled_flag) :
 		levels = self.validLevels(levels)
 
 		logger.verbose("Request to %s service \"%s\" on runlevels \"%s\"" % ( ( "enable" if enabled_flag else "disable" ),
-			self.systemServiceName(), ( levels if levels != None else "default" ) ))
+			self.__system_service_name, ( levels if levels != None else "default" ) ))
 
 		proc_args =  "%s %s %s %s" % ( config.value(SERVICE_NAME, "chkconfig_prog_path"), ( "--level %s" % (levels) if levels != None else "" ),
-			self.systemServiceName(), ( "on" if enabled_flag else "off" ) )
-		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
-
-		if proc_returncode != 0 :
-			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
-				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
-
-		return proc_returncode
+			self.__system_service_name, ( "on" if enabled_flag else "off" ) )
+		return tools.execProcess(proc_args, False)[2]
 
 	###
 

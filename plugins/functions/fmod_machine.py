@@ -17,9 +17,6 @@ RUNLEVELS_METHODS_NAMESPACE = "runlevels"
 
 RUNLEVELS = "0123456"
 
-SHUTDOWN_OPTION_HALT = "-h"
-SHUTDOWN_OPTION_REBOOT = "-r"
-
 
 ##### Private classes #####
 class Machine(service.FunctionObject) :
@@ -28,13 +25,11 @@ class Machine(service.FunctionObject) :
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def shutdown(self) :
-		proc_args = "%s %s now" % (config.value(SERVICE_NAME, "shutdown_prog_path"), SHUTDOWN_OPTION_HALT)
-		return tools.execProcess(proc_args)[2]
+		return tools.execProcess("%s -h now" % (config.value(SERVICE_NAME, "shutdown_prog_path")))[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def reboot(self) :
-		proc_args = "%s %s now" % (config.value(SERVICE_NAME, "shutdown_prog_path"), SHUTDOWN_OPTION_REBOOT)
-		return tools.execProcess(proc_args)[2]
+		return tools.execProcess("%s -r now" % (config.value(SERVICE_NAME, "shutdown_prog_path")))[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def suspend(self) :
@@ -54,9 +49,8 @@ class Machine(service.FunctionObject) :
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, out_signature="i")
 	def currentLevel(self) :
 		proc_args = config.value(SERVICE_NAME, "runlevel_prog_path")
-		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
 
-		level_pairs_list = proc_stdout.strip().split(" ")
+		level_pairs_list = tools.execProcess(proc_args)[0].strip().split(" ")
 		if len(level_pairs_list) != 2 or not level_pairs_list[1] in RUNLEVELS :
 			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
 				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
@@ -66,9 +60,8 @@ class Machine(service.FunctionObject) :
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, out_signature="i")
 	def previousLevel(self) :
 		proc_args = config.value(SERVICE_NAME, "runlevel_prog_path")
-		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
 
-		level_pairs_list = proc_stdout.strip().split(" ")
+		level_pairs_list = tools.execProcess(proc_args)[0].strip().split(" ")
 		if len(level_pairs_list) != 2 or not level_pairs_list[1] in RUNLEVELS+"N" :
 			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
 				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))

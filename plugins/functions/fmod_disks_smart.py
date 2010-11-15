@@ -37,15 +37,10 @@ class Disk(service.FunctionObject) :
 	@service.functionMethod(SMART_METHODS_NAMESPACE, out_signature="a(isiiiissss)")
 	def attributes(self) :
 		proc_args = "%s -A %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), self.__device_file_path)
-		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
-
-		if proc_returncode != 0 :
-			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
-				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		attrs_list = []
 		attrs_found_flag = False
-		for attrs_list_item in proc_stdout.split("\n") :
+		for attrs_list_item in tools.execProcess(proc_args)[0].split("\n") :
 			attrs_list_item = attrs_list_item.strip()
 
 			if attrs_found_flag :
@@ -69,15 +64,10 @@ class Disk(service.FunctionObject) :
 	@service.functionMethod(SMART_METHODS_NAMESPACE, out_signature="b")
 	def health(self) :
 		proc_args = "%s -H %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), self.__device_file_path)
-		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
-
-		if proc_returncode != 0 :
-			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
-				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
 		disk_health_flag = False
 		health_found_flag = False
-		for health_list_item in proc_stdout.split("\n") :
+		for health_list_item in tools.execProcess(proc_args)[0].split("\n") :
 			health_list_item = health_list_item.strip()
 
 			if health_found_flag :
@@ -150,10 +140,8 @@ class Service(service.Service) :
 	### Private ###
 
 	def smartAvailable(self, device_file_path) :
-		# FIXME: Add normal checking for SMART support
 		proc_args = "%s %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), device_file_path)
-		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
-		return not bool(proc_returncode)
+		return not bool(tools.execProcess(proc_args, False)[2])
 
 	###
 

@@ -94,23 +94,11 @@ class CommonInfo(service.FunctionObject) :
 
 	def lsbOption(self, option) :
 		proc_args = "%s %s" % (config.value(SERVICE_NAME, "lsb_release_prog_path"), option)
-		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
-
-		if proc_returncode != 0 :
-			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
-				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
-
-		return ":".join(proc_stdout.split(":")[1:]).strip()
+		return ":".join(tools.execProcess(proc_args)[0].split(":")[1:]).strip()
 
 	def unameOption(self, option) :
 		proc_args = "%s %s" % (config.value(SERVICE_NAME, "uname_prog_path"), option)
-		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
-
-		if proc_returncode != 0 :
-			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
-				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
-
-		return proc_stdout.strip()
+		return tools.execProcess(proc_args)[0].strip()
 
 
 ##### Public classes #####

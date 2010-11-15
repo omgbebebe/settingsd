@@ -59,11 +59,7 @@ class NtpConfig(service.FunctionObject) :
 	@service.functionMethod(NTP_METHODS_NAMESPACE)
 	def request(self) :
 		proc_args =  "%s %s" % (config.value(SERVICE_NAME, "ntpdate_prog_path"), " ".join(self.servers()))
-		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
-
-		if proc_returncode != 0 :
-			raise tools.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
-				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
+		tools.execProcess(proc_args)
 
 
 ##### Public classes #####

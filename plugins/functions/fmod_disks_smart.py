@@ -26,17 +26,17 @@ SMART_METHODS_NAMESPACE = "disks.smart"
 
 ##### Private classes #####
 class Disk(service.FunctionObject) :
-	def __init__(self, device_path, object_path, service_object = None) :
+	def __init__(self, device_file_path, object_path, service_object = None) :
 		service.FunctionObject.__init__(self, object_path, service_object)
 
-		self.__device_path = device_path
+		self.__device_file_path = device_file_path
 
 
 	### DBus methods ###
 
 	@service.functionMethod(SMART_METHODS_NAMESPACE, out_signature="a(isiiiissss)")
 	def attributes(self) :
-		proc_args = "%s -A %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), self.__device_path)
+		proc_args = "%s -A %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), self.__device_file_path)
 		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
 
 		if proc_returncode != 0 :
@@ -68,7 +68,7 @@ class Disk(service.FunctionObject) :
 
 	@service.functionMethod(SMART_METHODS_NAMESPACE, out_signature="b")
 	def health(self) :
-		proc_args = "%s -H %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), self.__device_path)
+		proc_args = "%s -H %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), self.__device_file_path)
 		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
 
 		if proc_returncode != 0 :
@@ -119,8 +119,9 @@ class Service(service.Service) :
 		devices_count = 0
 		for device in self.__udev_client.query_by_subsystem("block") :
 			device_name = device.get_name()
-			if disks_filter_regexp.match(device_name) :
-				disks_smart_shared.addSharedObject(device_name, Disk(device.get_device_file(),
+			device_file_path = device.get_device_file()
+			if disks_filter_regexp.match(device_name) and self.smartAvailable(device_file_path) :
+				disks_smart_shared.addSharedObject(device_name, Disk(device_file_path,
 					dbus_tools.joinPath(DISKS_SMART_SHARED_NAME, device_name), self))
 				devices_count += 1
 		logger.verbose("{mod}: Added %d devices" % (devices_count))
@@ -148,23 +149,31 @@ class Service(service.Service) :
 
 	### Private ###
 
+	def smartAvailable(self, device_file_path) :
+		# FIXME: Add normal checking for SMART support
+		proc_args = "%s %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), device_file_path)
+		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
+		return not bool(proc_returncode)
+
+	###
+
 	def udevEvent(self, udev_client, action, device) :
 		disks_smart_shared = shared.Functions.shared(DISKS_SMART_SHARED_NAME)
 		registered_devices_list = disks_smart_shared.sharedObjects().keys() 
 
 		if re.match(config.value(SERVICE_NAME, "disks_filter"), device.get_name()) :
 			device_name = device.get_name()
-			device_path = device.get_device_file()
+			device_file_path = device.get_device_file()
 
-			if action == "add" and not device in registered_devices_list :
-				disks_smart_shared.addSharedObject(device_name, Disk(device_path,
+			if action == "add" and not device in registered_devices_list and self.smartAvailable(device_file_path) :
+				disks_smart_shared.addSharedObject(device_name, Disk(device_file_path,
 					dbus_tools.joinPath(DISKS_SMART_SHARED_NAME, device_name), self))
 				self.__disks_smart.devicesChanged()
-				logger.debug("{mod}: Added SMART disk \"%s\"" % (device_path))
+				logger.debug("{mod}: Added SMART disk \"%s\"" % (device_file_path))
 
 			elif device.get_action() == "remove" and device_name in registered_devices_list :
 				disks_smart_shared.sharedObject(device_name).removeFromConnection()
 				disks_smart_shared.removeSharedObject(device_name)
 				self.__disks_smart.devicesChanged()
-				logger.debug("{mod}: Removed SMART disk \"%s\"" % (device_path))
+				logger.debug("{mod}: Removed SMART disk \"%s\"" % (device_file_path))
 

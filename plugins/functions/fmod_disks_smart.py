@@ -97,31 +97,40 @@ class DisksSmart(service.FunctionObject) :
 
 ##### Public classes #####
 class Service(service.Service) :
-	def initService(self) :
-		shared.Functions.addShared(DISKS_SMART_SHARED_NAME)
+	def __init__(self) :
+		service.Service.__init__(self)
 
-		###
-
-		self.__disks_smart = DisksSmart(DISKS_SMART_SHARED_NAME, self)
-		shared.Functions.addSharedObject(DISKS_SMART_OBJECT_NAME, self.__disks_smart)
-
-		###
+		#####
 
 		self.__udev_client = gudev.Client(["block"])
+
+		self.__disks_smart = DisksSmart(DISKS_SMART_OBJECT_NAME, self)
+
+
+	### Public ###
+
+	def initService(self) :
+		shared.Functions.addShared(DISKS_SMART_SHARED_NAME)
+		shared.Functions.addSharedObject(DISKS_SMART_SHARED_NAME, self.__disks_smart)
 
 		logger.verbose("{mod}: First devices request...")
 		disks_smart_shared = shared.Functions.shared(DISKS_SMART_SHARED_NAME)
 		disks_filter_regexp = re.compile(config.value(SERVICE_NAME, "disks_filter"))
+		devices_count = 0
 		for device in self.__udev_client.query_by_subsystem("block") :
-			if disks_filter_regexp.match(device.get_name()) :
-				self.udevEvent(self.__udev_client, "add", device)
+			device_name = device.get_name()
+			if disks_filter_regexp.match(device_name) :
+				disks_smart_shared.addSharedObject(device_name, Disk(device.get_device_file(),
+					dbus_tools.joinPath(DISKS_SMART_SHARED_NAME, device_name), self))
+				devices_count += 1
+		logger.verbose("{mod}: Added %d devices" % (devices_count))
 
 		self.__udev_client.connect("uevent", self.udevEvent)
-		logger.verbose("{mod}: Start polling udev events")
+		logger.verbose("{mod}: Start polling udev events for \"block\"")
 
 	def closeService(self) :
 		self.__udev_client.disconnect_by_func(self.udevEvent)
-		logger.verbose("{mod}: Stop polling udev events")
+		logger.verbose("{mod}: Stop polling udev events for \"block\"")
 
 	###
 

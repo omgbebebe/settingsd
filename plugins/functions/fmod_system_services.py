@@ -153,6 +153,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 
 	def initService(self) :
 		shared.Functions.addShared(SYSTEM_SERVICES_SHARED_NAME)
+		shared.Functions.addSharedObject(SYSTEM_SERVICES_OBJECT_NAME, self.__system_services)
 
 		initd_dir_path = config.value(SERVICE_NAME, "initd_dir_path")
 

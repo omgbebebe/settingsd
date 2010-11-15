@@ -9,6 +9,7 @@ from settingsd import dbus_tools
 
 
 ##### Private constants #####
+SETTINGSD_METHODS_NAMESPACE = dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME, "commonInfo.settingsd")
 LOGGER_METHODS_NAMESPACE = dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME, "logger")
 APPLICATION_METHODS_NAMESPACE = dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME, "application")
 
@@ -17,6 +18,20 @@ APPLICATION_METHODS_NAMESPACE = dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME
 class Settingsd(service.CustomObject) :
 
 	### DBus methods ###
+
+	@service.customMethod(SETTINGSD_METHODS_NAMESPACE, out_signature="s")
+	def version(self) :
+		return const.VERSION
+
+	@service.customMethod(SETTINGSD_METHODS_NAMESPACE, out_signature="s")
+	def versionStatus(self) :
+		return const.VERSION_STATUS
+
+	@service.customMethod(SETTINGSD_METHODS_NAMESPACE, out_signature="i")
+	def functionalityLevel(self) :
+		return const.FUNCTIONALITY_LEVEL
+
+	###
 
 	@service.customMethod(LOGGER_METHODS_NAMESPACE, in_signature="i")
 	def setLogLevel(self, log_level) :

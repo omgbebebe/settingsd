@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt6
+Release: alt7
 
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 
@@ -49,6 +49,9 @@ Extensible service to control the operating system via D-Bus.
 
 
 %changelog
+* Tue Nov 16 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt7
+- added requirements for this verison
+
 * Mon Nov 15 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt6
 - added exception on process fail to fmod_system_services at first services loading
 - added module for check SMART status

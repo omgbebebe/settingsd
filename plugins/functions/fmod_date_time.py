@@ -51,10 +51,10 @@ class DateTime(service.FunctionObject) :
 		os.symlink(os.path.join(config.value(SERVICE_NAME, "zoneinfo_dir_path"), zone),
 			config.value(SERVICE_NAME, "localtime_file_path"))
 
-		if not os.access(config.value(SERVICE_NAME, "clock_config_path"), os.F_OK) :
-			open(config.value(SERVICE_NAME, "clock_config_path"), "w").close()
+		if not os.access(config.value(SERVICE_NAME, "clock_config_file_path"), os.F_OK) :
+			open(config.value(SERVICE_NAME, "clock_config_file_path"), "w").close()
 
-		clock_config_file = open(config.value(SERVICE_NAME, "clock_config_path"), "r+")
+		clock_config_file = open(config.value(SERVICE_NAME, "clock_config_file_path"), "r+")
 		clock_config_file_data = clock_config_file.read()
 
 		clock_config_file_data = re.sub(r"(\A|\n)ZONE=[\"\']?[a-zA-Z0-9/]*[\"\']?", "\nZONE=\"%s\"" % (zone), clock_config_file_data)
@@ -69,8 +69,8 @@ class DateTime(service.FunctionObject) :
 
 	@service.functionMethod(ZONE_METHODS_NAMESPACE, out_signature="s")
 	def timeZone(self) :
-		if os.access(config.value(SERVICE_NAME, "clock_config_path"), os.F_OK) :
-			clock_config_file = open(config.value(SERVICE_NAME, "clock_config_path"))
+		if os.access(config.value(SERVICE_NAME, "clock_config_file_path"), os.F_OK) :
+			clock_config_file = open(config.value(SERVICE_NAME, "clock_config_file_path"))
 			clock_config_file_data = clock_config_file.read()
 			try :
 				clock_config_file.close()
@@ -133,6 +133,6 @@ class Service(service.Service) :
 			(SERVICE_NAME, "hwclock_prog_path", "/usr/sbin/hwclock", str),
 			(SERVICE_NAME, "localtime_file_path", "/etc/localtime", str),
 			(SERVICE_NAME, "zoneinfo_dir_path", "/usr/share/zoneinfo", str),
-			(SERVICE_NAME, "clock_config_path", "/etc/sysconfig/clock", str)
+			(SERVICE_NAME, "clock_config_file_path", "/etc/sysconfig/clock", str)
 		]
 

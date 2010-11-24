@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import os
 import re
 
 from settingsd import config
@@ -23,10 +24,13 @@ class NtpConfig(service.FunctionObject) :
 
 	@service.functionMethod(NTP_METHODS_NAMESPACE, in_signature="as")
 	def setServers(self, servers_list) :
+		if not os.access(config.value(SERVICE_NAME, "ntp_config_file_path"), os.F_OK) :
+			open(config.value(SERVICE_NAME, "ntp_config_file_path"), "w").close()
+
 		ntp_config_file = open(config.value(SERVICE_NAME, "ntp_config_file_path"), "r+")
 		ntp_config_file_data = ntp_config_file.read()
 
-		ntp_config_file_data = re.sub(r"\nserver[\s\t]+[^\n]+", "", ntp_config_file_data)
+		ntp_config_file_data = re.sub(r"(\n|\A)server[\s\t]+[^\n]+", "", ntp_config_file_data)
 		for servers_list_item in servers_list :
 			ntp_config_file_data += "server %s\n" % (servers_list_item)
 
@@ -40,19 +44,21 @@ class NtpConfig(service.FunctionObject) :
 
 	@service.functionMethod(NTP_METHODS_NAMESPACE, out_signature="as")
 	def servers(self) :
-		ntp_config_file = open(config.value(SERVICE_NAME, "ntp_config_file_path"), "r")
-		ntp_config_file_list = ntp_config_file.read().split("\n")
-		try :
-			ntp_config_file.close()
-		except : pass
+		if os.access(config.value(SERVICE_NAME, "ntp_config_file_path"), os.F_OK) :
+			ntp_config_file = open(config.value(SERVICE_NAME, "ntp_config_file_path"), "r")
+			ntp_config_file_list = ntp_config_file.read().split("\n")
+			try :
+				ntp_config_file.close()
+			except : pass
 
-		servers_list = []
-		for ntp_config_file_list_item in ntp_config_file_list :
-			if len(ntp_config_file_list_item) == 0 :
-				continue
-			if re.match(r"^server[\s\t]+", ntp_config_file_list_item) != None :
-				servers_list.append(re.split(r"[\s\t]+", ntp_config_file_list_item)[1])
-		return servers_list
+			servers_list = []
+			for ntp_config_file_list_item in ntp_config_file_list :
+				if len(ntp_config_file_list_item) == 0 :
+					continue
+				if re.match(r"^server[\s\t]+", ntp_config_file_list_item) != None :
+					servers_list.append(re.split(r"[\s\t]+", ntp_config_file_list_item)[1])
+			return servers_list
+		return []
 
 	###
 

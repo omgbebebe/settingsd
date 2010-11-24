@@ -26,7 +26,7 @@ def help() :
 		"\t-k, --kill -- Kill daemon process" % (const.MY_NAME) )
 
 def version() :
-	print "%s version %s-%s" % (const.MY_NAME, const.VERSION, const.VERSION_STATUS)
+	print "%s version %s-%s, functionality_level=%d" % (const.MY_NAME, const.VERSION, const.VERSION_STATUS, const.FUNCTIONALITY_LEVEL)
 
 
 ##### Main #####

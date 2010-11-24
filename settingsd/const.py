@@ -6,7 +6,7 @@ MY_NAME = "settingsd"
 
 VERSION = "0.1"
 VERSION_STATUS = "beta"
-FUNCTIONALITY_LEVEL = 57
+FUNCTIONALITY_LEVEL = 62
 
 
 FUNCTIONS_DIR = "plugins/functions"

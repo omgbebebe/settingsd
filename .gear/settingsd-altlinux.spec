@@ -19,7 +19,7 @@ BuildRequires: python-dev
 
 Requires: python-module-dbus, python-module-pyinotify, python-module-gudev
 Requires: chkconfig, service, SysVinit, pm-utils, lsb-release
-Requires: smartctl, ntpdate
+Requires: smartctl, ntpdate, hwclock
 
 %description
 Extensible service to control the operating system via D-Bus.

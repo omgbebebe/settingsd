@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt7
+Release: alt8
 
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 
@@ -49,6 +49,14 @@ Extensible service to control the operating system via D-Bus.
 
 
 %changelog
+* Thu Nov 25 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt8
+- added DBus policy for fmod_date_time, refactoring
+- added module for date/time configuration
+- current functionality level = 62
+- fixed regexp for ntp servers, code for checks /etc/ntp.conf
+- output version status at option -v
+- refactoring
+
 * Tue Nov 16 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt7
 - added requirements for this verison
 

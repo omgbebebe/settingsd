@@ -28,3 +28,22 @@ def validRange(arg, valid_args_list) :
 def validStringList(arg) :
 	return re.split(r"[,\t ]+", str(arg))
 
+###
+def validIpv4Address(arg) :
+	arg = str(arg).strip()
+
+	octets_list = []
+	for octets_list_item in arg.split(".") :
+		try :
+			octets_list_item = int(octets_list_item)
+			if not 0 <= octets_list_item <= 256 :
+				raise Exception
+			octets_list.append(octets_list_item)
+		except :
+			raise ValidatorError("Argument \"%s\" is not valid IPv4 address" % (arg))
+
+	if len(octets_list) != 4 :
+		raise ValidatorError("Argument \"%s\" is not valid IPv4 address" % (arg))
+
+	return (arg, octets_list)
+

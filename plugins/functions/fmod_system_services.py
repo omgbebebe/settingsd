@@ -74,16 +74,19 @@ class SystemService(service.FunctionObject) :
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def start(self) :
 		logger.verbose("{mod}: Request to start service \"%s\"" % (self.__system_service_name))
-		return tools.execProcess("%s start" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.__system_service_name)))[2]
+		return tools.execProcess("%s start" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
+			self.__system_service_name) ), False)[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def stop(self) :
 		logger.verbose("{mod}: Request to stop service \"%s\"" % (self.__system_service_name))
-		return tools.execProcess("%s stop" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.__system_service_name)))[2]
+		return tools.execProcess("%s stop" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
+			self.__system_service_name) ), False)[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def status(self) :
-		return tools.execProcess("%s status" % (os.path.join(config.value(SERVICE_NAME, "initd_dir_path"), self.__system_service_name)))[2]
+		return tools.execProcess("%s status" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
+			self.__system_service_name) ), False)[2]
 
 
 	### Private ###

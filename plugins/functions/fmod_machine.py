@@ -25,26 +25,26 @@ class Machine(service.FunctionObject) :
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def shutdown(self) :
-		return tools.execProcess("%s -h now" % (config.value(SERVICE_NAME, "shutdown_prog_path")))[2]
+		return tools.execProcess("%s -h now" % (config.value(SERVICE_NAME, "shutdown_prog_path")), False)[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def reboot(self) :
-		return tools.execProcess("%s -r now" % (config.value(SERVICE_NAME, "shutdown_prog_path")))[2]
+		return tools.execProcess("%s -r now" % (config.value(SERVICE_NAME, "shutdown_prog_path")), False)[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def suspend(self) :
-		return tools.execProcess(config.value(SERVICE_NAME, "pm_suspend_prog_path"))[2]
+		return tools.execProcess(config.value(SERVICE_NAME, "pm_suspend_prog_path"), False)[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def hibernate(self) :
-		return tools.execProcess(config.value(SERVICE_NAME, "pm_hibernate_prog_path"))[2]
+		return tools.execProcess(config.value(SERVICE_NAME, "pm_hibernate_prog_path"), False)[2]
 
 	###
 
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, in_signature="i", out_signature="i")
 	def switchTo(self, level) :
 		proc_args = "%s %s" % (config.value(SERVICE_NAME, "telinit_prog_path"), validators.validRange(str(level), RUNLEVELS))
-		return tools.execProcess(proc_args)[2]
+		return tools.execProcess(proc_args, False)[2]
 
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, out_signature="i")
 	def currentLevel(self) :

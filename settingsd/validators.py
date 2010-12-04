@@ -53,6 +53,8 @@ def validIpv4Netmask(arg) :
 	if len(octets_list) == 1 :
 		try :
 			arg = int(arg)
+			if not 0 <= arg <= 32 :
+				raise ValidatorError("Argument \"%s\" is not valid IPv4 netmask" % (arg))
 		except :
 			raise ValidatorError("Argument \"%s\" is not valid IPv4 netmask" % (arg))
 

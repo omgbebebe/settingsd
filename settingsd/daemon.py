@@ -28,6 +28,9 @@ def pidsListOfPythonProc(proc_name, without_options_list = [], uid = 0) :
 
 		cmdline_file = open(cmdline_file_path)
 		cmdline_list = cmdline_file.read().split("\0")
+		try :
+			cmdline_file.close()
+		except : pass
 
 		if len(cmdline_list) >= 2 and os.path.basename(cmdline_list[1]) == proc_name :
 			ignore_flag = False
@@ -37,8 +40,6 @@ def pidsListOfPythonProc(proc_name, without_options_list = [], uid = 0) :
 					break
 			if not ignore_flag :
 				proc_pids_list.append(proc_pid)
-
-		cmdline_file.close()
 	return proc_pids_list
 
 def maxFd() :

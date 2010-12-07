@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt9
+Release: alt10
 
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 
@@ -49,6 +49,17 @@ Extensible service to control the operating system via D-Bus.
 
 
 %changelog
+* Tue Dec 07 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt10
+- added validator for IPv4 address
+- changed functionality level
+- check for on-digit mask range
+- closing file does not emmit exception
+- fixed small bug in IPv4 address validator, added validator for IPv4 netmask validator, validator for hardware MAC address
+- new parsers for ntp_config
+- plugin for dnsmasq configuration
+- some calls of execProcess in plugins no longer cause exceptions
+- updated D-Bus policy
+
 * Thu Nov 25 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt9
 - added package requirement at hwclock
 

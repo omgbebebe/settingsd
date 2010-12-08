@@ -19,7 +19,7 @@ Extensible service to control the operating system via D-Bus.
 %package fmod-disks-smart
 Summary: Settingsd functional plugin for view SMART information of disks
 Group: Monitoring
-Requires: python-module-gudev, smartctl
+Requires: python-module-gudev, smartmontools
 Requires: %name = %version-%release
 %description fmod-disks-smart
 %summary

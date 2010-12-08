@@ -1,28 +1,46 @@
 Name: settingsd
 Version: 0.1
 Release: alt10
-
 Summary: Settingsd - extensible service to control the operating system via D-Bus
-
 Group: System/Servers
 License: GPL
 URL: http://etersoft.ru
-
 Packager: Devaev Maxim <mdevaev@etersoft.ru>
-
 #Git: git.eter:/people/mdevaev/packages/settingsd.git
 Source: %name-%version.tar
-
 BuildArch: noarch
-
 BuildRequires: python-dev
-
-Requires: python-module-dbus, python-module-pyinotify, python-module-gudev
-Requires: chkconfig, service, SysVinit, pm-utils, lsb-release
-Requires: smartctl, ntpdate, hwclock
-
+Requires: python-module-dbus, python-module-pyinotify
+Requires: chkconfig, service, SysVinit, pm-utils, lsb-release, hwclock
 %description
 Extensible service to control the operating system via D-Bus.
+
+
+%package fmod-disks-smart
+Summary: Settingsd functional plugin for view SMART information of disks
+Group: Monitoring
+Requires: python-module-gudev, smartctl
+Requires: %name = %version-%release
+%description
+%summary
+
+
+%package fmod-ntp-config
+Summary: Settingsd functional plugin for NTP configuration
+Group: System/Configuration/Other
+Requires: ntpdate
+Requires: %name = %version-%release
+%description
+%summary
+
+
+%package fmod-dnsmasq-config
+Summary: Settingsd functional plugin for dnsmasq configuration
+Group: System/Configuration/Networking
+Requires: dnsmasq
+Requires: %name = %version-%release
+%description 
+%summary
 
 
 %prep
@@ -40,12 +58,34 @@ Extensible service to control the operating system via D-Bus.
 %files
 %_bindir/settingsd-server.py
 %dir %_sysconfdir/%name/
-%config(noreplace) %_sysconfdir/%name/*.conf
+%config(noreplace) %_sysconfdir/%name/main.conf
 %_initddir/%name
 %_sysconfdir/dbus-1/system.d/*.conf
-%_datadir/%name/
+%dir %_datadir/%name/*/
+%_datadir/%name/functions/fmod_common_info.py*
+%_datadir/%name/functions/fmod_date_time.py*
+%_datadir/%name/functions/fmod_example.py*
+%_datadir/%name/functions/fmod_machine.py*
+%_datadir/%name/functions/fmod_settingsd.py*
+%_datadir/%name/functions/fmod_statistics.py*
+%_datadir/%name/functions/fmod_system_services.py*
 %python_sitelibdir/%name/
 %python_sitelibdir/*.egg-info
+
+
+%files fmod-disks-smart
+%config(noreplace) %_sysconfdir/%name/disks_smart.conf
+%_datadir/%name/functions/fmod_disks_smart.py*
+
+
+%files fmod-ntp-config
+%config(noreplace) %_sysconfdir/%name/ntp_config.conf
+%_datadir/%name/functions/fmod_ntp_config.py*
+
+
+%files fmod-dnsmasq-config
+%config(noreplace) %_sysconfdir/%name/dnsmasq.conf
+%_datadir/%name/functions/fmod_dnsmasq_config.py*
 
 
 %changelog

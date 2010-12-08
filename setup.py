@@ -22,9 +22,12 @@ data_files_list = [
 	("/etc/dbus-1/system.d", ["configs/dbus/org.etersoft.settingsd.conf"]),
 	("/etc/rc.d/init.d", ["init/settingsd"])
 ]
-for maps_list_item in ( ("share/settingsd/functions", "plugins/functions"),
-	("share/settingsd/actions", "plugins/actions"),
-	("share/settingsd/customs", "plugins/customs"),
+for maps_list_item in ( ("share/settingsd/plugins/functions", "plugins/functions"),
+	("share/settingsd/plugins/actions", "plugins/actions"),
+	("share/settingsd/plugins/customs", "plugins/customs"),
+	("share/settingsd/data/functions", "data/functions"),
+	("share/settingsd/data/actions", "data/actions"),
+	("share/settingsd/data/customs", "data/customs"),
 	("/etc/settingsd", "configs/settingsd") ) :
 
 	data_files_list.append(( maps_list_item[0], [ os.path.join(maps_list_item[1], item)
@@ -69,9 +72,13 @@ class SettingsdInstall(install) :
 		const_py_file = open(os.path.join(self.install_libbase, "settingsd/const.py"), "r+")
 		const_py_file_data = const_py_file.read()
 
-		for replaces_list_item in ( ("\"plugins/functions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/functions"))),
-			("\"plugins/actions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/actions"))),
-			("\"plugins/customs\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/customs"))),
+		for replaces_list_item in ( ("\"plugins/functions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/plugins/functions"))),
+			("\"plugins/actions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/plugins/actions"))),
+			("\"plugins/customs\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/plugins/customs"))),
+			("\"plugins/functions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/plugins/functions"))),
+			("\"data/functions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/data/functions"))),
+			("\"data/actions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/data/actions"))),
+			("\"data/customs\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/data/customs"))),
 			("\"configs/settingsd\"", "\"%s\"" % (os.path.join(( self.root if self.root != None else "/" ), "etc/settingsd"))) ) :
 				const_py_file_data = const_py_file_data.replace(replaces_list_item[0], replaces_list_item[1])
 

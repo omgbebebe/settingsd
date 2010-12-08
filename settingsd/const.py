@@ -12,6 +12,11 @@ FUNCTIONALITY_LEVEL = 74
 FUNCTIONS_DIR = "plugins/functions"
 ACTIONS_DIR = "plugins/actions"
 CUSTOMS_DIR = "plugins/customs"
+
+FUNCTIONS_DATA_DIR = "data/functions"
+ACTIONS_DATA_DIR = "data/actions"
+CUSTIOMS_DIR = "data/customs"
+
 CONFIGS_DIR = "configs/settingsd"
 CONFIG_FILE_POSTFIX = ".conf"
 

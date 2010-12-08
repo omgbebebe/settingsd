@@ -61,31 +61,32 @@ Requires: %name = %version-%release
 %config(noreplace) %_sysconfdir/%name/main.conf
 %_initddir/%name
 %_sysconfdir/dbus-1/system.d/*.conf
-%dir %_datadir/%name/*/
-%_datadir/%name/functions/fmod_common_info.py*
-%_datadir/%name/functions/fmod_date_time.py*
-%_datadir/%name/functions/fmod_example.py*
-%_datadir/%name/functions/fmod_machine.py*
-%_datadir/%name/functions/fmod_settingsd.py*
-%_datadir/%name/functions/fmod_statistics.py*
-%_datadir/%name/functions/fmod_system_services.py*
+%dir %_datadir/%name/plugins/*/
+%dir %_datadir/%name/data/*/
+%_datadir/%name/plugins/functions/fmod_common_info.py*
+%_datadir/%name/plugins/functions/fmod_date_time.py*
+%_datadir/%name/plugins/functions/fmod_example.py*
+%_datadir/%name/plugins/functions/fmod_machine.py*
+%_datadir/%name/plugins/functions/fmod_settingsd.py*
+%_datadir/%name/plugins/functions/fmod_statistics.py*
+%_datadir/%name/plugins/functions/fmod_system_services.py*
 %python_sitelibdir/%name/
 %python_sitelibdir/*.egg-info
 
 
 %files fmod-disks-smart
 %config(noreplace) %_sysconfdir/%name/disks_smart.conf
-%_datadir/%name/functions/fmod_disks_smart.py*
+%_datadir/%name/plugins/functions/fmod_disks_smart.py*
 
 
 %files fmod-ntp-config
 %config(noreplace) %_sysconfdir/%name/ntp_config.conf
-%_datadir/%name/functions/fmod_ntp_config.py*
+%_datadir/%name/plugins/functions/fmod_ntp_config.py*
 
 
 %files fmod-dnsmasq-config
 %config(noreplace) %_sysconfdir/%name/dnsmasq.conf
-%_datadir/%name/functions/fmod_dnsmasq_config.py*
+%_datadir/%name/plugins/functions/fmod_dnsmasq_config.py*
 
 
 %changelog

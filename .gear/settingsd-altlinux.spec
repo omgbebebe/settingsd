@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt11
+Release: alt12
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 Group: System/Servers
 License: GPL
@@ -90,6 +90,9 @@ Requires: %name = %version-%release
 
 
 %changelog
+* Wed Dec 08 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt12
+- fixed broken dependency on smartmontools
+
 * Wed Dec 08 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt11
 - added folders for plugins data
 - fixed build errors

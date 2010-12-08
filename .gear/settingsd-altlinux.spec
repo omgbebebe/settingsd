@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt10
+Release: alt11
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 Group: System/Servers
 License: GPL
@@ -90,6 +90,11 @@ Requires: %name = %version-%release
 
 
 %changelog
+* Wed Dec 08 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt11
+- added folders for plugins data
+- fixed build errors
+- package is divided into the main program and plugins
+
 * Tue Dec 07 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt10
 - added validator for IPv4 address
 - changed functionality level

@@ -21,7 +21,7 @@ Summary: Settingsd functional plugin for view SMART information of disks
 Group: Monitoring
 Requires: python-module-gudev, smartctl
 Requires: %name = %version-%release
-%description
+%description fmod-disks-smart
 %summary
 
 
@@ -30,7 +30,7 @@ Summary: Settingsd functional plugin for NTP configuration
 Group: System/Configuration/Other
 Requires: ntpdate
 Requires: %name = %version-%release
-%description
+%description fmod-ntp-config
 %summary
 
 
@@ -39,7 +39,7 @@ Summary: Settingsd functional plugin for dnsmasq configuration
 Group: System/Configuration/Networking
 Requires: dnsmasq
 Requires: %name = %version-%release
-%description 
+%description fmod-dnsmasq-config
 %summary
 
 

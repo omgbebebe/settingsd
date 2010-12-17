@@ -4,7 +4,9 @@
 import os
 import re
 import signal
+import shutil
 
+from settingsd import const
 from settingsd import config
 from settingsd import service
 from settingsd import shared
@@ -134,10 +136,20 @@ class SimpleDnsmasqConfig(service.FunctionObject) :
 		if not type(values_list).__name__ in ("list", "tuple") :
 			values_list = [values_list]
 
-		if not os.access(config.value(SERVICE_NAME, "dnsmasq_config_file_path"), os.F_OK) :
-			open(config.value(SERVICE_NAME, "dnsmasq_config_file_path"), "w").close()
+		dnsmasq_config_file_path = config.value(SERVICE_NAME, "dnsmasq_config_file_path")
 
-		dnsmasq_config_file = open(config.value(SERVICE_NAME, "dnsmasq_config_file_path"), "r+")
+		###
+
+		dnsmasq_config_file_path_sample = config_value(SERVICE_NAME, "dnsmasq_config_file_path_sample")
+		if not os.access(dnsmasq_config_file_path, os.F_OK) :
+			if access(dnsmasq_config_file_path_sample, os.F_OK) :
+				shutil.copy2(dnsmasq_config_file_path_sample, dnsmasq_config_file_path)
+			else :
+				open(dnsmasq_config_file_path, "w").close()
+
+		###
+
+		dnsmasq_config_file = open(dnsmasq_config_file_path, "r+")
 		dnsmasq_config_file_data = dnsmasq_config_file.read()
 
 		variable_regexp = re.compile(r"(((\n|\A)%s[\s\t]*=[^\n]*)+)" % (variable_name))
@@ -196,6 +208,8 @@ class Service(service.Service) :
 	@classmethod
 	def options(self) :
 		return [
-			(SERVICE_NAME, "dnsmasq_config_file_path", "/etc/dnsmasq.conf", str)
+			(SERVICE_NAME, "dnsmasq_config_file_path", "/etc/dnsmasq.conf", str),
+
+			(SERVICE_NAME, "dnsmasq_config_file_path_sample", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "dnsmasq.conf"), str)
 		]
 

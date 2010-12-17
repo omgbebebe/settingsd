@@ -29,7 +29,8 @@ class RTorrentd(service.FunctionObject) :
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="s")
 	def user(self) :
-		return self.configValue("RTORRENTD_USER")[0]
+		user_name_list = self.configValue("RTORRENTD_USER")
+		return ( user_name_list[0] if len(user_name_list) > 0 else "" )
 
 	###
 
@@ -39,7 +40,8 @@ class RTorrentd(service.FunctionObject) :
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="s")
 	def downloadsDir(self) :
-		return self.configValue("RTORRENTD_DOWNLOADS")[0]
+		downloads_dir_path_list = self.configValue("RTORRENTD_DOWNLOADS")
+		return ( downloads_dir_path_list[0] if len(downloads_dir_path_list) > 0 else "" )
 
 	###
 
@@ -49,7 +51,8 @@ class RTorrentd(service.FunctionObject) :
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="s")
 	def sessionDir(self) :
-		return self.configValue("RTORRENTD_SESSION")[0]
+		session_dir_path_list = self.configValue("RTORRENTD_SESSION")
+		return ( session_dir_path_list[0] if len(session_dir_path_list) > 0 else "" )
 
 	###
 
@@ -59,7 +62,8 @@ class RTorrentd(service.FunctionObject) :
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="s")
 	def tmpDir(self) :
-		return self.configValue("RTORRENTD_TMP")[0]
+		tmp_dir_path_list = self.configValue("RTORRENTD_TMP")
+		return ( tmp_dir_path_list[0] if len(tmp_dir_path_list) > 0 else "" )
 
 	###
 
@@ -69,13 +73,16 @@ class RTorrentd(service.FunctionObject) :
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="s")
 	def socketPath(self) :
-		return self.configValue("RTORRENTD_SOCKET")[0]
+		socket_path_list = self.configValue("RTORRENTD_SOCKET")
+		return ( socket_path_list[0] if len(socket_path_list) > 0 else "" )
 
 	###
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, in_signature="s")
 	def setSocketUser(self, user_name) :
-		socket_owner_list = self.configValue("RTORRENT_SOCKET_OWNER")[0].split(":")
+		socket_owner_list = self.configValue("RTORRENT_SOCKET_OWNER")
+		socket_owner_list = ( socket_owner_list[0].split(":") if len(socket_owner_list) > 0 else ["", ""] )
+
 		if len(socket_owner_list) != 2 :
 			socket_owner_list = (user_name, "")
 		else :
@@ -84,7 +91,9 @@ class RTorrentd(service.FunctionObject) :
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, in_signature="s")
 	def setSocketGroup(self, group_name) :
-		socket_owner_list = self.configValue("RTORRENT_SOCKET_OWNER")[0].split(":")
+		socket_owner_list = self.configValue("RTORRENT_SOCKET_OWNER")
+		socket_owner_list = ( socket_owner_list[0].split(":") if len(socket_owner_list) > 0 else ["", ""] )
+
 		if len(socket_owner_list) != 2 :
 			socket_owner_list = ("", group_name)
 		else :
@@ -93,14 +102,14 @@ class RTorrentd(service.FunctionObject) :
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="s")
 	def socketUser(self) :
-		return self.configValue("RTORRENT_SOCKET_OWNER")[0].split(":")[0]
+		socket_owner_list = self.configValue("RTORRENT_SOCKET_OWNER")
+		return ( socket_owner_list[0].split(":")[0] if len(socket_owner_list) > 0 else "" )
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="s")
 	def socketGroup(self) :
-		socket_owner_list = self.configValue("RTORRENT_SOCKET_OWNER")[0].split(":")
-		if len(socket_owner_list) != 2 :
-			return ""
-		return socket_owner_list[1]
+		socket_owner_list = self.configValue("RTORRENT_SOCKET_OWNER")
+		socket_owner_list = ( socket_owner_list[0].split(":") if len(socket_owner_list) > 0 else ["", ""] )
+		return ( socket_owner_list[1] if len(socket_owner_list) == 2 else "" )
 
 	###
 
@@ -110,7 +119,8 @@ class RTorrentd(service.FunctionObject) :
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="i")
 	def socketMode(self) :
-		return int(self.configValue("RTORRENT_SOCKET_PERMISSIONS"))
+		socket_mode_list = self.configValue("RTORRENT_SOCKET_PERMISSIONS")
+		return ( int(socket_mode_list[0]) if len(socket_mode_list) > 0 else -1 )
 
 
 	### Private ###
@@ -125,7 +135,7 @@ class RTorrentd(service.FunctionObject) :
 
 		rtorrentd_config_file_path_sample = config.value(SERVICE_NAME, "rtorrentd_config_file_path_sample")
 		if not os.access(rtorrentd_config_file_path, os.F_OK) :
-			if access(rtorrentd_config_file_path_sample, os.F_OK) :
+			if os.access(rtorrentd_config_file_path_sample, os.F_OK) :
 				shutil.copy2(rtorrentd_config_file_path_sample, rtorrentd_config_file_path)
 			else :
 				open(rtorrentd_config_file_path, "w").close()

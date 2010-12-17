@@ -3,7 +3,9 @@
 
 import os
 import re
+import shutil
 
+from settingsd import const
 from settingsd import config
 from settingsd import service
 from settingsd import shared
@@ -44,10 +46,20 @@ class NtpConfig(service.FunctionObject) :
 		if not type(values_list).__name__ in ("list", "tuple") :
 			values_list = [values_list]
 
-		if not os.access(config.value(SERVICE_NAME, "ntp_config_file_path"), os.F_OK) :
-			open(config.value(SERVICE_NAME, "ntp_config_file_path"), "w").close()
+		ntp_config_file_path = config.value(SERVICE_NAME, "ntp_config_file_path")
 
-		ntp_config_file = open(config.value(SERVICE_NAME, "ntp_config_file_path"), "r+")
+		###
+
+		ntp_config_file_path_sample = config_value(SERVICE_NAME, "ntp_config_file_path_sample")
+		if not os.access(ntp_config_file_path, os.F_OK) :
+			if access(ntp_config_file_path_sample, os.F_OK) :
+				shutil.copy2(ntp_config_file_path_sample, ntp_config_file_path)
+			else :
+				open(ntp_config_file_path, "w").close()
+
+		###
+
+		ntp_config_file = open(ntp_config_file_path, "r+")
 		ntp_config_file_data = ntp_config_file.read()
 
 		variable_regexp = re.compile(r"(((\n|\A)%s[\s\t]+[^\n]*)+)" % (variable_name))
@@ -108,6 +120,8 @@ class Service(service.Service) :
 	def options(self) :
 		return [
 			(SERVICE_NAME, "ntpdate_prog_path", "/usr/sbin/ntpdate", str),
-			(SERVICE_NAME, "ntp_config_file_path", "/etc/ntp.conf", str)
+			(SERVICE_NAME, "ntp_config_file_path", "/etc/ntp.conf", str),
+
+			(SERVICE_NAME, "ntp_config_file_path_sample", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "ntp.conf"), str)
 		]
 

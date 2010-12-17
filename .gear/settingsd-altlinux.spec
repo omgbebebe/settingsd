@@ -43,6 +43,15 @@ Requires: %name = %version-%release
 %summary
 
 
+%package fmod-dnsmasq-config
+Summary: Settingsd functional plugin for rtorrentd configuration
+Group: System/Configuration/Networking
+Requires: rtorrentd
+Requires: %name = %version-%release
+%description fmod-rtorrentd-config
+%summary
+
+
 %prep
 %setup
 
@@ -85,8 +94,12 @@ Requires: %name = %version-%release
 
 
 %files fmod-dnsmasq-config
-%config(noreplace) %_sysconfdir/%name/dnsmasq.conf
+%config(noreplace) %_sysconfdir/%name/dnsmasq_config.conf
 %_datadir/%name/plugins/functions/fmod_dnsmasq_config.py*
+
+%files fmod-rtorrentd-config
+%config(noreplace) %_sysconfdir/%name/rtorrentd_config.conf
+%_datadir/%name/plugins/functions/fmod_rtorrentd_config.py*
 
 
 %changelog

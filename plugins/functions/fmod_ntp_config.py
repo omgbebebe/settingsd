@@ -50,7 +50,7 @@ class NtpConfig(service.FunctionObject) :
 
 		###
 
-		ntp_config_file_path_sample = config_value(SERVICE_NAME, "ntp_config_file_path_sample")
+		ntp_config_file_path_sample = config.value(SERVICE_NAME, "ntp_config_file_path_sample")
 		if not os.access(ntp_config_file_path, os.F_OK) :
 			if access(ntp_config_file_path_sample, os.F_OK) :
 				shutil.copy2(ntp_config_file_path_sample, ntp_config_file_path)

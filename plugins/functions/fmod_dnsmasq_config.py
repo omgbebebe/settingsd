@@ -140,7 +140,7 @@ class SimpleDnsmasqConfig(service.FunctionObject) :
 
 		###
 
-		dnsmasq_config_file_path_sample = config_value(SERVICE_NAME, "dnsmasq_config_file_path_sample")
+		dnsmasq_config_file_path_sample = config.value(SERVICE_NAME, "dnsmasq_config_file_path_sample")
 		if not os.access(dnsmasq_config_file_path, os.F_OK) :
 			if access(dnsmasq_config_file_path_sample, os.F_OK) :
 				shutil.copy2(dnsmasq_config_file_path_sample, dnsmasq_config_file_path)

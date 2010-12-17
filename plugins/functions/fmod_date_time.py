@@ -60,7 +60,7 @@ class DateTime(service.FunctionObject) :
 
 		clock_config_file_path_sample = config.value(SERVICE_NAME, "clock_config_file_path_sample")
 		if not os.access(clock_config_file_path, os.F_OK) :
-			if access(clock_config_file_path_sample, os.F_OK) :
+			if os.access(clock_config_file_path_sample, os.F_OK) :
 				shutil.copy2(clock_config_file_path_sample, clock_config_file_path)
 			else :
 				open(clock_config_file_path, "w").close()

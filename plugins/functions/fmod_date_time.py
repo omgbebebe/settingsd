@@ -5,11 +5,14 @@ import os
 import time
 import re
 import hashlib
+import shutil
 
+from settingsd import const
 from settingsd import config
 from settingsd import service
 from settingsd import shared
 from settingsd import tools
+
 
 ##### Private constants #####
 SERVICE_NAME = "date_time"
@@ -51,10 +54,20 @@ class DateTime(service.FunctionObject) :
 		os.symlink(os.path.join(config.value(SERVICE_NAME, "zoneinfo_dir_path"), zone),
 			config.value(SERVICE_NAME, "localtime_file_path"))
 
-		if not os.access(config.value(SERVICE_NAME, "clock_config_file_path"), os.F_OK) :
-			open(config.value(SERVICE_NAME, "clock_config_file_path"), "w").close()
+		clock_config_file_path = config.value(SERVICE_NAME, "clock_config_file_path")
 
-		clock_config_file = open(config.value(SERVICE_NAME, "clock_config_file_path"), "r+")
+		###
+
+		clock_config_file_path_sample = config_value(SERVICE_NAME, "clock_config_file_path_sample")
+		if not os.access(clock_config_file_path, os.F_OK) :
+			if access(clock_config_file_path_sample, os.F_OK) :
+				shutil.copy2(clock_config_file_path_sample, clock_config_file_path)
+			else :
+				open(clock_config_file_path, "w").close()
+
+		###
+
+		clock_config_file = open(clock_config_file_path, "r+")
 		clock_config_file_data = clock_config_file.read()
 
 		clock_config_file_data = re.sub(r"(\A|\n)ZONE=[\"\']?[a-zA-Z0-9/]*[\"\']?", "\nZONE=\"%s\"" % (zone), clock_config_file_data)
@@ -133,6 +146,8 @@ class Service(service.Service) :
 			(SERVICE_NAME, "hwclock_prog_path", "/usr/sbin/hwclock", str),
 			(SERVICE_NAME, "localtime_file_path", "/etc/localtime", str),
 			(SERVICE_NAME, "zoneinfo_dir_path", "/usr/share/zoneinfo", str),
-			(SERVICE_NAME, "clock_config_file_path", "/etc/sysconfig/clock", str)
+			(SERVICE_NAME, "clock_config_file_path", "/etc/sysconfig/clock", str),
+
+			(SERVICE_NAME, "clock_config_file_path_sample", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "clock"), str)
 		]
 

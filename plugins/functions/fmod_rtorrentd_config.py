@@ -133,6 +133,30 @@ class RTorrentd(service.FunctionObject) :
 		config_path_list = self.configValue("RTORRENT_CONFIG")
 		return ( config_path_list[0] if len(config_path_list) > 0 else "" )
 
+	###
+
+	@service.functionMethod(DAEMON_METHODS_NAMESPACE, in_signature="s")
+	def setRawConfig(self, config_file_data) :
+		config_path_list = self.configValue("RTORRENT_CONFIG")
+		if len(config_path_list) > 0 and len(config_path_list[0]) > 0 :
+			config_file = open(config_path_list[0], "w")
+			config_file.write(config_file_data)
+			try :
+				config_file.close()
+			except : pass
+
+	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="s")
+	def rawConfig(self) :
+		config_path_list = self.configValue("RTORRENT_CONFIG")
+		if len(config_path_list) > 0 and len(config_path_list[0]) > 0 :
+			config_file = open(config_path_list[0])
+			config_file_data = config_file.read()
+			try :
+				config_file.close()
+			except : pass
+			return config_file_data
+		return ""
+
 
 	### Private ###
 

@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.1
-Release: alt13
+Release: alt14
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 Group: System/Servers
 License: GPL
@@ -103,6 +103,21 @@ Requires: %name = %version-%release
 
 
 %changelog
+* Mon Jan 17 2011 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt14
+- added module for rtorrentd configuration
+- added package for module fmod_rtorrent_config
+- checks for incorrect values in fmod_rtorrentd_config
+- dBus policy for fmod_rtorrentd_config
+- d-Bus policy update
+- fixed build error, subpackage names
+- functionality level = 83
+- functional level = 87
+- merge branch 'master' of git.eter:/people/mdevaev/packages/settingsd
+- renamed dnsmasq.conf to dnsmasq_config.conf
+- support of get/set raw data to config RTORRENT_CONFIG
+- support option RTORRENT_CONFIG
+- syntax error fix
+
 * Fri Dec 17 2010 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt13
 - added loading default configs for date/time
 - added loading default configs for dnsmasq

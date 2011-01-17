@@ -43,7 +43,7 @@ Requires: %name = %version-%release
 %summary
 
 
-%package fmod-dnsmasq-config
+%package fmod-rtorrentd-config
 Summary: Settingsd functional plugin for rtorrentd configuration
 Group: System/Configuration/Networking
 Requires: rtorrentd

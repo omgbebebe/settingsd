@@ -122,6 +122,17 @@ class RTorrentd(service.FunctionObject) :
 		socket_mode_list = self.configValue("RTORRENT_SOCKET_PERMISSIONS")
 		return ( int(socket_mode_list[0]) if len(socket_mode_list) > 0 else -1 )
 
+	###
+
+	@service.functionMethod(DAEMON_METHODS_NAMESPACE, in_signature="s")
+	def setConfigPath(self, config_path) :
+		self.setConfigValue("RTORRENT_CONFIG", config_path)
+
+	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="s")
+	def configPath(self) :
+		config_path_list = self.configValue("RTORRENT_CONFIG")
+		return ( config_path_list[0] if len(config_path_list) > 0 else "" )
+
 
 	### Private ###
 

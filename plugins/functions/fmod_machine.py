@@ -43,7 +43,7 @@ class Machine(service.FunctionObject) :
 
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, in_signature="i", out_signature="i")
 	def switchTo(self, level) :
-		proc_args = "%s %s" % (config.value(SERVICE_NAME, "telinit_prog_path"), validators.validRange(str(level), RUNLEVELS))
+		proc_args = "%s %s" % (config.value(SERVICE_NAME, "telinit_prog_path"), validators.common.validRange(str(level), RUNLEVELS))
 		return tools.execProcess(proc_args, False)[2]
 
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, out_signature="i")

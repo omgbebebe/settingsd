@@ -33,7 +33,7 @@ class SimpleDnsmasqConfig(service.FunctionObject) :
 	@service.functionMethod(SIMPLE_METHODS_NAMESPACE, in_signature="as")
 	def setServers(self, servers_list) :
 		for servers_list_item in servers_list :
-			validators.validIpv4Address(servers_list_item)
+			validators.network.validIpv4Address(servers_list_item)
 		self.setConfigValue("server", servers_list)
 
 	@service.functionMethod(SIMPLE_METHODS_NAMESPACE, out_signature="as")
@@ -64,8 +64,8 @@ class SimpleDnsmasqConfig(service.FunctionObject) :
 
 	@service.functionMethod(SIMPLE_METHODS_NAMESPACE, in_signature="ssss")
 	def setRange(self, start_ip, stop_ip, netmask, lease) :
-		dhcp_range = "%s,%s" % (validators.validIpv4Address(start_ip)[0], validators.validIpv4Address(stop_ip)[0])
-		dhcp_range += ( ",%s" % (validators.validIpv4Netmask(netmask)[0]) if len(netmask) != 0 else "" )
+		dhcp_range = "%s,%s" % (validators.network.validIpv4Address(start_ip)[0], validators.network.validIpv4Address(stop_ip)[0])
+		dhcp_range += ( ",%s" % (validators.network.validIpv4Netmask(netmask)[0]) if len(netmask) != 0 else "" )
 		dhcp_range += ( ",%s" % (lease) if len(lease) != 0 else "" )
 		self.setConfigValue("dhcp-range", dhcp_range)
 
@@ -82,7 +82,7 @@ class SimpleDnsmasqConfig(service.FunctionObject) :
 
 	@service.functionMethod(SIMPLE_METHODS_NAMESPACE, in_signature="sss")
 	def addStaticHost(self, mac, ip, name) :
-		static_host = "%s,%s" % (validators.validMacAddress(mac)[0], validators.validIpv4Address(ip)[0])
+		static_host = "%s,%s" % (validators.network.validMacAddress(mac)[0], validators.network.validIpv4Address(ip)[0])
 		static_host += ( ",%s" % (name) if len(name) != 0 else "" )
 		self.setConfigValue("dhcp-host", static_host, False)
 

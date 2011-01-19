@@ -13,7 +13,7 @@ from settingsd import const
 
 
 ##### Private constants #####
-packages_list = ["settingsd"]
+packages_list = ["settingsd", "settingsd/tools", "settingsd/validators"]
 scripts_list = ["settingsd-server.py"]
 
 

@@ -4,7 +4,7 @@
 ##### Public constants #####
 MY_NAME = "settingsd"
 
-VERSION = "0.1"
+VERSION = "0.2"
 VERSION_STATUS = "beta"
 FUNCTIONALITY_LEVEL = 87
 

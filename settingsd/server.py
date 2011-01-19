@@ -10,8 +10,8 @@ import gobject
 
 import const
 import config
-import validators
 import logger
+import validators.common
 
 
 ##### Public classes #####

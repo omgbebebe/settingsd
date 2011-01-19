@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-from common import ValidatorError
+__all__ = ["common", "network"]
 
-import common
-import network
+
+from common import ValidatorError
 

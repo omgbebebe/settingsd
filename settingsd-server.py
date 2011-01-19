@@ -51,21 +51,21 @@ if __name__ == "__main__" :
 
 			elif opts_list_item in ("--log-level",) :
 				try :
-					log_level = validators.validRange(int(args_list_item), const.ALL_LOG_LEVELS_LIST)
+					log_level = validators.common.validRange(int(args_list_item), const.ALL_LOG_LEVELS_LIST)
 				except Exception, err1 :
 					print "Incorrect option \"%s\": %s" % (opts_list_item, str(err1))
 					sys.exit(1)
 
 			elif opts_list_item in ("--use-syslog",) :
 				try :
-					use_syslog_flag = validators.validBool(args_list_item)
+					use_syslog_flag = validators.common.validBool(args_list_item)
 				except Exception, err1 :
 					print "Incorrect option \"%s\": %s" % (opts_list_item, str(err1))
 					sys.exit(1)
 
 			elif opts_list_item in ("--bus-type",) :
 				try :
-					bus_type = validators.validRange(args_list_item, const.ALL_BUS_TYPES_LIST)
+					bus_type = validators.common.validRange(args_list_item, const.ALL_BUS_TYPES_LIST)
 				except Exception, err1 :
 					print "Incorrect option \"%s\": %s" % (opts_list_item, str(err1))
 					sys.exit(1)

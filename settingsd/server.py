@@ -72,7 +72,7 @@ class Server(object) :
 	def loadServicesConfigs(self) :
 		for service_name in self.__services_dict.keys() :
 			service_options_list = list(self.__services_dict[service_name]["service_class"].options())
-			service_options_list.append((service_name, "enabled", "no", validators.validBool))
+			service_options_list.append((service_name, "enabled", "no", validators.common.validBool))
 
 			for service_options_list_item in service_options_list :
 				try :

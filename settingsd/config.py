@@ -23,9 +23,9 @@ ConfigDictObject = {
 	APPLICATION_SECTION : {
 		"service_name" : (const.DEFAULT_SERVICE_NAME, str),
 		"service_path" : (const.DEFAULT_SERVICE_PATH, str),
-		"bus_type" : (const.DEFAULT_BUS_TYPE, ( lambda arg : validators.validRange(arg, const.ALL_BUS_TYPES_LIST) )),
-		"log_level" : (const.DEFAULT_LOG_LEVEL, ( lambda arg : validators.validRange(int(arg), const.ALL_LOG_LEVELS_LIST) )),
-		"log_use_colors" :(const.DEFAULT_LOG_USE_COLORS_FLAG, validators.validBool)
+		"bus_type" : (const.DEFAULT_BUS_TYPE, ( lambda arg : validators.common.validRange(arg, const.ALL_BUS_TYPES_LIST) )),
+		"log_level" : (const.DEFAULT_LOG_LEVEL, ( lambda arg : validators.common.validRange(int(arg), const.ALL_LOG_LEVELS_LIST) )),
+		"log_use_colors" :(const.DEFAULT_LOG_USE_COLORS_FLAG, validators.common.validBool)
 	},
 	RUNTIME_SECTION : {
 		"application" : (None, None),

@@ -1,6 +1,6 @@
 Name: settingsd
-Version: 0.1
-Release: alt14
+Version: 0.2
+Release: alt1
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 Group: System/Servers
 License: GPL
@@ -103,6 +103,15 @@ Requires: %name = %version-%release
 
 
 %changelog
+* Wed Jan 19 2011 Devaev Maxim <mdevaev@etersoft.ru> 0.2-alt1
+- dbus_tools and tools now a tools packages
+- fixed installer, new version is 0.2
+- message if resieved keyboard interrupt
+- new validators in plugins
+- refactoring
+- splitted validators library
+- using new version validators and tools
+
 * Mon Jan 17 2011 Devaev Maxim <mdevaev@etersoft.ru> 0.1-alt14
 - added module for rtorrentd configuration
 - added package for module fmod_rtorrent_config

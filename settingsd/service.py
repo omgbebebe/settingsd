@@ -9,8 +9,8 @@ import abc
 import const
 import config
 import shared
-import dbus_tools
 import logger
+import tools.dbus
 
 from service_decorators import *
 
@@ -77,7 +77,7 @@ class CustomObject(dbus.service.Object) :
 		def build_path(shared) :
 			if shared != None :
 				path = build_path(shared.parentShared())
-				return ( shared.name() if path == None else dbus_tools.joinMethod(path, shared.name()) )
+				return ( shared.name() if path == None else tools.dbus.joinMethod(path, shared.name()) )
 			return None
 		return build_path(self.shared())
 
@@ -109,11 +109,11 @@ class CustomObject(dbus.service.Object) :
 
 class FunctionObject(CustomObject) :
 	def __init__(self, object_path, service_object = None) :
-		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION, "service_path"),
+		CustomObject.__init__(self, tools.dbus.joinPath(config.value(config.APPLICATION_SECTION, "service_path"),
 			"functions", object_path), service_object)
 
 class ActionObject(CustomObject) :
 	def __init__(self, object_path, service_object = None) :
-		CustomObject.__init__(self, dbus_tools.joinPath(config.value(config.APPLICATION_SECTION, "service_path"),
+		CustomObject.__init__(self, tools.dbus.joinPath(config.value(config.APPLICATION_SECTION, "service_path"),
 			"actions", object_path), service_object)
 

@@ -7,8 +7,8 @@ import dbus.glib
 
 import const
 import config
-import dbus_tools
 import logger
+import tools.dbus
 
 
 ##### Private decorators #####
@@ -18,7 +18,7 @@ def tracer(function, statics_list=[0]) :
 			logger.debug("%s%s %s::%s" % ( "    "*statics_list[0],
 				str((function.__dict__.has_key("_dbus_is_method") and "Called method") or
 					(function.__dict__.has_key("_dbus_is_signal") and "Emited signal")),
-				self.objectPath(), dbus_tools.joinMethod(function._dbus_interface, function.__name__) ))
+				self.objectPath(), tools.dbus.joinMethod(function._dbus_interface, function.__name__) ))
 
 			statics_list[0] += 1
 			try :
@@ -55,13 +55,13 @@ def customMethod(interface_name, **kwargs_dict) :
 
 def functionMethod(interface_name, **kwargs_dict) :
 	def decorator(function) :
-		return customMethod(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
+		return customMethod(tools.dbus.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
 			"functions", interface_name), **kwargs_dict)(function)
 	return decorator
 
 def actionMethod(interface_name, **kwargs_dict) :
 	def decorator(function) :
-		return customMethod(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
+		return customMethod(tools.dbus.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
 			"actions", interface_name), **kwargs_dict)(function)
 	return decorator
 
@@ -74,13 +74,13 @@ def customSignal(interface_name, **kwargs_dict) :
 
 def functionSignal(interface_name, **kwargs_dict) :
 	def decorator(function) :
-		return customSignal(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
+		return customSignal(tools.dbus.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
 			 "functions", interface_name), **kwargs_dict)(function)
 	return decorator
 
 def actionSignal(interface_name, **kwargs_dict) :
 	def decorator(function) :
-		return customSignal(dbus_tools.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
+		return customSignal(tools.dbus.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
 			"actions", interface_name), **kwargs_dict)(function)
 	return decorator
 

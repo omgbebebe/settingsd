@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-
 import subprocess
 
-import logger
+from .. import logger
 
 
 ##### Exceptions #####

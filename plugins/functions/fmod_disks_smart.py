@@ -9,9 +9,11 @@ import glib
 from settingsd import config
 from settingsd import service
 from settingsd import shared
-from settingsd import dbus_tools
-from settingsd import tools
 from settingsd import logger
+
+import settingsd.tools as tools
+import settingsd.tools.dbus
+import settingsd.tools.process
 
 
 ##### Private constants #####
@@ -40,7 +42,7 @@ class Disk(service.FunctionObject) :
 
 		attrs_list = []
 		attrs_found_flag = False
-		for attrs_list_item in tools.execProcess(proc_args)[0].split("\n") :
+		for attrs_list_item in tools.process.execProcess(proc_args)[0].split("\n") :
 			attrs_list_item = attrs_list_item.strip()
 
 			if attrs_found_flag :
@@ -67,7 +69,7 @@ class Disk(service.FunctionObject) :
 
 		disk_health_flag = False
 		health_found_flag = False
-		for health_list_item in tools.execProcess(proc_args)[0].split("\n") :
+		for health_list_item in tools.process.execProcess(proc_args)[0].split("\n") :
 			health_list_item = health_list_item.strip()
 
 			if health_found_flag :
@@ -112,7 +114,7 @@ class Service(service.Service) :
 			device_file_path = device.get_device_file()
 			if disks_filter_regexp.match(device_name) and self.smartAvailable(device_file_path) :
 				disks_smart_shared.addSharedObject(device_name, Disk(device_file_path,
-					dbus_tools.joinPath(DISKS_SMART_SHARED_NAME, device_name), self))
+					tools.dbus.joinPath(DISKS_SMART_SHARED_NAME, device_name), self))
 				devices_count += 1
 		logger.verbose("{mod}: Added %d devices" % (devices_count))
 
@@ -141,7 +143,7 @@ class Service(service.Service) :
 
 	def smartAvailable(self, device_file_path) :
 		proc_args = "%s %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), device_file_path)
-		return not bool(tools.execProcess(proc_args, False)[2])
+		return not bool(tools.process.execProcess(proc_args, False)[2])
 
 	###
 
@@ -155,7 +157,7 @@ class Service(service.Service) :
 
 			if action == "add" and not device in registered_devices_list and self.smartAvailable(device_file_path) :
 				disks_smart_shared.addSharedObject(device_name, Disk(device_file_path,
-					dbus_tools.joinPath(DISKS_SMART_SHARED_NAME, device_name), self))
+					tools.dbus.joinPath(DISKS_SMART_SHARED_NAME, device_name), self))
 				self.__disks_smart.devicesChanged()
 				logger.debug("{mod}: Added SMART disk \"%s\"" % (device_file_path))
 

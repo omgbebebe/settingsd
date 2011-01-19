@@ -5,7 +5,9 @@ from settingsd import config
 from settingsd import service
 from settingsd import shared
 from settingsd import logger
-from settingsd import tools
+
+import settingsd.tools as tools
+import settingsd.tools.process
 
 
 ##### Private constants #####
@@ -94,11 +96,11 @@ class CommonInfo(service.FunctionObject) :
 
 	def lsbOption(self, option) :
 		proc_args = "%s %s" % (config.value(SERVICE_NAME, "lsb_release_prog_path"), option)
-		return ":".join(tools.execProcess(proc_args)[0].split(":")[1:]).strip()
+		return ":".join(tools.process.execProcess(proc_args)[0].split(":")[1:]).strip()
 
 	def unameOption(self, option) :
 		proc_args = "%s %s" % (config.value(SERVICE_NAME, "uname_prog_path"), option)
-		return tools.execProcess(proc_args)[0].strip()
+		return tools.process.execProcess(proc_args)[0].strip()
 
 
 ##### Public classes #####

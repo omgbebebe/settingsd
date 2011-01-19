@@ -5,13 +5,15 @@ from settingsd import const
 from settingsd import config
 from settingsd import service
 from settingsd import shared
-from settingsd import dbus_tools
+
+import settingsd.tools as tools
+import settingsd.tools.dbus
 
 
 ##### Private constants #####
-SETTINGSD_METHODS_NAMESPACE = dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME, "commonInfo.settingsd")
-LOGGER_METHODS_NAMESPACE = dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME, "logger")
-APPLICATION_METHODS_NAMESPACE = dbus_tools.joinMethod(const.DEFAULT_SERVICE_NAME, "application")
+SETTINGSD_METHODS_NAMESPACE = tools.dbus.joinMethod(const.DEFAULT_SERVICE_NAME, "commonInfo.settingsd")
+LOGGER_METHODS_NAMESPACE = tools.dbus.joinMethod(const.DEFAULT_SERVICE_NAME, "logger")
+APPLICATION_METHODS_NAMESPACE = tools.dbus.joinMethod(const.DEFAULT_SERVICE_NAME, "application")
 
 
 ##### Private classes #####

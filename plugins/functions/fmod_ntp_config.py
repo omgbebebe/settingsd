@@ -10,8 +10,9 @@ from settingsd import config
 from settingsd import service
 from settingsd import shared
 from settingsd import logger
-from settingsd import tools
 
+import settingsd.tools as tools
+import settingsd.tools.process
 
 ##### Private constants #####
 SERVICE_NAME = "ntp_config"
@@ -37,7 +38,7 @@ class NtpConfig(service.FunctionObject) :
 	@service.functionMethod(NTP_METHODS_NAMESPACE)
 	def request(self) :
 		proc_args =  "%s %s" % (config.value(SERVICE_NAME, "ntpdate_prog_path"), " ".join(self.servers()))
-		tools.execProcess(proc_args)
+		tools.process.execProcess(proc_args)
 
 
 	### Private ###

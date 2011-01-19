@@ -5,7 +5,9 @@ import re
 
 from settingsd import service
 from settingsd import shared
-from settingsd import dbus_tools
+
+import settingsd.tools as tools
+import settingsd.tools.dbus
 
 
 ##### Private constants #####
@@ -212,7 +214,7 @@ class Service(service.Service) :
 		###
 
 		shared.Functions.shared(STATISTICS_SHARED_NAME).addSharedObject(MEMORY_OBJECT_NAME,
-			Memory(dbus_tools.joinPath(STATISTICS_SHARED_NAME, MEMORY_OBJECT_NAME), self))
+			Memory(tools.dbus.joinPath(STATISTICS_SHARED_NAME, MEMORY_OBJECT_NAME), self))
 
 		###
 
@@ -225,10 +227,10 @@ class Service(service.Service) :
 		except : pass
 
 		shared.Functions.shared(STATISTICS_SHARED_NAME).addSharedObject(CPU_OBJECT_NAME,
-			Cpu(CPU_OBJECT_NAME, dbus_tools.joinPath(STATISTICS_SHARED_NAME, CPU_OBJECT_NAME), self))
+			Cpu(CPU_OBJECT_NAME, tools.dbus.joinPath(STATISTICS_SHARED_NAME, CPU_OBJECT_NAME), self))
 		for cpu_names_list_item in cpu_names_list :
 			shared.Functions.shared(STATISTICS_SHARED_NAME).shared(CPU_SHARED_NAME).addSharedObject(cpu_names_list_item,
-				Cpu(cpu_names_list_item, dbus_tools.joinPath(STATISTICS_SHARED_NAME, CPU_SHARED_NAME, cpu_names_list_item), self))
+				Cpu(cpu_names_list_item, tools.dbus.joinPath(STATISTICS_SHARED_NAME, CPU_SHARED_NAME, cpu_names_list_item), self))
 
 	###
 

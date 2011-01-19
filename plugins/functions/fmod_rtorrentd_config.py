@@ -9,7 +9,6 @@ from settingsd import const
 from settingsd import config
 from settingsd import service
 from settingsd import shared
-from settingsd import tools
 
 
 ##### Private constants #####

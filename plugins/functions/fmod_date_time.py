@@ -11,7 +11,9 @@ from settingsd import const
 from settingsd import config
 from settingsd import service
 from settingsd import shared
-from settingsd import tools
+
+import settingsd.tools as tools
+import settingsd.tools.process
 
 
 ##### Private constants #####
@@ -36,7 +38,7 @@ class DateTime(service.FunctionObject) :
 	def setUtcTime(self, month, monthday, hour, minute, year, second) :
 		proc_args = "%s -u %02d%02d%02d%02d%04d.%02d" % ( config.value(SERVICE_NAME, "date_prog_path"),
 			month, monthday, hour, minute, year, second )
-		return tools.execProcess(proc_args, False)[2]
+		return tools.process.execProcess(proc_args, False)[2]
 
 	@service.functionMethod(SYSTEM_CLOCK_METHODS_NAMESPACE, out_signature="iiiiii")
 	def utcTime(self) :
@@ -121,7 +123,7 @@ class DateTime(service.FunctionObject) :
 
 	@service.functionMethod(HARDWARE_CLOCK_METHODS_NAMESPACE, out_signature="i")
 	def syncWithSystem(self) :
-		return tools.execProcess("%s --systohc" % (config.value(SERVICE_NAME, "hwclock_prog_path")), False)[0]
+		return tools.process.execProcess("%s --systohc" % (config.value(SERVICE_NAME, "hwclock_prog_path")), False)[0]
 
 
 ##### Public classes #####

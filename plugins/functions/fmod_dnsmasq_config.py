@@ -11,7 +11,9 @@ from settingsd import config
 from settingsd import service
 from settingsd import shared
 from settingsd import logger
-from settingsd import validators
+
+import settingsd.validators as validators
+import settingsd.validators.network
 
 
 ##### Private constants #####

@@ -9,10 +9,13 @@ import pyinotify
 from settingsd import config
 from settingsd import service
 from settingsd import shared
-from settingsd import dbus_tools
 from settingsd import logger
-from settingsd import tools
+
 from settingsd import validators
+
+import settingsd.tools as tools
+import settingsd.tools.dbus
+import settingsd.tools.process
 
 
 ##### Private constants #####
@@ -49,7 +52,7 @@ class SystemService(service.FunctionObject) :
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
 	def levelsMap(self) :
 		proc_args =  "%s --list %s" % (config.value(SERVICE_NAME, "chkconfig_prog_path"), self.__system_service_name)
-		(proc_stdout, proc_stderr, proc_returncode) = tools.execProcess(proc_args)
+		(proc_stdout, proc_stderr, proc_returncode) = tools.process.execProcess(proc_args)
 
 		service_record_list = re.split(r"\s+", proc_stdout.split("\n")[0])
 		levels_list = ["0"]*(len(service_record_list) - 1)
@@ -74,18 +77,18 @@ class SystemService(service.FunctionObject) :
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def start(self) :
 		logger.verbose("{mod}: Request to start service \"%s\"" % (self.__system_service_name))
-		return tools.execProcess("%s start" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
+		return tools.process.execProcess("%s start" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
 			self.__system_service_name) ), False)[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def stop(self) :
 		logger.verbose("{mod}: Request to stop service \"%s\"" % (self.__system_service_name))
-		return tools.execProcess("%s stop" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
+		return tools.process.execProcess("%s stop" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
 			self.__system_service_name) ), False)[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def status(self) :
-		return tools.execProcess("%s status" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
+		return tools.process.execProcess("%s status" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
 			self.__system_service_name) ), False)[2]
 
 
@@ -99,7 +102,7 @@ class SystemService(service.FunctionObject) :
 
 		proc_args =  "%s %s %s %s" % ( config.value(SERVICE_NAME, "chkconfig_prog_path"), ( "--level %s" % (levels) if levels != None else "" ),
 			self.__system_service_name, ( "on" if enabled_flag else "off" ) )
-		return tools.execProcess(proc_args, False)[2]
+		return tools.process.execProcess(proc_args, False)[2]
 
 	###
 
@@ -153,7 +156,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			if st_mode & stat.S_IEXEC and st_mode & stat.S_IFREG :
 				dbus_system_service_name = re.sub(r"-|\.", "_", system_service_name)
 				system_services_shared.addSharedObject(dbus_system_service_name, SystemService(system_service_name,
-					dbus_tools.joinPath(SERVICE_NAME, dbus_system_service_name), self))
+					tools.dbus.joinPath(SERVICE_NAME, dbus_system_service_name), self))
 				system_service_count += 1
 		logger.verbose("{mod}: Added %d system services" % (system_service_count))
 
@@ -194,7 +197,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 
 		if event.maskname == "IN_CREATE" :
 			system_services_shared.addSharedObject(dbus_system_service_name, SystemService(event.name,
-				dbus_tools.joinPath(SERVICE_NAME, dbus_system_service_name), self))
+				tools.dbus.joinPath(SERVICE_NAME, dbus_system_service_name), self))
 			logger.verbose("{mod}: Added system service \"%s\"" % (dbus_system_service_name))
 
 		elif event.maskname == "IN_DELETE" :

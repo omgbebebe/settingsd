@@ -108,6 +108,7 @@ class Application(object) :
 		try :
 			self.__server.runLoop()
 		except (SystemExit, KeyboardInterrupt) :
+			logger.info("Recieved KeyboardInterrupt or SystemExit, closing...")
 			self.quit()
 		except :
 			logger.error("Runtime error, trying to close services")

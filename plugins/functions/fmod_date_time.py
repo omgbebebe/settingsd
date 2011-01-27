@@ -70,6 +70,7 @@ class DateTime(service.FunctionObject) :
 			time_zone_editor = tools.editors.PlainEditor(spaces_list=[])
 			time_zone_editor.open(config.value(SERVICE_NAME, "clock_config_file_path"))
 			zones_list = time_zone_editor.value("ZONE")
+			time_zone_editor.close()
 			if len(zones_list) > 0 :
 				return os.path.normpath(zones_list[-1])
 

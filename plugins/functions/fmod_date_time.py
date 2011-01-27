@@ -14,6 +14,7 @@ from settingsd import shared
 
 import settingsd.tools as tools
 import settingsd.tools.process
+import settingsd.tools.editors
 
 
 ##### Private constants #####
@@ -56,44 +57,21 @@ class DateTime(service.FunctionObject) :
 		os.symlink(os.path.join(config.value(SERVICE_NAME, "zoneinfo_dir_path"), zone),
 			config.value(SERVICE_NAME, "localtime_file_path"))
 
-		clock_config_file_path = config.value(SERVICE_NAME, "clock_config_file_path")
-
-		###
-
-		clock_config_file_path_sample = config.value(SERVICE_NAME, "clock_config_file_path_sample")
-		if not os.access(clock_config_file_path, os.F_OK) :
-			if os.access(clock_config_file_path_sample, os.F_OK) :
-				shutil.copy2(clock_config_file_path_sample, clock_config_file_path)
-			else :
-				open(clock_config_file_path, "w").close()
-
-		###
-
-		clock_config_file = open(clock_config_file_path, "r+")
-		clock_config_file_data = clock_config_file.read()
-
-		clock_config_file_data = re.sub(r"(\A|\n)ZONE=[\"\']?[a-zA-Z0-9/]*[\"\']?", "\nZONE=\"%s\"" % (zone), clock_config_file_data)
-
-		clock_config_file.seek(0)
-		clock_config_file.truncate()
-		clock_config_file.write(clock_config_file_data)
-
-		try :
-			clock_config_file.close()
-		except : pass
+		time_zone_editor = tools.editors.PlainEditor(spaces_list=[])
+		time_zone_editor.open(config.value(SERVICE_NAME, "clock_config_file_path"),
+			config.value(SERVICE_NAME, "sample_clock_config_file_path"))
+		time_zone_editor.setValue("ZONE", zone)
+		time_zone_editor.save()
+		time_zone_editor.close()
 
 	@service.functionMethod(ZONE_METHODS_NAMESPACE, out_signature="s")
 	def timeZone(self) :
 		if os.access(config.value(SERVICE_NAME, "clock_config_file_path"), os.F_OK) :
-			clock_config_file = open(config.value(SERVICE_NAME, "clock_config_file_path"))
-			clock_config_file_data = clock_config_file.read()
-			try :
-				clock_config_file.close()
-			except : pass
-
-			zone_match = re.search(r"(\A|\n)ZONE=[\"\']?([a-zA-Z0-9/]*)[\"\']?", clock_config_file_data)
-			if zone_match != None :
-				return os.path.normpath(zone_match.group(2))
+			time_zone_editor = tools.editors.PlainEditor(spaces_list=[])
+			time_zone_editor.open(config.value(SERVICE_NAME, "clock_config_file_path"))
+			zones_list = time_zone_editor.value("ZONE")
+			if len(zones_list) > 0 :
+				return os.path.normpath(zones_list[-1])
 
 		try :
 			zoneinfo_dir_path = os.path.normpath(os.readlink(config.value(SERVICE_NAME, "localtime_file_path")))
@@ -150,6 +128,6 @@ class Service(service.Service) :
 			(SERVICE_NAME, "zoneinfo_dir_path", "/usr/share/zoneinfo", str),
 			(SERVICE_NAME, "clock_config_file_path", "/etc/sysconfig/clock", str),
 
-			(SERVICE_NAME, "clock_config_file_path_sample", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "clock"), str)
+			(SERVICE_NAME, "sample_clock_config_file_path", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "clock"), str)
 		]
 

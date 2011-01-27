@@ -1,5 +1,5 @@
 Name: settingsd
-Version: 0.2
+Version: 0.3
 Release: alt1
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 Group: System/Servers
@@ -103,6 +103,17 @@ Requires: %name = %version-%release
 
 
 %changelog
+* Thu Jan 27 2011 Devaev Maxim <mdevaev@etersoft.ru> 0.3-alt1
+- added library for editing config files and universal class for plain configs
+- closing editor in fmod_date_time
+- fmod_date_time uses PlainEditor
+- fmod_dnsmasq_config uses PlainEditor
+- fmod_ntp_config uses PlainEditor
+- log exceptions at file creating in PlainConfig
+- logging in PlainEditor
+- refactoring, fmod_rtorrentd_config uses PlainEditor
+- splitted opening of config for read and write
+
 * Wed Jan 19 2011 Devaev Maxim <mdevaev@etersoft.ru> 0.2-alt1
 - dbus_tools and tools now a tools packages
 - fixed installer, new version is 0.2

@@ -28,7 +28,7 @@ class PlainEditor(object) :
 
 		#####
 
-		self.__config_file = None
+		self.__config_file_path = None
 		self.__config_file_data_list = None
 
 		###
@@ -42,42 +42,44 @@ class PlainEditor(object) :
 
 	### Public ###
 
-	def open(self, config_file_path, config_sample_file_path = None) :
-		if self.__config_file != None :
-			raise AlreadyAssociated("This parser already associated with config \"%s\"" % self.__config_file.name)
+	def open(self, config_file_path, sample_config_file_path = None) :
+		if self.__config_file_path != None :
+			raise AlreadyAssociated("This parser already associated with config \"%s\"" % self.__config_file_path)
 
 		if not os.access(config_file_path, os.F_OK) :
-			if config_sample_file_path != None and os.access(config_sample_file_path, os.F_OK) :
-				shutil.copy2(config_sample_file_path, config_file_path)
+			if sample_config_file_path != None and os.access(sample_config_file_path, os.F_OK) :
+				shutil.copy2(sample_config_file_path, config_file_path)
 			else :
 				open(config_file_path, "w").close()
 
-		self.__config_file = open(config_file_path, "r+")
-		self.__config_file_data_list = self.__config_file.read().split("\n")
+		config_file = open(config_file_path, "r")
+		self.__config_file_data_list = config_file.read().split("\n")
+		self.__config_file_path = config_file_path
+		try :
+			config_file.close()
+		except : pass
 
 	def save(self) :
-		if self.__config_file == None :
+		if self.__config_file_path == None :
 			raise NotAssociated("This parser is not associated with config")
 
-		self.__config_file.seek(0)
-		self.__config_file.truncate()
-		self.__config_file.write("\n".join(self.__config_file_data_list))
-		self.__config_file.flush()
+		config_file = open(self.__config_file_path, "w")
+		config_file.write("\n".join(self.__config_file_data_list))
+		try :
+			config_file.close()
+		except : pass
 
 	def close(self) :
-		if self.__config_file == None :
+		if self.__config_file_path == None :
 			raise NotAssociated("This parser is not associated with config")
 
-		try :
-			self.__config_file.close()
-		except : pass
-		self.__config_file = None
 		self.__config_file_data_list = None
+		self.__config_file_path = None
 
 	###
 
 	def setValue(self, variable_name, values_list) :
-		if self.__config_file == None :
+		if self.__config_file_path == None :
 			raise NotAssociated("This parser is not associated with config")
 
 		if not type(values_list).__name__ in ("list", "tuple") :
@@ -103,7 +105,7 @@ class PlainEditor(object) :
 			self.__config_file_data_list.insert(last_variable_index + count, variable)
 
 	def value(self, variable_name) :
-		if self.__config_file == None :
+		if self.__config_file_path == None :
 			raise NotAssociated("This parser is not associated with config")
 
 		values_list = []

@@ -5,6 +5,8 @@ import os
 import re
 import shutil
 
+from .. import logger
+
 
 ##### Exceptions #####
 class NotAssociated(Exception) :
@@ -47,10 +49,14 @@ class PlainEditor(object) :
 			raise AlreadyAssociated("This parser already associated with config \"%s\"" % self.__config_file_path)
 
 		if not os.access(config_file_path, os.F_OK) :
+			logger.debug("{submod}: Config file \"%s\" does not exist" % (config_file_path))
 			if sample_config_file_path != None and os.access(sample_config_file_path, os.F_OK) :
 				shutil.copy2(sample_config_file_path, config_file_path)
+				logger.debug("{submod}: Config file \"%s\" has been created from sample \"%s\"" % (
+					config_file_path, sample_config_file_path ))
 			else :
 				open(config_file_path, "w").close()
+				logger.debug("{submod}: Created empty file \"%s\"" % (config_file_path))
 
 		config_file = open(config_file_path, "r")
 		self.__config_file_data_list = config_file.read().split("\n")
@@ -58,6 +64,7 @@ class PlainEditor(object) :
 		try :
 			config_file.close()
 		except : pass
+		logger.debug("{submod}: Cached and associated config file \"%s\"" % (config_file_path))
 
 	def save(self) :
 		if self.__config_file_path == None :
@@ -68,6 +75,7 @@ class PlainEditor(object) :
 		try :
 			config_file.close()
 		except : pass
+		logger.debug("{submod}: Saved config file \"%s\"" % (config_file_path))
 
 	def close(self) :
 		if self.__config_file_path == None :
@@ -75,6 +83,7 @@ class PlainEditor(object) :
 
 		self.__config_file_data_list = None
 		self.__config_file_path = None
+		logger.debug("{submod}: Unassociated parser from config file \"%s\"" % (config_file_path))
 
 	###
 

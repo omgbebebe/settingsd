@@ -50,13 +50,17 @@ class PlainEditor(object) :
 
 		if not os.access(config_file_path, os.F_OK) :
 			logger.debug("{submod}: Config file \"%s\" does not exist" % (config_file_path))
-			if sample_config_file_path != None and os.access(sample_config_file_path, os.F_OK) :
-				shutil.copy2(sample_config_file_path, config_file_path)
-				logger.debug("{submod}: Config file \"%s\" has been created from sample \"%s\"" % (
-					config_file_path, sample_config_file_path ))
-			else :
-				open(config_file_path, "w").close()
-				logger.debug("{submod}: Created empty file \"%s\"" % (config_file_path))
+			try :
+				if sample_config_file_path != None and os.access(sample_config_file_path, os.F_OK) :
+					shutil.copy2(sample_config_file_path, config_file_path)
+					logger.debug("{submod}: Config file \"%s\" has been created from sample \"%s\"" % (
+						config_file_path, sample_config_file_path ))
+				else :
+					open(config_file_path, "w").close()
+					logger.debug("{submod}: Created empty file \"%s\"" % (config_file_path))
+			except :
+				logger.error("Cannot create config file \"%s\"" % (config_file_path))
+				logger.attachException()
 
 		config_file = open(config_file_path, "r")
 		self.__config_file_data_list = config_file.read().split("\n")

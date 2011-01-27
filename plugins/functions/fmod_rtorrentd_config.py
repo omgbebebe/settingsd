@@ -10,6 +10,9 @@ from settingsd import config
 from settingsd import service
 from settingsd import shared
 
+import settingsd.tools as tools
+import settingsd.tools.editors
+
 
 ##### Private constants #####
 SERVICE_NAME = "rtorrentd_config"
@@ -124,11 +127,11 @@ class RTorrentd(service.FunctionObject) :
 	###
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, in_signature="s")
-	def setConfigPath(self, config_path) :
+	def setRawConfigPath(self, config_path) :
 		self.setConfigValue("RTORRENT_CONFIG", config_path)
 
 	@service.functionMethod(DAEMON_METHODS_NAMESPACE, out_signature="s")
-	def configPath(self) :
+	def rawConfigPath(self) :
 		config_path_list = self.configValue("RTORRENT_CONFIG")
 		return ( config_path_list[0] if len(config_path_list) > 0 else "" )
 
@@ -159,61 +162,20 @@ class RTorrentd(service.FunctionObject) :
 
 	### Private ###
 
-	def setConfigValue(self, variable_name, values_list, replace_flag = True) :
-		if not type(values_list).__name__ in ("list", "tuple") :
-			values_list = [values_list]
-
-		rtorrentd_config_file_path = config.value(SERVICE_NAME, "rtorrentd_config_file_path")
-
-		###
-
-		rtorrentd_config_file_path_sample = config.value(SERVICE_NAME, "rtorrentd_config_file_path_sample")
-		if not os.access(rtorrentd_config_file_path, os.F_OK) :
-			if os.access(rtorrentd_config_file_path_sample, os.F_OK) :
-				shutil.copy2(rtorrentd_config_file_path_sample, rtorrentd_config_file_path)
-			else :
-				open(rtorrentd_config_file_path, "w").close()
-
-		###
-
-		rtorrentd_config_file = open(rtorrentd_config_file_path, "r+")
-		rtorrentd_config_file_data = rtorrentd_config_file.read()
-
-		variable_regexp = re.compile(r"(((\n|\A)%s=[^\n]*)+)" % (variable_name))
-		variable = "\n".join([ "%s=\"%s\"" % (variable_name, values_list_item) for values_list_item in values_list ])
-		if variable_regexp.search(rtorrentd_config_file_data) :
-			if len(variable) != 0 :
-				variable = ( "\n" if replace_flag else "\\1\n" )+variable
-			rtorrentd_config_file_data = variable_regexp.sub(variable, rtorrentd_config_file_data)
-		elif len(variable) != 0 :
-			rtorrentd_config_file_data += ( "\n" if rtorrentd_config_file_data[-1] != "\n" else "" )+variable+"\n"
-
-		rtorrentd_config_file.seek(0)
-		rtorrentd_config_file.truncate()
-		rtorrentd_config_file.write(rtorrentd_config_file_data)
-
-		try :
-			rtorrentd_config_file_data.close()
-		except : pass
+	def setConfigValue(self, variable_name, values_list) :
+		rtorrentd_editor = tools.editors.PlainEditor(spaces_list = [])
+		rtorrentd_editor.open(config.value(SERVICE_NAME, "rtorrentd_config_file_path"),
+			config.value(SERVICE_NAME, "sample_rtorrentd_config_file_path"))
+		rtorrentd_editor.setValue(variable_name, values_list)
+		rtorrentd_editor.save()
+		rtorrentd_editor.close()
 
 	def configValue(self, variable_name) :
-		if os.access(config.value(SERVICE_NAME, "rtorrentd_config_file_path"), os.F_OK) :
-			rtorrentd_config_file = open(config.value(SERVICE_NAME, "rtorrentd_config_file_path"), "r")
-			rtorrentd_config_file_list = rtorrentd_config_file.read().split("\n")
-			try :
-				rtorrentd_config_file.close()
-			except : pass
-
-			variable_regexp = re.compile(r"^%s=[\"\']?([^\n\"\']*)" % (variable_name))
-			variables_list = []
-			for rtorrentd_config_file_list_item in rtorrentd_config_file_list :
-				if len(rtorrentd_config_file_list_item) == 0 :
-					continue
-				variable_match = variable_regexp.match(rtorrentd_config_file_list_item)
-				if variable_match != None :
-					variables_list.append(variable_match.group(1))
-			return variables_list
-		return []
+		rtorrentd_editor = tools.editors.PlainEditor(spaces_list = [])
+		rtorrentd_editor.open(config.value(SERVICE_NAME, "rtorrentd_config_file_path"))
+		values_list = rtorrentd_editor.value(variable_name)
+		rtorrentd_editor.close()
+		return values_list
 
 
 ##### Public classes #####
@@ -236,6 +198,6 @@ class Service(service.Service) :
 		return [
 			(SERVICE_NAME, "rtorrentd_config_file_path", "/etc/sysconfig/rtorrent", str),
 
-			(SERVICE_NAME, "rtorrentd_config_file_path_sample", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "rtorrent"), str)
+			(SERVICE_NAME, "sample_rtorrentd_config_file_path", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "rtorrent"), str)
 		]
 

@@ -26,6 +26,7 @@ SYSTEM_SERVICES_SHARED_NAME = "system_services"
 SYSTEM_SERVICES_OBJECT_NAME = "system_services"
 
 SYSTEM_SERVICE_METHODS_NAMESPACE = "systemService"
+SYSTEM_SERVICES_METHODS_NAMESPACE = "systemServices"
 
 
 RUNLEVELS = "0123456"
@@ -121,7 +122,7 @@ class SystemService(service.FunctionObject) :
 
 
 class SystemServices(service.FunctionObject) :
-	@service.functionSignal(SYSTEM_SERVICE_METHODS_NAMESPACE)
+	@service.functionSignal(SYSTEM_SERVICES_METHODS_NAMESPACE)
 	def servicesChanged(self) :
 		pass
 

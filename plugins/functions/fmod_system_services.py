@@ -156,8 +156,10 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			st_mode = os.stat(os.path.join(initd_dir_path, system_service_name)).st_mode
 			if st_mode & stat.S_IEXEC and st_mode & stat.S_IFREG :
 				dbus_system_service_name = re.sub(r"-|\.", "_", system_service_name)
+
 				system_services_shared.addSharedObject(dbus_system_service_name, SystemService(system_service_name,
 					tools.dbus.joinPath(SERVICE_NAME, dbus_system_service_name), self))
+
 				system_service_count += 1
 		logger.verbose("{mod}: Added %d system services" % (system_service_count))
 

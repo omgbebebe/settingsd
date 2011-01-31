@@ -40,6 +40,12 @@ class SystemService(service.FunctionObject) :
 		self.__system_service_name = system_service_name
 
 
+	### Public ###
+
+	def name(self) :
+		return self.__system_service_name
+
+
 	### DBus methods ###
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, in_signature="s", out_signature="i")
@@ -101,7 +107,8 @@ class SystemService(service.FunctionObject) :
 		logger.verbose("Request to %s service \"%s\" on runlevels \"%s\"" % ( ( "enable" if enabled_flag else "disable" ),
 			self.__system_service_name, ( levels if levels != None else "default" ) ))
 
-		proc_args =  "%s %s %s %s" % ( config.value(SERVICE_NAME, "chkconfig_prog_path"), ( "--level %s" % (levels) if levels != None else "" ),
+		proc_args =  "%s %s %s %s" % ( config.value(SERVICE_NAME, "chkconfig_prog_path"),
+			( "--level %s" % (levels) if levels != None else "" ),
 			self.__system_service_name, ( "on" if enabled_flag else "off" ) )
 		return tools.process.execProcess(proc_args, False)[2]
 

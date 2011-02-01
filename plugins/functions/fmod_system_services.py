@@ -205,10 +205,13 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		if event.maskname == "IN_CREATE" :
 			system_services_shared.addSharedObject(dbus_system_service_name, SystemService(event.name,
 				tools.dbus.joinPath(SERVICE_NAME, dbus_system_service_name), self))
-			logger.verbose("{mod}: Added system service \"%s\"" % (dbus_system_service_name))
 
+			self.__system_services.servicesChanged()
+			logger.verbose("{mod}: Added system service \"%s\"" % (dbus_system_service_name))
 		elif event.maskname == "IN_DELETE" :
 			system_services_shared.sharedObject(dbus_system_service_name).removeFromConnection()
 			system_services_shared.removeSharedObject(dbus_system_service_name)
+
+			self.__system_services.servicesChanged()			
 			logger.verbose("{mod}: Removed system service \"%s\"" % (dbus_system_service_name))
 

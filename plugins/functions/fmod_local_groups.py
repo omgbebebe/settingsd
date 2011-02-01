@@ -65,15 +65,15 @@ class LocalGroup(service.FunctionObject) :
 		return tools.process.execProcess("%s -G %s %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
 			",".join(users_list), user_name ), False)[2]
 
+	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="as")
+	def users(self) :
+		return grp.getgrnam(self.__group_name).gr_mem
+
 	###
 
 	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="i")
 	def gid(self) :
 		return grp.getgrnam(self.__group_name).gr_gid
-
-	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="as")
-	def users(self) :
-		return grp.getgrnam(self.__group_name).gr_mem
 
 
 class LocalGroups(service.FunctionObject) :
@@ -83,12 +83,11 @@ class LocalGroups(service.FunctionObject) :
 	@service.functionMethod(LOCAL_GROUPS_METHODS_NAMESPACE, in_signature="si", out_signature="i")
 	def addGroup(self, group_name, gid) :
 		group_name = validators.os.validGroupName(group_name)
+		(gid_arg, gid_str) = ( ("-g %d" % (gid), str(gid)) if gid >= 0 else ("", "auto") )
 
-		proc_args = "%s %s" % (config.value(SERVICE_NAME, "groupadd_prog_path"), group_name)
-		proc_args += ( " -g %d" % (gid) if gid >= 0 else "" )
+		logger.verbose("{mod}: Request to add UNIX group \"%s\" with gid=%s" % (group_name, gid_str))
 
-		logger.verbose("{mod}: Request to add UNIX group \"%s\" with gid %d" % (group_name, gid))
-		return tools.process.execProcess(proc_args, False)[2]
+		return tools.process.execProcess("%s %s %s" % (config.value(SERVICE_NAME, "groupadd_prog_path"), gid_arg, group_name))
 
 	@service.functionMethod(LOCAL_GROUPS_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def removeGroup(self, group_name) :
@@ -185,6 +184,8 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 				local_groups_shared.sharedObject(dbus_group_name).removeFromConnection()
 				local_groups_shared.removeSharedObject(dbus_group_name)
 				logger.verbose("{mod}: Removed UNIX group \"%s\"" % (group_name))
+
+		self.__local_groups.groupsChanged()
 
 	###
 

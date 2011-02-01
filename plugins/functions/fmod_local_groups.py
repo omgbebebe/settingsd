@@ -38,13 +38,13 @@ class LocalGroup(service.FunctionObject) :
 		self.__group_name = group_name
 
 
-	### Public ###
+	### DBus methods ###
 
-	def name(self) :
+	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="s")
+	def realName(self) :
 		return self.__group_name
 
-
-	### DBus methods ###
+	###
 
 	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def addUser(self, user_name) :
@@ -181,7 +181,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 
 		for dbus_group_name in local_groups_shared.sharedObjects().keys() :
 			if not dbus_group_name in dbus_group_names_list :
-				group_name = local_groups_shared.sharedObject(dbus_group_name).name()
+				group_name = local_groups_shared.sharedObject(dbus_group_name).realName()
 				local_groups_shared.sharedObject(dbus_group_name).removeFromConnection()
 				local_groups_shared.removeSharedObject(dbus_group_name)
 				logger.verbose("{mod}: Removed UNIX group \"%s\"" % (group_name))

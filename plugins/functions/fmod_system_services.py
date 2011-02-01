@@ -29,9 +29,6 @@ SYSTEM_SERVICE_METHODS_NAMESPACE = "systemService"
 SYSTEM_SERVICES_METHODS_NAMESPACE = "systemServices"
 
 
-RUNLEVELS = "0123456"
-
-
 ##### Private classes #####
 class SystemService(service.FunctionObject) :
 	def __init__(self, system_service_name, object_path, service_object = None) :
@@ -40,13 +37,13 @@ class SystemService(service.FunctionObject) :
 		self.__system_service_name = system_service_name
 
 
-	### Public ###
+	### DBus methods ###
 
-	def name(self) :
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
+	def realName(self) :
 		return self.__system_service_name
 
-
-	### DBus methods ###
+	###
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def on(self, levels = None) :
@@ -119,7 +116,7 @@ class SystemService(service.FunctionObject) :
 			if len(levels) == 0 :
 				levels = None
 			for level in levels :
-				if not level in RUNLEVELS :
+				if not level in "0123456" :
 					raise validators.ValidatorError("Incorrect item \"%s\" in argument \"%s\"" % (level, levels))
 		elif type (levels).__name__ == "NoneType" :
 			pass

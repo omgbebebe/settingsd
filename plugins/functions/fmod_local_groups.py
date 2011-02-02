@@ -46,6 +46,22 @@ class LocalGroup(service.FunctionObject) :
 
 	###
 
+	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, in_signature="i", out_signature="i")
+	def setGid(self, gid) :
+		if gid < 0 :
+			raise validators.ValidatorError("Incorrect GID %d" % (gid))
+
+		logger.verbose("{mod}: Request to change gid for local group \"%s\", new gid=%d" % (self.__group_name, gid))
+
+		return tools.process.execProcess("%s -g %d %s" % ( config.value(SERVICE_NAME, "groupmod_prog_path"),
+			gid, self.__group_name ), False)[2]
+
+	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="i")
+	def gid(self) :
+		return grp.getgrnam(self.__group_name).gr_gid
+
+	###
+
 	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def addUser(self, user_name) :
 		user_name = validators.os.validUserName(user_name)
@@ -68,12 +84,6 @@ class LocalGroup(service.FunctionObject) :
 	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="as")
 	def users(self) :
 		return grp.getgrnam(self.__group_name).gr_mem
-
-	###
-
-	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="i")
-	def gid(self) :
-		return grp.getgrnam(self.__group_name).gr_gid
 
 
 class LocalGroups(service.FunctionObject) :
@@ -156,6 +166,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		return [
 			(SERVICE_NAME, "groupadd_prog_path", "/usr/sbin/groupadd", str),
 			(SERVICE_NAME, "groupdel_prog_path", "/usr/sbin/groupdel", str),
+			(SERVICE_NAME, "groupmod_prog_path", "/usr/sbin/groupmod", str),
 			(SERVICE_NAME, "usermod_prog_path", "/usr/sbin/usermod", str),
 			(SERVICE_NAME, "group_config_file_path", "/etc/group", str)
 		]

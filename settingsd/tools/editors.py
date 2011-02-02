@@ -85,9 +85,9 @@ class PlainEditor(object) :
 		if self.__config_file_path == None :
 			raise NotAssociated("This parser is not associated with config")
 
+		logger.debug("{submod}: Unassociated parser from config file \"%s\"" % (self.__config_file_path))
 		self.__config_file_data_list = None
 		self.__config_file_path = None
-		logger.debug("{submod}: Unassociated parser from config file \"%s\"" % (config_file_path))
 
 	###
 

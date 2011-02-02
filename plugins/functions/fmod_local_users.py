@@ -52,7 +52,7 @@ class LocalUser(service.FunctionObject) :
 		if uid < 0 :
 			raise validators.ValidatorError("Incorrect UID %d" % (uid))
 
-		logger.verbose("{mod}: Request to change uid for UNIX user \"%s\", new uid=%d" % (self.__user_name, uid))
+		logger.verbose("{mod}: Request to change uid for local user \"%s\", new uid=%d" % (self.__user_name, uid))
 
 		return tools.process.execProcess("%s -u %d %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
 			uid, self.__user_name ), False)[2]
@@ -68,7 +68,7 @@ class LocalUser(service.FunctionObject) :
 		if gid < 0 :
 			raise validators.ValidatorError("Incorrect GID %d" % (gid))
 
-		logger.verbose("{mod}: Request to change gid for UNIX user \"%s\", new gid=%d" % (self.__user_name, gid))
+		logger.verbose("{mod}: Request to change gid for local user \"%s\", new gid=%d" % (self.__user_name, gid))
 
 		return tools.process.execProcess("%s -g %d %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
 			gid, self.__user_name ), False)[2]
@@ -84,7 +84,7 @@ class LocalUser(service.FunctionObject) :
 		if re.match(r"^[./\w\d]*$", path) == None :
 			raise validators.ValidatorError("Incorrect symbols in string \"%s\"" % (path))
 
-		logger.verbose("{mod}: Request to change home for UNIX user \"%s\", new home=\"%s\"" % (self.__user_name, path))
+		logger.verbose("{mod}: Request to change home for local user \"%s\", new home=\"%s\"" % (self.__user_name, path))
 
 		return tools.process.execProcess("%s -d \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
 			path, self.__user_name ), False)[2]
@@ -98,7 +98,7 @@ class LocalUser(service.FunctionObject) :
 		if re.match(r"^[./\w\d]*$", path) == None :
 			raise validators.ValidatorError("Incorrect symbols in string \"%s\"" % (path))
 
-		logger.verbose("{mod}: Request to change shell for UNIX user \"%s\", new shell=\"%s\"" % (self.__user_name, path))
+		logger.verbose("{mod}: Request to change shell for local user \"%s\", new shell=\"%s\"" % (self.__user_name, path))
 
 		return tools.process.execProcess("%s -s \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
 			path, self.__user_name ), False)[2]
@@ -114,7 +114,7 @@ class LocalUser(service.FunctionObject) :
 		if re.match(r"^[@<>./\w\d \t]*$", text) == None :
 			raise validators.ValidatorError("Incorrect symbols in string \"%s\"" % (text))
 
-		logger.verbose("{mod}: Request to change comment for UNIX user \"%s\", new comment=\"%s\"" % (self.__user_name, text))
+		logger.verbose("{mod}: Request to change comment for local user \"%s\", new comment=\"%s\"" % (self.__user_name, text))
 
 		return tools.process.execProcess("%s -c \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
 			text, self.__user_name ), False)[2]
@@ -129,7 +129,7 @@ class LocalUser(service.FunctionObject) :
 	def setLock(self, lock_flag) :
 		(lock_arg, lock_str) = ( ("-L", "lock") if lock_flag else ("-U", "unlock") )
 
-		logger.verbose("{mod}: Request to %s UNIX user \"%s\"" % (lock_str))
+		logger.verbose("{mod}: Request to %s local user \"%s\"" % (lock_str))
 
 		return tools.process.execProcess("%s %s %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
 			lock_arg, self.__user_name ), False)[2]
@@ -153,7 +153,7 @@ class LocalUsers(service.FunctionObject) :
 		(uid_arg, uid_str) = ( ("-u %d" % (uid), str(uid)) if uid >= 0 else ("", "auto") )
 		(gid_arg, gid_str) = ( ("-g %d" % (gid), str(gid)) if gid >= 0 else ("", "auto") )
 
-		logger.verbose("{mod}: Request to add UNIX user \"%s\" with uid=%s and gid=%s" % (user_name, uid_str, gid_str))
+		logger.verbose("{mod}: Request to add local user \"%s\" with uid=%s and gid=%s" % (user_name, uid_str, gid_str))
 
 		return tools.process.execProcess("%s %s %s %s" % (config.value(SERVICE_NAME, "useradd_prog_path"),
 			uid_arg, gid_arg, user_name))
@@ -163,7 +163,7 @@ class LocalUsers(service.FunctionObject) :
 		user_name = validators.os.validUserName(user_name)
 		(remove_data_arg, remove_data_str) = ( ("-r", " and its data") if remove_data_flag else ("", "") )
 
-		logger.verbose("{mod}: Request to remove UNIX user \"%s\"%s" % (user_name, remove_data_str))
+		logger.verbose("{mod}: Request to remove local user \"%s\"%s" % (user_name, remove_data_str))
 		return tools.process.execProcess("%s %s %s" % (config.value(SERVICE_NAME, "userdel_prog_path"),
 			remove_data_arg, user_name), False)[2]
 
@@ -195,7 +195,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		shared.Functions.addShared(LOCAL_USERS_SHARED_NAME)
 		shared.Functions.addSharedObject(LOCAL_USERS_OBJECT_NAME, self.__local_users)
 
-		logger.verbose("{mod}: First UNIX users request...")
+		logger.verbose("{mod}: First local users request...")
 		local_users_shared = shared.Functions.shared(LOCAL_USERS_SHARED_NAME)
 		user_count = 0
 		for user_name in self.localUsers() :
@@ -203,7 +203,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			local_users_shared.addSharedObject(dbus_user_name, LocalUser(user_name,
 				tools.dbus.joinPath(SERVICE_NAME, dbus_user_name), self))
 			user_count += 1
-		logger.verbose("{mod}: Added %d UNIX users" % (user_count))
+		logger.verbose("{mod}: Added %d local users" % (user_count))
 
 		passwd_config_subdir_path = os.path.dirname(config.value(SERVICE_NAME, "passwd_config_file_path"))
 		self.__watch_manager.add_watch(passwd_config_subdir_path, pyinotify.IN_DELETE|pyinotify.IN_CREATE|pyinotify.IN_MOVED_TO, rec=True)
@@ -250,14 +250,14 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			if not local_users_shared.hasSharedObject(dbus_user_names_list[count]) :
 				local_users_shared.addSharedObject(dbus_user_names_list[count], LocalUser(user_names_list[count],
 					tools.dbus.joinPath(SERVICE_NAME, dbus_user_names_list[count]), self))
-				logger.verbose("{mod}: Added UNIX user \"%s\"" % (user_names_list[count]))
+				logger.verbose("{mod}: Added local user \"%s\"" % (user_names_list[count]))
 
 		for dbus_user_name in local_users_shared.sharedObjects().keys() :
 			if not dbus_user_name in dbus_user_names_list :
 				user_name = local_users_shared.sharedObject(dbus_user_name).realName()
 				local_users_shared.sharedObject(dbus_user_name).removeFromConnection()
 				local_users_shared.removeSharedObject(dbus_user_name)
-				logger.verbose("{mod}: Removed UNIX user \"%s\"" % (user_name))
+				logger.verbose("{mod}: Removed local user \"%s\"" % (user_name))
 
 		self.__local_users.usersChanged()
 

@@ -50,7 +50,7 @@ class LocalGroup(service.FunctionObject) :
 	def addUser(self, user_name) :
 		user_name = validators.os.validUserName(user_name)
 
-		logger.verbose("{mod}: Request to add user \"%s\" to UNIX group \"%s\"" % (user_name, self.__group_name))
+		logger.verbose("{mod}: Request to add user \"%s\" to local group \"%s\"" % (user_name, self.__group_name))
 		return tools.process.execProcess("%s -a -G %s %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
 			self.__group_name, user_name ), False)[2]
 
@@ -61,7 +61,7 @@ class LocalGroup(service.FunctionObject) :
 		users_list = grp.getgrnam(self.__group_name).gr_mem
 		users_list.remove(self.__group_name)
 
-		logger.verbose("{mod}: Request to remove user \"%s\" from UNIX group \"%s\"" % (user_name, self.__group_name))
+		logger.verbose("{mod}: Request to remove user \"%s\" from local group \"%s\"" % (user_name, self.__group_name))
 		return tools.process.execProcess("%s -G %s %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
 			",".join(users_list), user_name ), False)[2]
 
@@ -85,7 +85,7 @@ class LocalGroups(service.FunctionObject) :
 		group_name = validators.os.validGroupName(group_name)
 		(gid_arg, gid_str) = ( ("-g %d" % (gid), str(gid)) if gid >= 0 else ("", "auto") )
 
-		logger.verbose("{mod}: Request to add UNIX group \"%s\" with gid=%s" % (group_name, gid_str))
+		logger.verbose("{mod}: Request to add local group \"%s\" with gid=%s" % (group_name, gid_str))
 
 		return tools.process.execProcess("%s %s %s" % (config.value(SERVICE_NAME, "groupadd_prog_path"), gid_arg, group_name))
 
@@ -93,7 +93,7 @@ class LocalGroups(service.FunctionObject) :
 	def removeGroup(self, group_name) :
 		group_name = validators.os.validGroupName(group_name)
 
-		logger.verbose("{mod}: Request to remove UNIX group \"%s\"" % (group_name))
+		logger.verbose("{mod}: Request to remove local group \"%s\"" % (group_name))
 		return tools.process.execProcess("%s %s" % (config.value(SERVICE_NAME, "groupdel_prog_path"), group_name), False)[2]
 
 
@@ -124,7 +124,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		shared.Functions.addShared(LOCAL_GROUPS_SHARED_NAME)
 		shared.Functions.addSharedObject(LOCAL_GROUPS_OBJECT_NAME, self.__local_groups)
 
-		logger.verbose("{mod}: First UNIX groups request...")
+		logger.verbose("{mod}: First local groups request...")
 		local_groups_shared = shared.Functions.shared(LOCAL_GROUPS_SHARED_NAME)
 		group_count = 0
 		for group_name in self.localGroups() :
@@ -132,7 +132,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			local_groups_shared.addSharedObject(dbus_group_name, LocalGroup(group_name,
 				tools.dbus.joinPath(SERVICE_NAME, dbus_group_name), self))
 			group_count += 1
-		logger.verbose("{mod}: Added %d UNIX groups" % (group_count))
+		logger.verbose("{mod}: Added %d local groups" % (group_count))
 
 		group_config_subdir_path = os.path.dirname(config.value(SERVICE_NAME, "group_config_file_path"))
 		self.__watch_manager.add_watch(group_config_subdir_path, pyinotify.IN_DELETE|pyinotify.IN_CREATE|pyinotify.IN_MOVED_TO, rec=True)
@@ -176,14 +176,14 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			if not local_groups_shared.hasSharedObject(dbus_group_names_list[count]) :
 				local_groups_shared.addSharedObject(dbus_group_names_list[count], LocalGroup(group_names_list[count],
 					tools.dbus.joinPath(SERVICE_NAME, dbus_group_names_list[count]), self))
-				logger.verbose("{mod}: Added UNIX group \"%s\"" % (group_names_list[count]))
+				logger.verbose("{mod}: Added local group \"%s\"" % (group_names_list[count]))
 
 		for dbus_group_name in local_groups_shared.sharedObjects().keys() :
 			if not dbus_group_name in dbus_group_names_list :
 				group_name = local_groups_shared.sharedObject(dbus_group_name).realName()
 				local_groups_shared.sharedObject(dbus_group_name).removeFromConnection()
 				local_groups_shared.removeSharedObject(dbus_group_name)
-				logger.verbose("{mod}: Removed UNIX group \"%s\"" % (group_name))
+				logger.verbose("{mod}: Removed local group \"%s\"" % (group_name))
 
 		self.__local_groups.groupsChanged()
 

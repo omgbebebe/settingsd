@@ -18,6 +18,7 @@ import settingsd.validators.os
 import settingsd.tools as tools
 import settingsd.tools.dbus
 import settingsd.tools.process
+import settingsd.tools.editors
 
 
 ##### Private constants #####
@@ -167,12 +168,40 @@ class LocalUsers(service.FunctionObject) :
 		return tools.process.execProcess("%s %s %s" % (config.value(SERVICE_NAME, "userdel_prog_path"),
 			remove_data_arg, user_name), False)[2]
 
+	###
+
+	@service.functionMethod(LOCAL_USERS_METHODS_NAMESPACE, out_signature="i")
+	def minUid(self) :
+		return self.loginDefsValue("UID_MIN")
+
+	@service.functionMethod(LOCAL_USERS_METHODS_NAMESPACE, out_signature="i")
+	def maxUid(self) :
+		return self.loginDefsValue("UID_MAX")
+
+	@service.functionMethod(LOCAL_USERS_METHODS_NAMESPACE, out_signature="i")
+	def minSystemUid(self) :
+		return self.loginDefsValue("SYS_UID_MIN")
+
+	@service.functionMethod(LOCAL_USERS_METHODS_NAMESPACE, out_signature="i")
+	def maxSystemUid(self) :
+		return self.loginDefsValue("SYS_UID_MAX")
+
 
 	### DBus signals ###
 
 	@service.functionSignal(LOCAL_USERS_METHODS_NAMESPACE)
 	def usersChanged(self) :
 		pass
+
+
+	### Private ###
+
+	def loginDefsValue(self, variable_name) :
+		editor = tools.editors.PlainEditor(delimiter = "", quotes_list = [])
+		editor.open(config.value(SERVICE_NAME, "login_defs_config_file_path"))
+		values_list = editor.value(variable_name)
+		editor.close()
+		return ( int(values_list[-1]) if len(values_list) > 0 else -1 )
 
 
 ##### Public classes #####
@@ -229,7 +258,8 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			(SERVICE_NAME, "userdel_prog_path", "/usr/sbin/userdel", str),
 			(SERVICE_NAME, "usermod_prog_path", "/usr/sbin/usermod", str),
 			(SERVICE_NAME, "passwd_config_file_path", "/etc/passwd", str),
-			(SERVICE_NAME, "shadow_config_file_path", "/etc/shadow", str)
+			(SERVICE_NAME, "shadow_config_file_path", "/etc/shadow", str),
+			(SERVICE_NAME, "login_defs_config_file_path", "/etc/login.defs", str)
 		]
 
 
@@ -237,7 +267,8 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 
 	def inotifyEvent(self, event) :
 		if event.dir or not event.pathname in ( config.value(SERVICE_NAME, "passwd_config_file_path"),
-			config.value(SERVICE_NAME, "shadow_config_file_path") ) :
+			config.value(SERVICE_NAME, "shadow_config_file_path"),
+			config.value(SERVICE_NAME, "login_defs_config_file_path") ) :
 
 			return
 

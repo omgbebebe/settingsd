@@ -164,15 +164,14 @@ class RTorrentd(service.FunctionObject) :
 
 	def setConfigValue(self, variable_name, values_list) :
 		rtorrentd_editor = tools.editors.PlainEditor(spaces_list = [])
-		rtorrentd_editor.open(config.value(SERVICE_NAME, "rtorrentd_config_file_path"),
-			config.value(SERVICE_NAME, "sample_rtorrentd_config_file_path"))
+		rtorrentd_editor.open(config.value(SERVICE_NAME, "rtorrentd_conf"), config.value(SERVICE_NAME, "rtorrentd_conf_sample"))
 		rtorrentd_editor.setValue(variable_name, values_list)
 		rtorrentd_editor.save()
 		rtorrentd_editor.close()
 
 	def configValue(self, variable_name) :
 		rtorrentd_editor = tools.editors.PlainEditor(spaces_list = [])
-		rtorrentd_editor.open(config.value(SERVICE_NAME, "rtorrentd_config_file_path"))
+		rtorrentd_editor.open(config.value(SERVICE_NAME, "rtorrentd_conf"))
 		values_list = rtorrentd_editor.value(variable_name)
 		rtorrentd_editor.close()
 		return values_list
@@ -196,8 +195,8 @@ class Service(service.Service) :
 	@classmethod
 	def options(self) :
 		return [
-			(SERVICE_NAME, "rtorrentd_config_file_path", "/etc/sysconfig/rtorrent", str),
+			(SERVICE_NAME, "rtorrentd_conf", "/etc/sysconfig/rtorrent", str),
 
-			(SERVICE_NAME, "sample_rtorrentd_config_file_path", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "rtorrent"), str)
+			(SERVICE_NAME, "rtorrentd_conf_sample", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "rtorrent"), str)
 		]
 

@@ -54,7 +54,7 @@ class LocalGroup(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change gid for local group \"%s\", new gid=%d" % (self.__group_name, gid))
 
-		return tools.process.execProcess("%s -g %d %s" % ( config.value(SERVICE_NAME, "groupmod_prog_path"),
+		return tools.process.execProcess("%s -g %d %s" % ( config.value(SERVICE_NAME, "groupmod_bin"),
 			gid, self.__group_name ), False)[2]
 
 	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="i")
@@ -68,7 +68,7 @@ class LocalGroup(service.FunctionObject) :
 		user_name = validators.os.validUserName(user_name)
 
 		logger.verbose("{mod}: Request to add user \"%s\" to local group \"%s\"" % (user_name, self.__group_name))
-		return tools.process.execProcess("%s -a -G %s %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
+		return tools.process.execProcess("%s -a -G %s %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
 			self.__group_name, user_name ), False)[2]
 
 	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, in_signature="s", out_signature="i")
@@ -79,7 +79,7 @@ class LocalGroup(service.FunctionObject) :
 		users_list.remove(self.__group_name)
 
 		logger.verbose("{mod}: Request to remove user \"%s\" from local group \"%s\"" % (user_name, self.__group_name))
-		return tools.process.execProcess("%s -G %s %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
+		return tools.process.execProcess("%s -G %s %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
 			",".join(users_list), user_name ), False)[2]
 
 	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="as")
@@ -98,14 +98,14 @@ class LocalGroups(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to add local group \"%s\" with gid=%s" % (group_name, gid_str))
 
-		return tools.process.execProcess("%s %s %s" % (config.value(SERVICE_NAME, "groupadd_prog_path"), gid_arg, group_name))
+		return tools.process.execProcess("%s %s %s" % (config.value(SERVICE_NAME, "groupadd_bin"), gid_arg, group_name))
 
 	@service.functionMethod(LOCAL_GROUPS_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def removeGroup(self, group_name) :
 		group_name = validators.os.validGroupName(group_name)
 
 		logger.verbose("{mod}: Request to remove local group \"%s\"" % (group_name))
-		return tools.process.execProcess("%s %s" % (config.value(SERVICE_NAME, "groupdel_prog_path"), group_name), False)[2]
+		return tools.process.execProcess("%s %s" % (config.value(SERVICE_NAME, "groupdel_bin"), group_name), False)[2]
 
 	###
 
@@ -137,7 +137,7 @@ class LocalGroups(service.FunctionObject) :
 
 	def loginDefsValue(self, variable_name) :
 		editor = tools.editors.PlainEditor(delimiter = "", quotes_list = [])
-		editor.open(config.value(SERVICE_NAME, "login_defs_config_file_path"))
+		editor.open(config.value(SERVICE_NAME, "login_defs_conf"))
 		values_list = editor.value(variable_name)
 		editor.close()
 		return ( int(values_list[-1]) if len(values_list) > 0 else -1 )
@@ -173,13 +173,13 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			group_count += 1
 		logger.verbose("{mod}: Added %d local groups" % (group_count))
 
-		group_config_subdir_path = os.path.dirname(config.value(SERVICE_NAME, "group_config_file_path"))
+		group_config_subdir_path = os.path.dirname(config.value(SERVICE_NAME, "group_conf"))
 		self.__watch_manager.add_watch(group_config_subdir_path, pyinotify.IN_DELETE|pyinotify.IN_CREATE|pyinotify.IN_MOVED_TO, rec=True)
 		self.start()
 		logger.verbose("{mod}: Start polling inotify events for \"%s\"" % (group_config_subdir_path))
 
 	def closeService(self) :
-		group_config_subdir_path = os.path.dirname(config.value(SERVICE_NAME, "group_config_file_path"))
+		group_config_subdir_path = os.path.dirname(config.value(SERVICE_NAME, "group_conf"))
 		self.__watch_manager.rm_watch(self.__watch_manager.get_wd(group_config_subdir_path))
 		self.stop()
 		logger.verbose("{mod}: Stop polling inotify events for \"%s\"" % (group_config_subdir_path))
@@ -193,20 +193,20 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 	@classmethod
 	def options(self) :
 		return [
-			(SERVICE_NAME, "groupadd_prog_path", "/usr/sbin/groupadd", str),
-			(SERVICE_NAME, "groupdel_prog_path", "/usr/sbin/groupdel", str),
-			(SERVICE_NAME, "groupmod_prog_path", "/usr/sbin/groupmod", str),
-			(SERVICE_NAME, "usermod_prog_path", "/usr/sbin/usermod", str),
-			(SERVICE_NAME, "group_config_file_path", "/etc/group", str),
-			(SERVICE_NAME, "login_defs_config_file_path", "/etc/login.defs", str)
+			(SERVICE_NAME, "groupadd_bin", "/usr/sbin/groupadd", str),
+			(SERVICE_NAME, "groupdel_bin", "/usr/sbin/groupdel", str),
+			(SERVICE_NAME, "groupmod_bin", "/usr/sbin/groupmod", str),
+			(SERVICE_NAME, "usermod_bin", "/usr/sbin/usermod", str),
+			(SERVICE_NAME, "group_conf", "/etc/group", str),
+			(SERVICE_NAME, "login_defs_conf", "/etc/login.defs", str)
 		]
 
 
 	### Private ###
 
 	def inotifyEvent(self, event) :
-		if event.dir or not event.pathname in ( config.value(SERVICE_NAME, "group_config_file_path"),
-			config.value(SERVICE_NAME, "login_defs_config_file_path") ) :
+		if event.dir or not event.pathname in ( config.value(SERVICE_NAME, "group_conf"),
+			config.value(SERVICE_NAME, "login_defs_conf") ) :
 
 			return
 
@@ -235,7 +235,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 	def localGroups(self) :
 		group_name_regexp = re.compile(r"(^[a-z_][a-z0-9_-]*):")
 
-		group_config_file = open(config.value(SERVICE_NAME, "group_config_file_path"))
+		group_config_file = open(config.value(SERVICE_NAME, "group_conf"))
 
 		group_names_list = []
 		for group_record in group_config_file.read().split("\n") :

@@ -55,7 +55,7 @@ class SystemService(service.FunctionObject) :
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
 	def levelsMap(self) :
-		proc_args =  "%s --list %s" % (config.value(SERVICE_NAME, "chkconfig_prog_path"), self.__system_service_name)
+		proc_args =  "%s --list %s" % (config.value(SERVICE_NAME, "chkconfig_bin"), self.__system_service_name)
 		(proc_stdout, proc_stderr, proc_returncode) = tools.process.execProcess(proc_args)
 
 		service_record_list = re.split(r"\s+", proc_stdout.split("\n")[0])
@@ -81,18 +81,18 @@ class SystemService(service.FunctionObject) :
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def start(self) :
 		logger.verbose("{mod}: Request to start service \"%s\"" % (self.__system_service_name))
-		return tools.process.execProcess("%s start" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
+		return tools.process.execProcess("%s start" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir"),
 			self.__system_service_name) ), False)[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def stop(self) :
 		logger.verbose("{mod}: Request to stop service \"%s\"" % (self.__system_service_name))
-		return tools.process.execProcess("%s stop" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
+		return tools.process.execProcess("%s stop" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir"),
 			self.__system_service_name) ), False)[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def status(self) :
-		return tools.process.execProcess("%s status" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir_path"),
+		return tools.process.execProcess("%s status" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir"),
 			self.__system_service_name) ), False)[2]
 
 
@@ -104,7 +104,7 @@ class SystemService(service.FunctionObject) :
 		logger.verbose("Request to %s service \"%s\" on runlevels \"%s\"" % ( ( "enable" if enabled_flag else "disable" ),
 			self.__system_service_name, ( levels if levels != None else "default" ) ))
 
-		proc_args =  "%s %s %s %s" % ( config.value(SERVICE_NAME, "chkconfig_prog_path"),
+		proc_args =  "%s %s %s %s" % ( config.value(SERVICE_NAME, "chkconfig_bin"),
 			( "--level %s" % (levels) if levels != None else "" ),
 			self.__system_service_name, ( "on" if enabled_flag else "off" ) )
 		return tools.process.execProcess(proc_args, False)[2]
@@ -151,7 +151,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		shared.Functions.addShared(SYSTEM_SERVICES_SHARED_NAME)
 		shared.Functions.addSharedObject(SYSTEM_SERVICES_OBJECT_NAME, self.__system_services)
 
-		initd_dir_path = config.value(SERVICE_NAME, "initd_dir_path")
+		initd_dir_path = config.value(SERVICE_NAME, "initd_dir")
 
 		logger.verbose("{mod}: First services requset...")
 		system_services_shared = shared.Functions.shared(SYSTEM_SERVICES_SHARED_NAME)
@@ -174,7 +174,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		logger.verbose("{mod}: Start polling inotify events for \"%s\"" % (initd_dir_path))
 
 	def closeService(self) :
-		initd_dir_path = config.value(SERVICE_NAME, "initd_dir_path")
+		initd_dir_path = config.value(SERVICE_NAME, "initd_dir")
 		self.__watch_manager.rm_watch(self.__watch_manager.get_wd(initd_dir_path))
 		self.stop()
 		logger.verbose("{mod}: Stop polling inotify events for \"%s\"" % (initd_dir_path))
@@ -188,8 +188,8 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 	@classmethod
 	def options(self) :
 		return [
-			(SERVICE_NAME, "initd_dir_path", "/etc/rc.d/init.d", str),
-			(SERVICE_NAME, "chkconfig_prog_path", "/sbin/chkconfig", str)
+			(SERVICE_NAME, "initd_dir", "/etc/rc.d/init.d", str),
+			(SERVICE_NAME, "chkconfig_bin", "/sbin/chkconfig", str)
 		]
 
 

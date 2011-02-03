@@ -95,11 +95,11 @@ class CommonInfo(service.FunctionObject) :
 	### Private ###
 
 	def lsbOption(self, option) :
-		proc_args = "%s %s" % (config.value(SERVICE_NAME, "lsb_release_prog_path"), option)
+		proc_args = "%s %s" % (config.value(SERVICE_NAME, "lsb_release_bin"), option)
 		return ":".join(tools.process.execProcess(proc_args)[0].split(":")[1:]).strip()
 
 	def unameOption(self, option) :
-		proc_args = "%s %s" % (config.value(SERVICE_NAME, "uname_prog_path"), option)
+		proc_args = "%s %s" % (config.value(SERVICE_NAME, "uname_bin"), option)
 		return tools.process.execProcess(proc_args)[0].strip()
 
 
@@ -120,7 +120,7 @@ class Service(service.Service) :
 	@classmethod
 	def options(self) :
 		return [
-			(SERVICE_NAME, "lsb_release_prog_path", "/usr/bin/lsb_release", str),
-			(SERVICE_NAME, "uname_prog_path", "/bin/uname", str)
+			(SERVICE_NAME, "lsb_release_bin", "/usr/bin/lsb_release", str),
+			(SERVICE_NAME, "uname_bin", "/bin/uname", str)
 		]
 

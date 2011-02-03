@@ -29,8 +29,7 @@ class NtpConfig(service.FunctionObject) :
 	@service.functionMethod(NTP_METHODS_NAMESPACE, in_signature="as")
 	def setServers(self, servers_list) :
 		ntp_editor = tools.editors.PlainEditor(delimiter = "", quotes_list = [])
-		ntp_editor.open(config.value(SERVICE_NAME, "ntp_config_file_path"),
-			config.value(SERVICE_NAME, "sample_ntp_config_file_path"))
+		ntp_editor.open(config.value(SERVICE_NAME, "ntp_conf"), config.value(SERVICE_NAME, "ntp_conf_sample"))
 		ntp_editor.setValue("server", servers_list)
 		ntp_editor.save()
 		ntp_editor.close()
@@ -38,7 +37,7 @@ class NtpConfig(service.FunctionObject) :
 	@service.functionMethod(NTP_METHODS_NAMESPACE, out_signature="as")
 	def servers(self) :
 		ntp_editor = tools.editors.PlainEditor(delimiter = "", quotes_list = [])
-		ntp_editor.open(config.value(SERVICE_NAME, "ntp_config_file_path"))
+		ntp_editor.open(config.value(SERVICE_NAME, "ntp_conf"))
 		servers_list = ntp_editor.value("server")
 		ntp_editor.close()
 		return servers_list
@@ -47,7 +46,7 @@ class NtpConfig(service.FunctionObject) :
 
 	@service.functionMethod(NTP_METHODS_NAMESPACE)
 	def request(self) :
-		proc_args =  "%s %s" % (config.value(SERVICE_NAME, "ntpdate_prog_path"), " ".join(self.servers()))
+		proc_args =  "%s %s" % (config.value(SERVICE_NAME, "ntpdate_bin"), " ".join(self.servers()))
 		tools.process.execProcess(proc_args)
 
 
@@ -69,9 +68,9 @@ class Service(service.Service) :
 	@classmethod
 	def options(self) :
 		return [
-			(SERVICE_NAME, "ntpdate_prog_path", "/usr/sbin/ntpdate", str),
-			(SERVICE_NAME, "ntp_config_file_path", "/etc/ntp.conf", str),
+			(SERVICE_NAME, "ntpdate_bin", "/usr/sbin/ntpdate", str),
+			(SERVICE_NAME, "ntp_conf", "/etc/ntp.conf", str),
 
-			(SERVICE_NAME, "sample_ntp_config_file_path", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "ntp.conf"), str)
+			(SERVICE_NAME, "ntp_conf_sample", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "ntp.conf"), str)
 		]
 

@@ -91,8 +91,8 @@ class SimpleDnsmasqConfig(service.FunctionObject) :
 		static_host += ( ",%s" % (name) if len(name) != 0 else "" )
 
 		dnsmasq_editor = tools.editors.PlainEditor(spaces_list = [], quotes_list = [])
-		dnsmasq_editor.open(config.value(SERVICE_NAME, "dnsmasq_config_file_path"),
-			config.value(SERVICE_NAME, "sample_dnsmasq_config_file_path"))
+		dnsmasq_editor.open(config.value(SERVICE_NAME, "dnsmasq_conf"),
+			config.value(SERVICE_NAME, "dnsmasq_conf_sample"))
 		dnsmasq_editor.setValue("dhcp-host", dnsmasq_editor.value("dhcp_host") + [static_host])
 		dnsmasq_editor.save()
 		dnsmasq_editor.close()
@@ -145,15 +145,15 @@ class SimpleDnsmasqConfig(service.FunctionObject) :
 
 	def setConfigValue(self, variable_name, values_list) :
 		dnsmasq_editor = tools.editors.PlainEditor(spaces_list = [], quotes_list = [])
-		dnsmasq_editor.open(config.value(SERVICE_NAME, "dnsmasq_config_file_path"),
-			config.value(SERVICE_NAME, "sample_dnsmasq_config_file_path"))
+		dnsmasq_editor.open(config.value(SERVICE_NAME, "dnsmasq_conf"),
+			config.value(SERVICE_NAME, "dnsmasq_conf_sample"))
 		dnsmasq_editor.setValue(variable_name, values_list)
 		dnsmasq_editor.save()
 		dnsmasq_editor.close()
 
 	def configValue(self, variable_name) :
 		dnsmasq_editor = tools.editors.PlainEditor(spaces_list = [], quotes_list = [])
-		dnsmasq_editor.open(config.value(SERVICE_NAME, "dnsmasq_config_file_path"))
+		dnsmasq_editor.open(config.value(SERVICE_NAME, "dnsmasq_conf"))
 		values_list = dnsmasq_editor.value(variable_name)
 		dnsmasq_editor.close()
 		return values_list
@@ -177,8 +177,8 @@ class Service(service.Service) :
 	@classmethod
 	def options(self) :
 		return [
-			(SERVICE_NAME, "dnsmasq_config_file_path", "/etc/dnsmasq.conf", str),
+			(SERVICE_NAME, "dnsmasq_conf", "/etc/dnsmasq.conf", str),
 
-			(SERVICE_NAME, "sample_dnsmasq_config_file_path", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "dnsmasq.conf"), str)
+			(SERVICE_NAME, "dnsmasq_conf_sample", os.path.join(const.FUNCTIONS_DATA_DIR, SERVICE_NAME, "dnsmasq.conf"), str)
 		]
 

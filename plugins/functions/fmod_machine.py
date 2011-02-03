@@ -29,30 +29,30 @@ class Machine(service.FunctionObject) :
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def shutdown(self) :
-		return tools.process.execProcess("%s -h now" % (config.value(SERVICE_NAME, "shutdown_prog_path")), False)[2]
+		return tools.process.execProcess("%s -h now" % (config.value(SERVICE_NAME, "shutdown_bin")), False)[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def reboot(self) :
-		return tools.process.execProcess("%s -r now" % (config.value(SERVICE_NAME, "shutdown_prog_path")), False)[2]
+		return tools.process.execProcess("%s -r now" % (config.value(SERVICE_NAME, "shutdown_bin")), False)[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def suspend(self) :
-		return tools.process.execProcess(config.value(SERVICE_NAME, "pm_suspend_prog_path"), False)[2]
+		return tools.process.execProcess(config.value(SERVICE_NAME, "pm_suspend_bin"), False)[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def hibernate(self) :
-		return tools.process.execProcess(config.value(SERVICE_NAME, "pm_hibernate_prog_path"), False)[2]
+		return tools.process.execProcess(config.value(SERVICE_NAME, "pm_hibernate_bin"), False)[2]
 
 	###
 
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, in_signature="i", out_signature="i")
 	def switchTo(self, level) :
-		proc_args = "%s %s" % (config.value(SERVICE_NAME, "telinit_prog_path"), validators.common.validRange(str(level), RUNLEVELS))
+		proc_args = "%s %s" % (config.value(SERVICE_NAME, "telinit_bin"), validators.common.validRange(str(level), RUNLEVELS))
 		return tools.process.execProcess(proc_args, False)[2]
 
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, out_signature="i")
 	def currentLevel(self) :
-		proc_args = config.value(SERVICE_NAME, "runlevel_prog_path")
+		proc_args = config.value(SERVICE_NAME, "runlevel_bin")
 
 		level_pairs_list = tools.process.execProcess(proc_args)[0].strip().split(" ")
 		if len(level_pairs_list) != 2 or not level_pairs_list[1] in RUNLEVELS :
@@ -63,7 +63,7 @@ class Machine(service.FunctionObject) :
 
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, out_signature="i")
 	def previousLevel(self) :
-		proc_args = config.value(SERVICE_NAME, "runlevel_prog_path")
+		proc_args = config.value(SERVICE_NAME, "runlevel_bin")
 
 		level_pairs_list = tools.process.execProcess(proc_args)[0].strip().split(" ")
 		if len(level_pairs_list) != 2 or not level_pairs_list[1] in RUNLEVELS+"N" :
@@ -90,10 +90,10 @@ class Service(service.Service) :
 	@classmethod
 	def options(self) :
 		return [
-			(SERVICE_NAME, "shutdown_prog_path", "/sbin/shutdown", str),
-			(SERVICE_NAME, "pm_suspend_prog_path", "/usr/sbin/pm-suspend", str),
-			(SERVICE_NAME, "pm_hibernate_prog_path", "/usr/sbin/pm-hibernate", str),
-			(SERVICE_NAME, "telinit_prog_path", "/sbin/telinit", str),
-			(SERVICE_NAME, "runlevel_prog_path", "/sbin/runlevel", str)
+			(SERVICE_NAME, "shutdown_bin", "/sbin/shutdown", str),
+			(SERVICE_NAME, "pm_suspend_bin", "/usr/sbin/pm-suspend", str),
+			(SERVICE_NAME, "pm_hibernate_bin", "/usr/sbin/pm-hibernate", str),
+			(SERVICE_NAME, "telinit_bin", "/sbin/telinit", str),
+			(SERVICE_NAME, "runlevel_bin", "/sbin/runlevel", str)
 		]
 

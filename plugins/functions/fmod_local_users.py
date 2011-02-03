@@ -55,7 +55,7 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change uid for local user \"%s\", new uid=%d" % (self.__user_name, uid))
 
-		return tools.process.execProcess("%s -u %d %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
+		return tools.process.execProcess("%s -u %d %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
 			uid, self.__user_name ), False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="i")
@@ -71,7 +71,7 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change gid for local user \"%s\", new gid=%d" % (self.__user_name, gid))
 
-		return tools.process.execProcess("%s -g %d %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
+		return tools.process.execProcess("%s -g %d %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
 			gid, self.__user_name ), False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="i")
@@ -87,7 +87,7 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change home for local user \"%s\", new home=\"%s\"" % (self.__user_name, path))
 
-		return tools.process.execProcess("%s -d \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
+		return tools.process.execProcess("%s -d \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
 			path, self.__user_name ), False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="s")
@@ -101,7 +101,7 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change shell for local user \"%s\", new shell=\"%s\"" % (self.__user_name, path))
 
-		return tools.process.execProcess("%s -s \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
+		return tools.process.execProcess("%s -s \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
 			path, self.__user_name ), False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="s")
@@ -117,7 +117,7 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change comment for local user \"%s\", new comment=\"%s\"" % (self.__user_name, text))
 
-		return tools.process.execProcess("%s -c \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
+		return tools.process.execProcess("%s -c \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
 			text, self.__user_name ), False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="s")
@@ -132,7 +132,7 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to %s local user \"%s\"" % (lock_str))
 
-		return tools.process.execProcess("%s %s %s" % ( config.value(SERVICE_NAME, "usermod_prog_path"),
+		return tools.process.execProcess("%s %s %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
 			lock_arg, self.__user_name ), False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="b")
@@ -156,7 +156,7 @@ class LocalUsers(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to add local user \"%s\" with uid=%s and gid=%s" % (user_name, uid_str, gid_str))
 
-		return tools.process.execProcess("%s %s %s %s" % (config.value(SERVICE_NAME, "useradd_prog_path"),
+		return tools.process.execProcess("%s %s %s %s" % (config.value(SERVICE_NAME, "useradd_bin"),
 			uid_arg, gid_arg, user_name))
 
 	@service.functionMethod(LOCAL_USERS_METHODS_NAMESPACE, in_signature="sb", out_signature="i")
@@ -165,7 +165,7 @@ class LocalUsers(service.FunctionObject) :
 		(remove_data_arg, remove_data_str) = ( ("-r", " and its data") if remove_data_flag else ("", "") )
 
 		logger.verbose("{mod}: Request to remove local user \"%s\"%s" % (user_name, remove_data_str))
-		return tools.process.execProcess("%s %s %s" % (config.value(SERVICE_NAME, "userdel_prog_path"),
+		return tools.process.execProcess("%s %s %s" % (config.value(SERVICE_NAME, "userdel_bin"),
 			remove_data_arg, user_name), False)[2]
 
 	###
@@ -198,7 +198,7 @@ class LocalUsers(service.FunctionObject) :
 
 	def loginDefsValue(self, variable_name) :
 		editor = tools.editors.PlainEditor(delimiter = "", quotes_list = [])
-		editor.open(config.value(SERVICE_NAME, "login_defs_config_file_path"))
+		editor.open(config.value(SERVICE_NAME, "login_defs_conf"))
 		values_list = editor.value(variable_name)
 		editor.close()
 		return ( int(values_list[-1]) if len(values_list) > 0 else -1 )
@@ -234,13 +234,13 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			user_count += 1
 		logger.verbose("{mod}: Added %d local users" % (user_count))
 
-		passwd_config_subdir_path = os.path.dirname(config.value(SERVICE_NAME, "passwd_config_file_path"))
+		passwd_config_subdir_path = os.path.dirname(config.value(SERVICE_NAME, "passwd_conf"))
 		self.__watch_manager.add_watch(passwd_config_subdir_path, pyinotify.IN_DELETE|pyinotify.IN_CREATE|pyinotify.IN_MOVED_TO, rec=True)
 		self.start()
 		logger.verbose("{mod}: Start polling inotify events for \"%s\"" % (passwd_config_subdir_path))
 
 	def closeService(self) :
-		passwd_config_subdir_path = os.path.dirname(config.value(SERVICE_NAME, "passwd_config_file_path"))
+		passwd_config_subdir_path = os.path.dirname(config.value(SERVICE_NAME, "passwd_conf"))
 		self.__watch_manager.rm_watch(self.__watch_manager.get_wd(passwd_config_subdir_path))
 		self.stop()
 		logger.verbose("{mod}: Stop polling inotify events for \"%s\"" % (passwd_config_subdir_path))
@@ -254,21 +254,20 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 	@classmethod
 	def options(self) :
 		return [
-			(SERVICE_NAME, "useradd_prog_path", "/usr/sbin/useradd", str),
-			(SERVICE_NAME, "userdel_prog_path", "/usr/sbin/userdel", str),
-			(SERVICE_NAME, "usermod_prog_path", "/usr/sbin/usermod", str),
-			(SERVICE_NAME, "passwd_config_file_path", "/etc/passwd", str),
-			(SERVICE_NAME, "shadow_config_file_path", "/etc/shadow", str),
-			(SERVICE_NAME, "login_defs_config_file_path", "/etc/login.defs", str)
+			(SERVICE_NAME, "useradd_bin", "/usr/sbin/useradd", str),
+			(SERVICE_NAME, "userdel_bin", "/usr/sbin/userdel", str),
+			(SERVICE_NAME, "usermod_bin", "/usr/sbin/usermod", str),
+			(SERVICE_NAME, "passwd_conf", "/etc/passwd", str),
+			(SERVICE_NAME, "shadow_conf", "/etc/shadow", str),
+			(SERVICE_NAME, "login_defs_conf", "/etc/login.defs", str)
 		]
 
 
 	### Private ###
 
 	def inotifyEvent(self, event) :
-		if event.dir or not event.pathname in ( config.value(SERVICE_NAME, "passwd_config_file_path"),
-			config.value(SERVICE_NAME, "shadow_config_file_path"),
-			config.value(SERVICE_NAME, "login_defs_config_file_path") ) :
+		if event.dir or not event.pathname in ( config.value(SERVICE_NAME, "passwd_conf"),
+			config.value(SERVICE_NAME, "shadow_conf"), config.value(SERVICE_NAME, "login_defs_conf") ) :
 
 			return
 
@@ -297,7 +296,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 	def localUsers(self) :
 		user_name_regexp = re.compile(r"(^[a-z_][a-z0-9_-]*):")
 
-		passwd_config_file = open(config.value(SERVICE_NAME, "passwd_config_file_path"))
+		passwd_config_file = open(config.value(SERVICE_NAME, "passwd_conf"))
 
 		user_names_list = []
 		for passwd_record in passwd_config_file.read().split("\n") :

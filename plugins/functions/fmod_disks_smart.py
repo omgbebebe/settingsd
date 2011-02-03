@@ -38,7 +38,7 @@ class Disk(service.FunctionObject) :
 
 	@service.functionMethod(SMART_METHODS_NAMESPACE, out_signature="a(isiiiissss)")
 	def attributes(self) :
-		proc_args = "%s -A %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), self.__device_file_path)
+		proc_args = "%s -A %s" % (config.value(SERVICE_NAME, "smartctl_bin"), self.__device_file_path)
 
 		attrs_list = []
 		attrs_found_flag = False
@@ -65,7 +65,7 @@ class Disk(service.FunctionObject) :
 
 	@service.functionMethod(SMART_METHODS_NAMESPACE, out_signature="b")
 	def health(self) :
-		proc_args = "%s -H %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), self.__device_file_path)
+		proc_args = "%s -H %s" % (config.value(SERVICE_NAME, "smartctl_bin"), self.__device_file_path)
 
 		disk_health_flag = False
 		health_found_flag = False
@@ -135,14 +135,14 @@ class Service(service.Service) :
 	def options(self) :
 		return [
 			(SERVICE_NAME, "disks_filter", "^[(sd)(hd)][a-z]+$", str),
-			(SERVICE_NAME, "smartctl_prog_path", "/usr/sbin/smartctl", str)
+			(SERVICE_NAME, "smartctl_bin", "/usr/sbin/smartctl", str)
 		]
 
 
 	### Private ###
 
 	def smartAvailable(self, device_file_path) :
-		proc_args = "%s %s" % (config.value(SERVICE_NAME, "smartctl_prog_path"), device_file_path)
+		proc_args = "%s %s" % (config.value(SERVICE_NAME, "smartctl_bin"), device_file_path)
 		return not bool(tools.process.execProcess(proc_args, False)[2])
 
 	###

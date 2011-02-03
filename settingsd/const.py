@@ -4,9 +4,9 @@
 ##### Public constants #####
 MY_NAME = "settingsd"
 
-VERSION = "0.2"
+VERSION = "0.3"
 VERSION_STATUS = "beta"
-FUNCTIONALITY_LEVEL = 87
+FUNCTIONALITY_LEVEL = 121
 
 
 FUNCTIONS_DIR = "plugins/functions"

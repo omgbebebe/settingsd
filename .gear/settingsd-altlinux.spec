@@ -75,6 +75,7 @@ Requires: %name = %version-%release
 %_datadir/%name/plugins/functions/fmod_common_info.py*
 %_datadir/%name/plugins/functions/fmod_date_time.py*
 %_datadir/%name/plugins/functions/fmod_example.py*
+%_datadir/%name/plugins/functions/fmod_local_users.py*
 %_datadir/%name/plugins/functions/fmod_local_groups.py*
 %_datadir/%name/plugins/functions/fmod_machine.py*
 %_datadir/%name/plugins/functions/fmod_settingsd.py*

@@ -79,7 +79,7 @@ class PlainEditor(object) :
 		try :
 			config_file.close()
 		except : pass
-		logger.debug("{submod}: Saved config file \"%s\"" % (config_file_path))
+		logger.debug("{submod}: Saved config file \"%s\"" % (self.__config_file_path))
 
 	def close(self) :
 		if self.__config_file_path == None :

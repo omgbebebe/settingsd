@@ -296,7 +296,11 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 	def localUsers(self) :
 		user_name_regexp = re.compile(r"(^[a-z_][a-z0-9_-]*):")
 
-		passwd_config_file = open(config.value(SERVICE_NAME, "passwd_conf"))
+		try :
+			passwd_config_file = open(config.value(SERVICE_NAME, "passwd_conf"))
+		except :
+			logger.attachException()
+			return []
 
 		user_names_list = []
 		for passwd_record in passwd_config_file.read().split("\n") :

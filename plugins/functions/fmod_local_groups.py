@@ -235,7 +235,11 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 	def localGroups(self) :
 		group_name_regexp = re.compile(r"(^[a-z_][a-z0-9_-]*):")
 
-		group_config_file = open(config.value(SERVICE_NAME, "group_conf"))
+		try :
+			group_config_file = open(config.value(SERVICE_NAME, "group_conf"))
+		except :
+			logger.attachException()
+			return []
 
 		group_names_list = []
 		for group_record in group_config_file.read().split("\n") :

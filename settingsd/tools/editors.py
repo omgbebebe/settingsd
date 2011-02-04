@@ -95,7 +95,9 @@ class PlainEditor(object) :
 		if self.__config_file_path == None :
 			raise NotAssociated("This parser is not associated with config")
 
-		if not type(values_list).__name__ in ("list", "tuple") :
+		if values_list == None :
+			values_list = []
+		elif not type(values_list).__name__ in ("list", "tuple") :
 			values_list = [values_list]
 
 		last_variable_index = len(self.__config_file_data_list) - 1

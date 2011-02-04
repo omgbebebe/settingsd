@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.3
-Release: alt1
+Release: alt2
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 Group: System/Servers
 License: GPL
@@ -120,6 +120,31 @@ Requires: %name = %version-%release
 
 
 %changelog
+* Fri Feb 04 2011 Devaev Maxim <mdevaev@etersoft.ru> 0.3-alt2
+- added fmod_local_users to spec
+- added methods for get GID variables from login.defs
+- added methods for get UID variables from login.defs
+- config options refactoring
+- correct processing of missing files
+- dBus policy for fmod_local_users
+- fixed error on close() in PLainEditor
+- fixed signal servicesChanged()
+- fix variable path in PlainEditor on save()
+- module for control at local users
+- module for nss roles control (from Tartarus)
+- new func level = 121
+- new validators collection for standards UNIX entities
+- none value in PlainEditor.setValue() works same as []
+- plugin for control of UNIX groups, his D-Bus policy and configuration
+- realName() method for some objects
+- refactoring, fixed groupsChanged() signal
+- refactoring of dbus namespaces in fmod_system_services
+- refactoring, policy update for fmod_system_service
+- removed word "UNIX" from log message
+- setGid() for fmod_local_groups
+- spec update for fmod_nss_roles
+- code refactoring
+
 * Thu Jan 27 2011 Devaev Maxim <mdevaev@etersoft.ru> 0.3-alt1
 - added library for editing config files and universal class for plain configs
 - closing editor in fmod_date_time

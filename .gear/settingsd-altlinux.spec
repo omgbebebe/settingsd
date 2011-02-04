@@ -1,6 +1,6 @@
 Name: settingsd
 Version: 0.3
-Release: alt2
+Release: alt3
 Summary: Settingsd - extensible service to control the operating system via D-Bus
 Group: System/Servers
 License: GPL
@@ -120,6 +120,9 @@ Requires: %name = %version-%release
 
 
 %changelog
+* Fri Feb 04 2011 Devaev Maxim <mdevaev@etersoft.ru> 0.3-alt3
+- functionality level = 132
+
 * Fri Feb 04 2011 Devaev Maxim <mdevaev@etersoft.ru> 0.3-alt2
 - added fmod_local_users to spec
 - added methods for get GID variables from login.defs

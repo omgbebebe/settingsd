@@ -52,6 +52,15 @@ Requires: %name = %version-%release
 %summary
 
 
+%package fmod-nss-roles
+Summary: Settingsd functional plugin for NSS roles configuration
+Group: System/Libraries
+Requires: libnss-role
+Requires: %name = %version-%release
+%description fmod-nss-roles
+%summary
+
+
 %prep
 %setup
 
@@ -99,9 +108,15 @@ Requires: %name = %version-%release
 %config(noreplace) %_sysconfdir/%name/dnsmasq_config.conf
 %_datadir/%name/plugins/functions/fmod_dnsmasq_config.py*
 
+
 %files fmod-rtorrentd-config
 %config(noreplace) %_sysconfdir/%name/rtorrentd_config.conf
 %_datadir/%name/plugins/functions/fmod_rtorrentd_config.py*
+
+
+%files fmod-nss-roles
+%config(noreplace) %_sysconfdir/%name/nss_roles.conf
+%_datadir/%name/plugins/functions/fmod_nss_roles.py*
 
 
 %changelog

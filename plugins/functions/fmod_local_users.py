@@ -228,7 +228,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		local_users_shared = shared.Functions.shared(LOCAL_USERS_SHARED_NAME)
 		user_count = 0
 		for user_name in self.localUsers() :
-			dbus_user_name = user_name.replace("-", "_")
+			dbus_user_name = re.sub(r"[^\w\d_]", "_", user_name)
 			local_users_shared.addSharedObject(dbus_user_name, LocalUser(user_name,
 				tools.dbus.joinPath(SERVICE_NAME, dbus_user_name), self))
 			user_count += 1
@@ -272,7 +272,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			return
 
 		user_names_list = self.localUsers()
-		dbus_user_names_list = [ item.replace("-", "_") for item in user_names_list ]
+		dbus_user_names_list = [ re.sub(r"[^\w\d_]", "_", item) for item in user_names_list ]
 
 		local_users_shared = shared.Functions.shared(LOCAL_USERS_SHARED_NAME)
 

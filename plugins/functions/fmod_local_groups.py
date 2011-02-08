@@ -167,7 +167,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		local_groups_shared = shared.Functions.shared(LOCAL_GROUPS_SHARED_NAME)
 		group_count = 0
 		for group_name in self.localGroups() :
-			dbus_group_name = group_name.replace("-", "_")
+			dbus_group_name = re.sub(r"[^\w\d_]", "_", group_name)
 			local_groups_shared.addSharedObject(dbus_group_name, LocalGroup(group_name,
 				tools.dbus.joinPath(SERVICE_NAME, dbus_group_name), self))
 			group_count += 1
@@ -211,7 +211,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			return
 
 		group_names_list = self.localGroups()
-		dbus_group_names_list = [ item.replace("-", "_") for item in group_names_list ]
+		dbus_group_names_list = [ re.sub(r"[^\w\d_]", "_", item) for item in group_names_list ]
 
 		local_groups_shared = shared.Functions.shared(LOCAL_GROUPS_SHARED_NAME)
 

@@ -220,7 +220,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		nss_roles_shared = shared.Functions.shared(NSS_ROLES_SHARED_NAME)
 		role_count = 0
 		for role_name in self.nssRoles() :
-			dbus_role_name = role_name.replace("-", "_")
+			dbus_role_name = re.sub(r"[^\w\d_]", "_", role_name)
 			nss_roles_shared.addSharedObject(dbus_role_name, NssRole(role_name,
 				tools.dbus.joinPath(SERVICE_NAME, dbus_role_name), self))
 			role_count += 1
@@ -261,7 +261,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			return
 
 		role_names_list = self.nssRoles()
-		dbus_role_names_list = [ item.replace("-", "_") for item in role_names_list ]
+		dbus_role_names_list = [ re.sub(r"[^\w\d_]", "_", item) for item in role_names_list ]
 
 		nss_roles_shared = shared.Functions.shared(NSS_ROLES_SHARED_NAME)
 

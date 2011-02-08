@@ -159,7 +159,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		for system_service_name in os.listdir(initd_dir_path) :
 			st_mode = os.stat(os.path.join(initd_dir_path, system_service_name)).st_mode
 			if st_mode & stat.S_IEXEC and st_mode & stat.S_IFREG :
-				dbus_system_service_name = re.sub(r"-|\.", "_", system_service_name)
+				dbus_system_service_name = re.sub(r"[^\w\d_]", "_", system_service_name)
 
 				system_services_shared.addSharedObject(dbus_system_service_name, SystemService(system_service_name,
 					tools.dbus.joinPath(SERVICE_NAME, dbus_system_service_name), self))
@@ -199,7 +199,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 		if event.dir :
 			return
 
-		dbus_system_service_name = re.sub(r"-|\.", "_", event.name)
+		dbus_system_service_name = re.sub(r"[^\w\d_]", "_", event.name)
 		system_services_shared = shared.Functions.shared(SERVICE_NAME)
 
 		if event.maskname == "IN_CREATE" :

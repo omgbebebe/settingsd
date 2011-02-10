@@ -130,7 +130,7 @@ class LocalUser(service.FunctionObject) :
 	def setLock(self, lock_flag) :
 		(lock_arg, lock_str) = ( ("-L", "lock") if lock_flag else ("-U", "unlock") )
 
-		logger.verbose("{mod}: Request to %s local user \"%s\"" % (lock_str))
+		logger.verbose("{mod}: Request to %s local user \"%s\"" % (lock_str, self.__user_name))
 
 		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), lock_arg, self.__user_name]
 		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
@@ -147,8 +147,11 @@ class LocalUser(service.FunctionObject) :
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def setPasswd(self, passwd) :
+		logger.verbose("{mod}: Request to change password for local user \"%s\"" % (self.__user_name))
+
 		return tools.process.execProcess(config.value(SERVICE_NAME, "chpasswd_bin"),
-			input = "%s:%s\n" % (self.__user_name, passwd), fatal_flag = False)[2]
+			proc_input = "%s:%s\n" % (self.__user_name, passwd),
+			fatal_flag = False, confidential_input_flag = True)[2]
 
 
 class LocalUsers(service.FunctionObject) :

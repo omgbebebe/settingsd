@@ -143,6 +143,13 @@ class LocalUser(service.FunctionObject) :
 			return ( len(passwd) > 0 and passwd[0] == "!" )
 		return False
 
+	###
+
+	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, in_signature="s", out_signature="i")
+	def setPasswd(self, passwd) :
+		return tools.process.execProcess(config.value(SERVICE_NAME, "chpasswd_bin"),
+			input = "%s:%s\n" % (self.__user_name, passwd), fatal_flag = False)[2]
+
 
 class LocalUsers(service.FunctionObject) :
 
@@ -258,6 +265,7 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 			(SERVICE_NAME, "useradd_bin", "/usr/sbin/useradd", str),
 			(SERVICE_NAME, "userdel_bin", "/usr/sbin/userdel", str),
 			(SERVICE_NAME, "usermod_bin", "/usr/sbin/usermod", str),
+			(SERVICE_NAME, "chpasswd_bin", "/usr/sbin/chpasswd", str),
 			(SERVICE_NAME, "passwd_conf", "/etc/passwd", str),
 			(SERVICE_NAME, "shadow_conf", "/etc/shadow", str),
 			(SERVICE_NAME, "login_defs_conf", "/etc/login.defs", str)

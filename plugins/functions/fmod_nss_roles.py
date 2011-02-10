@@ -128,8 +128,9 @@ class NssRole(service.FunctionObject) :
 		user_name = validators.os.validUserName(user_name)
 
 		logger.verbose("{mod}: Request to add user \"%s\" to NSS role \"%s\"" % (user_name, self.__role_name))
-		return tools.process.execProcess("%s -a -G %s %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
-			self.__role_name, user_name ), False)[2]
+
+		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), "-a", "-G", self.__role_name, user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(NSS_ROLE_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def removeUser(self, user_name) :
@@ -137,10 +138,12 @@ class NssRole(service.FunctionObject) :
 
 		users_list = grp.getgrnam(self.__role_name).gr_mem
 		users_list.remove(self.__role_name)
+		users = ",".join(users_list)
 
 		logger.verbose("{mod}: Request to remove user \"%s\" from NSS role \"%s\"" % (user_name, self.__role_name))
-		return tools.process.execProcess("%s -G %s %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
-			",".join(users_list), user_name ), False)[2]
+
+		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), "-G", users, user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(NSS_ROLE_METHODS_NAMESPACE, out_signature="as")
 	def users(self) :

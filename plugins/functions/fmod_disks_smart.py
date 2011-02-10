@@ -38,11 +38,11 @@ class Disk(service.FunctionObject) :
 
 	@service.functionMethod(SMART_METHODS_NAMESPACE, out_signature="a(isiiiissss)")
 	def attributes(self) :
-		proc_args = "%s -A %s" % (config.value(SERVICE_NAME, "smartctl_bin"), self.__device_file_path)
+		proc_args_list = [config.value(SERVICE_NAME, "smartctl_bin"), "-A", self.__device_file_path]
 
 		attrs_list = []
 		attrs_found_flag = False
-		for attrs_list_item in tools.process.execProcess(proc_args)[0].split("\n") :
+		for attrs_list_item in tools.process.execProcess(proc_args_list)[0].split("\n") :
 			attrs_list_item = attrs_list_item.strip()
 
 			if attrs_found_flag :
@@ -65,11 +65,11 @@ class Disk(service.FunctionObject) :
 
 	@service.functionMethod(SMART_METHODS_NAMESPACE, out_signature="b")
 	def health(self) :
-		proc_args = "%s -H %s" % (config.value(SERVICE_NAME, "smartctl_bin"), self.__device_file_path)
+		proc_args_list = [config.value(SERVICE_NAME, "smartctl_bin"), "-H", self.__device_file_path]
 
 		disk_health_flag = False
 		health_found_flag = False
-		for health_list_item in tools.process.execProcess(proc_args)[0].split("\n") :
+		for health_list_item in tools.process.execProcess(proc_args_list)[0].split("\n") :
 			health_list_item = health_list_item.strip()
 
 			if health_found_flag :
@@ -142,8 +142,8 @@ class Service(service.Service) :
 	### Private ###
 
 	def smartAvailable(self, device_file_path) :
-		proc_args = "%s %s" % (config.value(SERVICE_NAME, "smartctl_bin"), device_file_path)
-		return not bool(tools.process.execProcess(proc_args, False)[2])
+		proc_args_list = [config.value(SERVICE_NAME, "smartctl_bin"), device_file_path]
+		return not bool(tools.process.execProcess(proc_args_list, fatal_flag = False)[2])
 
 	###
 

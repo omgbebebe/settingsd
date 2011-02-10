@@ -55,8 +55,8 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change uid for local user \"%s\", new uid=%d" % (self.__user_name, uid))
 
-		return tools.process.execProcess("%s -u %d %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
-			uid, self.__user_name ), False)[2]
+		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), "-u", str(uid), self.__user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="i")
 	def uid(self) :
@@ -71,8 +71,8 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change gid for local user \"%s\", new gid=%d" % (self.__user_name, gid))
 
-		return tools.process.execProcess("%s -g %d %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
-			gid, self.__user_name ), False)[2]
+		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), "-g", str(gid), self.__user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="i")
 	def gid(self) :
@@ -87,8 +87,8 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change home for local user \"%s\", new home=\"%s\"" % (self.__user_name, path))
 
-		return tools.process.execProcess("%s -d \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
-			path, self.__user_name ), False)[2]
+		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), "-d", path, self.__user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="s")
 	def homePath(self) :
@@ -101,8 +101,8 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change shell for local user \"%s\", new shell=\"%s\"" % (self.__user_name, path))
 
-		return tools.process.execProcess("%s -s \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
-			path, self.__user_name ), False)[2]
+		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), "-s", path, self.__user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="s")
 	def shell(self) :
@@ -117,8 +117,8 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change comment for local user \"%s\", new comment=\"%s\"" % (self.__user_name, text))
 
-		return tools.process.execProcess("%s -c \'%s\' %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
-			text, self.__user_name ), False)[2]
+		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), "-c", text, self.__user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="s")
 	def comment(self) :
@@ -132,8 +132,8 @@ class LocalUser(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to %s local user \"%s\"" % (lock_str))
 
-		return tools.process.execProcess("%s %s %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
-			lock_arg, self.__user_name ), False)[2]
+		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), lock_arg, self.__user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_USER_METHODS_NAMESPACE, out_signature="b")
 	def isLocked(self) :
@@ -151,13 +151,13 @@ class LocalUsers(service.FunctionObject) :
 	@service.functionMethod(LOCAL_USERS_METHODS_NAMESPACE, in_signature="sii", out_signature="i")
 	def addUser(self, user_name, uid, gid) :
 		user_name = validators.os.validUserName(user_name)
-		(uid_arg, uid_str) = ( ("-u %d" % (uid), str(uid)) if uid >= 0 else ("", "auto") )
-		(gid_arg, gid_str) = ( ("-g %d" % (gid), str(gid)) if gid >= 0 else ("", "auto") )
+		(uid_args_list, uid_str) = ( (["-u", str(uid)], str(uid)) if uid >= 0 else ([], "auto") )
+		(gid_args_list, gid_str) = ( (["-g", str(gid)], str(gid)) if gid >= 0 else ([], "auto") )
 
 		logger.verbose("{mod}: Request to add local user \"%s\" with uid=%s and gid=%s" % (user_name, uid_str, gid_str))
 
-		return tools.process.execProcess("%s %s %s %s" % (config.value(SERVICE_NAME, "useradd_bin"),
-			uid_arg, gid_arg, user_name))
+		proc_args_list = [config.value(SERVICE_NAME, "useradd_bin")] + uid_args_list + gid_args_list + [user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_USERS_METHODS_NAMESPACE, in_signature="sb", out_signature="i")
 	def removeUser(self, user_name, remove_data_flag) :
@@ -165,8 +165,9 @@ class LocalUsers(service.FunctionObject) :
 		(remove_data_arg, remove_data_str) = ( ("-r", " and its data") if remove_data_flag else ("", "") )
 
 		logger.verbose("{mod}: Request to remove local user \"%s\"%s" % (user_name, remove_data_str))
-		return tools.process.execProcess("%s %s %s" % (config.value(SERVICE_NAME, "userdel_bin"),
-			remove_data_arg, user_name), False)[2]
+
+		proc_args_list = [config.value(SERVICE_NAME, "userdel_bin"), remove_data_arg, user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	###
 

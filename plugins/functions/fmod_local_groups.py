@@ -54,8 +54,8 @@ class LocalGroup(service.FunctionObject) :
 
 		logger.verbose("{mod}: Request to change gid for local group \"%s\", new gid=%d" % (self.__group_name, gid))
 
-		return tools.process.execProcess("%s -g %d %s" % ( config.value(SERVICE_NAME, "groupmod_bin"),
-			gid, self.__group_name ), False)[2]
+		proc_args_list = [config.value(SERVICE_NAME, "groupmod_bin"), "-g", str(gid), self.__group_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="i")
 	def gid(self) :
@@ -68,8 +68,9 @@ class LocalGroup(service.FunctionObject) :
 		user_name = validators.os.validUserName(user_name)
 
 		logger.verbose("{mod}: Request to add user \"%s\" to local group \"%s\"" % (user_name, self.__group_name))
-		return tools.process.execProcess("%s -a -G %s %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
-			self.__group_name, user_name ), False)[2]
+
+		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), "-a", "-G", self.__group_name, user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def removeUser(self, user_name) :
@@ -77,10 +78,12 @@ class LocalGroup(service.FunctionObject) :
 
 		users_list = grp.getgrnam(self.__group_name).gr_mem
 		users_list.remove(self.__group_name)
+		users = ",".join(users_list)
 
 		logger.verbose("{mod}: Request to remove user \"%s\" from local group \"%s\"" % (user_name, self.__group_name))
-		return tools.process.execProcess("%s -G %s %s" % ( config.value(SERVICE_NAME, "usermod_bin"),
-			",".join(users_list), user_name ), False)[2]
+
+		proc_args_list = [config.value(SERVICE_NAME, "usermod_bin"), "-G", users, user_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_GROUP_METHODS_NAMESPACE, out_signature="as")
 	def users(self) :
@@ -94,18 +97,21 @@ class LocalGroups(service.FunctionObject) :
 	@service.functionMethod(LOCAL_GROUPS_METHODS_NAMESPACE, in_signature="si", out_signature="i")
 	def addGroup(self, group_name, gid) :
 		group_name = validators.os.validGroupName(group_name)
-		(gid_arg, gid_str) = ( ("-g %d" % (gid), str(gid)) if gid >= 0 else ("", "auto") )
+		(gid_args_list, gid_str) = ( (["-g", str(gid)], str(gid)) if gid >= 0 else ([], "auto") )
 
 		logger.verbose("{mod}: Request to add local group \"%s\" with gid=%s" % (group_name, gid_str))
 
-		return tools.process.execProcess("%s %s %s" % (config.value(SERVICE_NAME, "groupadd_bin"), gid_arg, group_name))
+		proc_args_list = [config.value(SERVICE_NAME, "groupadd_bin")] + gid_args_list + [group_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(LOCAL_GROUPS_METHODS_NAMESPACE, in_signature="s", out_signature="i")
 	def removeGroup(self, group_name) :
 		group_name = validators.os.validGroupName(group_name)
 
 		logger.verbose("{mod}: Request to remove local group \"%s\"" % (group_name))
-		return tools.process.execProcess("%s %s" % (config.value(SERVICE_NAME, "groupdel_bin"), group_name), False)[2]
+
+		proc_args_list = [config.value(SERVICE_NAME, "groupdel_bin"), group_name]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	###
 

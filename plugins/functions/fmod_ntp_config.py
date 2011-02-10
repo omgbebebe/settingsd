@@ -46,8 +46,7 @@ class NtpConfig(service.FunctionObject) :
 
 	@service.functionMethod(NTP_METHODS_NAMESPACE)
 	def request(self) :
-		proc_args =  "%s %s" % (config.value(SERVICE_NAME, "ntpdate_bin"), " ".join(self.servers()))
-		tools.process.execProcess(proc_args)
+		tools.process.execProcess([config.value(SERVICE_NAME, "ntpdate_bin")] + self.servers())
 
 
 ##### Public classes #####

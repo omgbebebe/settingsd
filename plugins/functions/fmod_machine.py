@@ -19,9 +19,6 @@ SERVICE_NAME = "machine"
 POWER_METHODS_NAMESPACE = "power"
 RUNLEVELS_METHODS_NAMESPACE = "runlevels"
 
-RUNLEVELS = "0123456"
-
-
 ##### Private classes #####
 class Machine(service.FunctionObject) :
 
@@ -29,33 +26,31 @@ class Machine(service.FunctionObject) :
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def shutdown(self) :
-		return tools.process.execProcess("%s -h now" % (config.value(SERVICE_NAME, "shutdown_bin")), False)[2]
+		return tools.process.execProcess([config.value(SERVICE_NAME, "shutdown_bin"), "-h", "now"], fatal_flag = False)[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def reboot(self) :
-		return tools.process.execProcess("%s -r now" % (config.value(SERVICE_NAME, "shutdown_bin")), False)[2]
+		return tools.process.execProcess([config.value(SERVICE_NAME, "shutdown_bin"), "-r", "now"], fatal_flag = False)[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def suspend(self) :
-		return tools.process.execProcess(config.value(SERVICE_NAME, "pm_suspend_bin"), False)[2]
+		return tools.process.execProcess(config.value(SERVICE_NAME, "pm_suspend_bin"), fatal_flag = False)[2]
 
 	@service.functionMethod(POWER_METHODS_NAMESPACE, out_signature="i")
 	def hibernate(self) :
-		return tools.process.execProcess(config.value(SERVICE_NAME, "pm_hibernate_bin"), False)[2]
+		return tools.process.execProcess(config.value(SERVICE_NAME, "pm_hibernate_bin"), fatal_flag = False)[2]
 
 	###
 
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, in_signature="i", out_signature="i")
 	def switchTo(self, level) :
-		proc_args = "%s %s" % (config.value(SERVICE_NAME, "telinit_bin"), validators.common.validRange(str(level), RUNLEVELS))
-		return tools.process.execProcess(proc_args, False)[2]
+		proc_args_list = [config.value(SERVICE_NAME, "telinit_bin"), validators.common.validRange(str(level), "0123456")]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, out_signature="i")
 	def currentLevel(self) :
-		proc_args = config.value(SERVICE_NAME, "runlevel_bin")
-
-		level_pairs_list = tools.process.execProcess(proc_args)[0].strip().split(" ")
-		if len(level_pairs_list) != 2 or not level_pairs_list[1] in RUNLEVELS :
+		level_pairs_list = tools.process.execProcess(config.value(SERVICE_NAME, "runlevel_bin"))[0].strip().split(" ")
+		if len(level_pairs_list) != 2 or not level_pairs_list[1] in "0123456" :
 			raise tools.process.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
 				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
@@ -63,14 +58,12 @@ class Machine(service.FunctionObject) :
 
 	@service.functionMethod(RUNLEVELS_METHODS_NAMESPACE, out_signature="i")
 	def previousLevel(self) :
-		proc_args = config.value(SERVICE_NAME, "runlevel_bin")
-
-		level_pairs_list = tools.process.execProcess(proc_args)[0].strip().split(" ")
-		if len(level_pairs_list) != 2 or not level_pairs_list[1] in RUNLEVELS+"N" :
+		level_pairs_list = tools.process.execProcess(config.value(SERVICE_NAME, "runlevel_bin"))[0].strip().split(" ")
+		if len(level_pairs_list) != 2 or not level_pairs_list[1] in "0123456N" :
 			raise tools.process.SubprocessFailure("Error while execute \"%s\"\nStdout: %s\nStderr: %s\nReturn code: %d" % (
 				proc_args, proc_stdout.strip(), proc_stderr.strip(), proc_returncode ))
 
-		return ( int(level_pairs_list[0]) if level_pairs_list[0] in RUNLEVELS else -1 )
+		return ( int(level_pairs_list[0]) if level_pairs_list[0] in "0123456" else -1 )
 
 
 ##### Public classes #####

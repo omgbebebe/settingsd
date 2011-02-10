@@ -37,9 +37,9 @@ class DateTime(service.FunctionObject) :
 
 	@service.functionMethod(SYSTEM_CLOCK_METHODS_NAMESPACE, in_signature="iiiiii", out_signature="i")
 	def setUtcTime(self, month, monthday, hour, minute, year, second) :
-		proc_args = "%s -u %02d%02d%02d%02d%04d.%02d" % ( config.value(SERVICE_NAME, "date_bin"),
-			month, monthday, hour, minute, year, second )
-		return tools.process.execProcess(proc_args, False)[2]
+		proc_args_list = [ config.value(SERVICE_NAME, "date_bin"), "-u", "%02d%02d%02d%02d%04d.%02d" % (
+			month, monthday, hour, minute, year, second ) ]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(SYSTEM_CLOCK_METHODS_NAMESPACE, out_signature="iiiiii")
 	def utcTime(self) :
@@ -102,7 +102,7 @@ class DateTime(service.FunctionObject) :
 
 	@service.functionMethod(HARDWARE_CLOCK_METHODS_NAMESPACE, out_signature="i")
 	def syncWithSystem(self) :
-		return tools.process.execProcess("%s --systohc" % (config.value(SERVICE_NAME, "hwclock_bin")), False)[0]
+		return tools.process.execProcess([config.value(SERVICE_NAME, "hwclock_bin"), "--systohc"], fatal_flag = False)[0]
 
 
 ##### Public classes #####

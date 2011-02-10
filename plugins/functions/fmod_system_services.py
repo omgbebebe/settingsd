@@ -55,8 +55,8 @@ class SystemService(service.FunctionObject) :
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
 	def levelsMap(self) :
-		proc_args =  "%s --list %s" % (config.value(SERVICE_NAME, "chkconfig_bin"), self.__system_service_name)
-		(proc_stdout, proc_stderr, proc_returncode) = tools.process.execProcess(proc_args)
+		proc_args_list = [config.value(SERVICE_NAME, "chkconfig_bin"), "--list", self.__system_service_name]
+		(proc_stdout, proc_stderr, proc_returncode) = tools.process.execProcess(proc_args_list)
 
 		service_record_list = re.split(r"\s+", proc_stdout.split("\n")[0])
 		levels_list = ["0"]*(len(service_record_list) - 1)
@@ -81,19 +81,19 @@ class SystemService(service.FunctionObject) :
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def start(self) :
 		logger.verbose("{mod}: Request to start service \"%s\"" % (self.__system_service_name))
-		return tools.process.execProcess("%s start" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir"),
-			self.__system_service_name) ), False)[2]
+		proc_args_list = [ os.path.join(config.value(SERVICE_NAME, "initd_dir"), self.__system_service_name), "start"]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def stop(self) :
 		logger.verbose("{mod}: Request to stop service \"%s\"" % (self.__system_service_name))
-		return tools.process.execProcess("%s stop" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir"),
-			self.__system_service_name) ), False)[2]
+		proc_args_list = [ os.path.join(config.value(SERVICE_NAME, "initd_dir"), self.__system_service_name), "stop"]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def status(self) :
-		return tools.process.execProcess("%s status" % ( os.path.join(config.value(SERVICE_NAME, "initd_dir"),
-			self.__system_service_name) ), False)[2]
+		proc_args_list = [ os.path.join(config.value(SERVICE_NAME, "initd_dir"), self.__system_service_name), "status"]
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 
 	### Private ###
@@ -104,10 +104,10 @@ class SystemService(service.FunctionObject) :
 		logger.verbose("Request to %s service \"%s\" on runlevels \"%s\"" % ( ( "enable" if enabled_flag else "disable" ),
 			self.__system_service_name, ( levels if levels != None else "default" ) ))
 
-		proc_args =  "%s %s %s %s" % ( config.value(SERVICE_NAME, "chkconfig_bin"),
-			( "--level %s" % (levels) if levels != None else "" ),
-			self.__system_service_name, ( "on" if enabled_flag else "off" ) )
-		return tools.process.execProcess(proc_args, False)[2]
+		proc_args_list = ( [config.value(SERVICE_NAME, "chkconfig_bin")] +
+			( ["--level", str(levels)] if levels != None else [] ),
+			self.__system_service_name, ( ["on"] if enabled_flag else ["off"] ) )
+		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 	###
 

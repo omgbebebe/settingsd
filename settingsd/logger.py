@@ -7,8 +7,8 @@ import syslog
 import inspect
 import time
 
-import const
-import config
+from . import const
+from . import config
 
 
 ##### Public constants #####
@@ -77,7 +77,7 @@ def log(message_type, message) :
 
 		colored_index = int(sys.stderr.isatty() and config.value(config.APPLICATION_SECTION, "log_use_colors"))
 		for message_list_item in message.split("\n") :
-			print >> sys.stderr, "[ %s ] %s" % (ALL_MESSAGES_TEXTS_LIST[message_type[0]][colored_index], message_list_item)
+			print("[ %s ] %s" % (ALL_MESSAGES_TEXTS_LIST[message_type[0]][colored_index], message_list_item), file=sys.stderr)
 			if config.value(config.RUNTIME_SECTION, "use_syslog") :
 				syslog.syslog(message_type[1], "[ %s ] %s" % (ALL_MESSAGES_TEXTS_LIST[message_type[0]][0], message_list_item))
 

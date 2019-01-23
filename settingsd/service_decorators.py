@@ -5,10 +5,11 @@ import dbus
 import dbus.service
 import dbus.glib
 
-import const
-import config
-import logger
-import tools.dbus
+from . import const
+from . import config
+from . import logger
+from . import tools
+from .tools import dbus as dbus_tools
 
 
 ##### Private decorators #####
@@ -16,9 +17,9 @@ def tracer(function, statics_list=[0]) :
 	def wrapper(self, *args_list, **kwargs_dict) :
 		if config.value(config.APPLICATION_SECTION, "log_level") == const.LOG_LEVEL_DEBUG :
 			logger.debug("%s%s %s::%s" % ( "    "*statics_list[0],
-				str((function.__dict__.has_key("_dbus_is_method") and "Called method") or
-					(function.__dict__.has_key("_dbus_is_signal") and "Emited signal")),
-				self.objectPath(), tools.dbus.joinMethod(function._dbus_interface, function.__name__) ))
+				str(("_dbus_is_method" in function.__dict__ and "Called method") or
+					("_dbus_is_signal" in function.__dict__ and "Emited signal")),
+				self.objectPath(), dbus_tools.joinMethod(function._dbus_interface, function.__name__) ))
 
 			statics_list[0] += 1
 			try :

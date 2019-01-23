@@ -14,7 +14,7 @@ from settingsd import daemon
 
 ##### Private methods #####
 def help() :
-	print ( "Usage: %s [options]\n"
+	print(( "Usage: %s [options]\n"
 		"Options:\n"
 		"\t-h, --help -- Print this text\n"
 		"\t-v, --version -- Print version and license info\n"
@@ -23,10 +23,10 @@ def help() :
 		"\t--bus-type=<system|session> -- Use system or session bus, replace value from config\n"
 		"\t-d, --daemon -- Run application as daemon, by default using interactive mode\n"
 		"\t-s, --status -- Check status of daemon\n"
-		"\t-k, --kill -- Kill daemon process" % (const.MY_NAME) )
+		"\t-k, --kill -- Kill daemon process" % (const.MY_NAME) ))
 
 def version() :
-	print "%s version %s-%s, functionality_level=%d" % (const.MY_NAME, const.VERSION, const.VERSION_STATUS, const.FUNCTIONALITY_LEVEL)
+	print("%s version %s-%s, functionality_level=%d" % (const.MY_NAME, const.VERSION, const.VERSION_STATUS, const.FUNCTIONALITY_LEVEL))
 
 
 ##### Main #####
@@ -52,22 +52,22 @@ if __name__ == "__main__" :
 			elif opts_list_item in ("--log-level",) :
 				try :
 					log_level = validators.common.validRange(int(args_list_item), const.ALL_LOG_LEVELS_LIST)
-				except Exception, err1 :
-					print "Incorrect option \"%s\": %s" % (opts_list_item, str(err1))
+				except Exception as err1 :
+					print("Incorrect option \"%s\": %s" % (opts_list_item, str(err1)))
 					sys.exit(1)
 
 			elif opts_list_item in ("--use-syslog",) :
 				try :
 					use_syslog_flag = validators.common.validBool(args_list_item)
-				except Exception, err1 :
-					print "Incorrect option \"%s\": %s" % (opts_list_item, str(err1))
+				except Exception as err1 :
+					print("Incorrect option \"%s\": %s" % (opts_list_item, str(err1)))
 					sys.exit(1)
 
 			elif opts_list_item in ("--bus-type",) :
 				try :
 					bus_type = validators.common.validRange(args_list_item, const.ALL_BUS_TYPES_LIST)
-				except Exception, err1 :
-					print "Incorrect option \"%s\": %s" % (opts_list_item, str(err1))
+				except Exception as err1 :
+					print("Incorrect option \"%s\": %s" % (opts_list_item, str(err1)))
 					sys.exit(1)
 
 			elif opts_list_item in ("-d", "--daemon") :
@@ -76,21 +76,21 @@ if __name__ == "__main__" :
 			elif opts_list_item in ("-s", "--status") :
 				try :
 					sys.exit(abs(daemon.daemonStatus()))
-				except Exception, err1 :
-					print "Daemon status error: %s" % (str(err1))
+				except Exception as err1 :
+					print("Daemon status error: %s" % (str(err1)))
 					sys.exit(1)
 
 			elif opts_list_item in ("-k", "--kill") :
 				try :
 					sys.exit(abs(daemon.killDaemon()))
-				except Exception, err1 :
-					print "Daemon kill error: %s" % (str(err1))
+				except Exception as err1 :
+					print("Daemon kill error: %s" % (str(err1)))
 					sys.exit(1)
 
 			else :
-				print "Unknown option \"%s\"" % (opts_list_item)
-	except Exception, err1 :
-		print "Bad command line options: %s" % (str(err1))
+				print("Unknown option \"%s\"" % (opts_list_item))
+	except Exception as err1 :
+		print("Bad command line options: %s" % (str(err1)))
 
 	#####
 

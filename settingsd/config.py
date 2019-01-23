@@ -2,11 +2,10 @@
 
 
 import os
-import ConfigParser
+import configparser
 
-import const
-import validators
-import validators.common
+from . import const
+from . import validators
 
 
 ##### Public constants #####
@@ -40,16 +39,16 @@ ConfigDictObject = {
 def setValue(section, option, value, validator = None) :
 	global ConfigDictObject
 
-	if not ConfigDictObject.has_key(section) :
+	if section not in ConfigDictObject :
 		ConfigDictObject[section] = {}
 
-	if ConfigDictObject[section].has_key(option) :
+	if option in ConfigDictObject[section] :
 		validator = ConfigDictObject[section][option][1]
 
 	if validator != None :
 		try :
 			value = validator(value)
-		except Exception, err1 :
+		except Exception as err1 :
 			raise validators.ValidatorError("Incorrect config option \"%s :: %s = %s\": %s" % (section, option, value, str(err1)))
 
 	ConfigDictObject[section][option] = (value, validator)
@@ -69,7 +68,7 @@ def loadConfigs(only_sections_list = (), exclude_sections_list = ()) :
 		if not config_files_list_item.endswith(const.CONFIG_FILE_POSTFIX) :
 			continue
 
-		config_parser = ConfigParser.ConfigParser()
+		config_parser = configparser.ConfigParser()
 		config_parser.read(os.path.join(const.CONFIGS_DIR, config_files_list_item))
 
 		for section in config_parser.sections() :

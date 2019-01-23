@@ -8,10 +8,10 @@ import dbus.service
 import dbus.glib
 import gobject
 
-import const
-import config
-import logger
-import validators.common
+from . import const
+from . import config
+from . import logger
+from . import validators
 
 
 ##### Public classes #####
@@ -70,7 +70,7 @@ class Server(object) :
 		config.loadConfigs(only_sections_list = (config.APPLICATION_SECTION,))
 
 	def loadServicesConfigs(self) :
-		for service_name in self.__services_dict.keys() :
+		for service_name in list(self.__services_dict.keys()) :
 			service_options_list = list(self.__services_dict[service_name]["service_class"].options())
 			service_options_list.append((service_name, "enabled", "no", validators.common.validBool))
 
@@ -102,7 +102,7 @@ class Server(object) :
 	###
 
 	def initServices(self) :
-		for service_name in self.__services_dict.keys() :
+		for service_name in list(self.__services_dict.keys()) :
 			if config.value(service_name, "enabled") :
 				logger.verbose("Enabling service \"%s\"..." % (service_name))
 				try :
@@ -114,7 +114,7 @@ class Server(object) :
 				logger.info("Initialized service: %s" % (service_name))
 
 	def closeServices(self) :
-		for service_name in self.__services_dict.keys() :
+		for service_name in list(self.__services_dict.keys()) :
 			if self.__services_dict[service_name]["service"] != None :
 				logger.verbose("Disabling service \"%s\"..." % (service_name))
 				try :

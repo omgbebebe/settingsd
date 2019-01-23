@@ -7,8 +7,8 @@ import signal
 import errno
 import resource
 
-import const
-import logger
+from . import const
+from . import logger
 
 
 ##### Private methods #####
@@ -58,10 +58,10 @@ def maxFd() :
 	return max_fd
 
 def closeFd(fd, retries_count = 5) :
-	for count in xrange(retries_count) :
+	for count in range(retries_count) :
 		try :
 			os.close(fd)
-		except OSError, err1 :
+		except OSError as err1 :
 			if err1.errno != errno.EBADF :
 				continue
 		break
@@ -92,7 +92,7 @@ def startDaemon(function, work_dir_path = None, umask = None) :
 				os.umask(umask)
 				logger.verbose("Accapted new umask: %.3o" % (umask))
 
-			for fd in xrange(maxFd()) :
+			for fd in range(maxFd()) :
 				closeFd(fd)
 			null_fd = os.open("/dev/null", os.O_RDWR)
 			for fd in (0, 1, 2) :

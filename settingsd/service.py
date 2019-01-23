@@ -6,22 +6,17 @@ import dbus.service
 import dbus.glib
 import abc
 
-import const
-import config
-import shared
-import logger
-import tools.dbus
+from . import const
+from . import config
+from . import shared
+from . import logger
+from . import tools
 
-from service_decorators import *
+from .service_decorators import *
 
 
 ##### Private classes #####
-class ServiceInterface(object) :
-	__metaclass__ = abc.ABCMeta
-
-
-	### Public ###
-
+class ServiceInterface(object, metaclass=abc.ABCMeta) :
 	@abc.abstractmethod
 	def initService(self) :
 		pass
@@ -29,12 +24,7 @@ class ServiceInterface(object) :
 	def closeService(self) :
 		pass
 
-class ServiceRequisitesInterface(object) :
-	__metaclass__ = abc.ABCMeta
-
-
-	### Public ###
-
+class ServiceRequisitesInterface(object, metaclass=abc.ABCMeta) :
 	@classmethod
 	@abc.abstractmethod
 	def serviceName(self) :
@@ -68,7 +58,7 @@ class CustomObject(dbus.service.Object) :
 	def name(self) :
 		if self.shared() == None :
 			return None
-		for (shared_object_name, shared_object) in self.shared().sharedObjects().items() :
+		for (shared_object_name, shared_object) in list(self.shared().sharedObjects().items()) :
 			if shared_object == self :
 				return shared_object_name
 		return None

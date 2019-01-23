@@ -115,7 +115,7 @@ class PlainEditor(object) :
 		space = ( " " if len(self.__spaces_list) > 0 else "" )
 		quote = ( self.__quotes_list[0] if len(self.__quotes_list) > 0 else "" )
 
-		for count in xrange(len(values_list)) :
+		for count in range(len(values_list)) :
 			variable = variable_name + space + self.__delimiter + space + quote + str(values_list[count]) + quote
 			self.__config_file_data_list.insert(last_variable_index + count, variable)
 
@@ -243,7 +243,7 @@ class IniEditor(object) :
 			self.__config_file_data_list.insert(last_variable_index + 1, "[%s]" % (section_name))
 			last_variable_index += 2
 
-		for count in xrange(len(values_list)) :
+		for count in range(len(values_list)) :
 			self.__config_file_data_list.insert(last_variable_index + count, "%s = %s" % (variable_name, str(values_list[count])))
 
 	def value(self, section_name, variable_name) :

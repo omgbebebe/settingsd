@@ -3,7 +3,7 @@
 
 import re
 
-from common import ValidatorError
+from .common import ValidatorError
 
 
 ##### Public methods #####

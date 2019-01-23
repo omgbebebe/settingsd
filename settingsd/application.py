@@ -6,11 +6,11 @@ import os
 import signal
 import syslog
 
-import const
-import config
-import logger
-import server
-import daemon
+from . import const
+from . import config
+from . import logger
+from . import server
+from . import daemon
 
 
 ##### Public classes #####
@@ -122,7 +122,7 @@ class Application(object) :
 
 	def runDaemon(self) :
 		work_dir_path = ( "/" if os.getuid() == 0 else None )
-		umask = ( 077 if os.getuid() == 0 else None )
+		umask = ( 0o77 if os.getuid() == 0 else None )
 
 		logger.info("Run server as daemon: uid=%d, dir=%s, umask=%s" % ( os.getuid(),
 			( work_dir_path if work_dir_path != None else os.getcwd() ),

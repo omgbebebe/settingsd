@@ -1,17 +1,30 @@
 Name: settingsd
-Version: 0.3
-Release: alt4
+Version: 0.4
+Release: alt1
+
 Summary: Settingsd - extensible service to control the operating system via D-Bus
+
 Group: System/Servers
-License: GPL
-URL: http://etersoft.ru
-Packager: Devaev Maxim <mdevaev@etersoft.ru>
-#Git: git.eter:/people/mdevaev/packages/settingsd.git
+License: LGPLv2
+URL: https://github.com/Etersoft/settingsd
+
+Packager: Vitaly Lipatov <lav@altlinux.ru>
+
+# Source-git: https://github.com/Etersoft/settingsd.git
 Source: %name-%version.tar
+
 BuildArch: noarch
-BuildRequires: python-dev
-Requires: python3-module-dbus, python3-module-pam, python3-module-pyinotify
-Requires: chkconfig, service, SysVinit, pm-utils, lsb-release, hwclock
+
+BuildRequires: python3-dev
+
+%add_python3_path %_datadir/%name/plugins/
+
+Requires: python3-module-dbus
+#, python3-module-pyinotify
+# FIXME:
+# Requires: chkconfig, service, SysVinit
+Requires: pm-utils, lsb-release, hwclock
+
 %description
 Extensible service to control the operating system via D-Bus.
 
@@ -19,8 +32,8 @@ Extensible service to control the operating system via D-Bus.
 %package fmod-disks-smart
 Summary: Settingsd functional plugin for view SMART information of disks
 Group: Monitoring
-Requires: python-module-gudev, smartmontools
-Requires: %name = %version-%release
+Requires: smartmontools
+Requires: %name = %EVR
 %description fmod-disks-smart
 %summary
 
@@ -29,7 +42,7 @@ Requires: %name = %version-%release
 Summary: Settingsd functional plugin for NTP configuration
 Group: System/Configuration/Other
 Requires: ntpdate
-Requires: %name = %version-%release
+Requires: %name = %EVR
 %description fmod-ntp-config
 %summary
 
@@ -38,7 +51,7 @@ Requires: %name = %version-%release
 Summary: Settingsd functional plugin for dnsmasq configuration
 Group: System/Configuration/Networking
 Requires: dnsmasq
-Requires: %name = %version-%release
+Requires: %name = %EVR
 %description fmod-dnsmasq-config
 %summary
 
@@ -47,7 +60,7 @@ Requires: %name = %version-%release
 Summary: Settingsd functional plugin for rtorrentd configuration
 Group: System/Configuration/Networking
 Requires: rtorrentd
-Requires: %name = %version-%release
+Requires: %name = %EVR
 %description fmod-rtorrentd-config
 %summary
 
@@ -56,21 +69,32 @@ Requires: %name = %version-%release
 Summary: Settingsd functional plugin for NSS roles configuration
 Group: System/Libraries
 Requires: libnss-role
-Requires: %name = %version-%release
+Requires: %name = %EVR
 %description fmod-nss-roles
+%summary
+
+%package fmod-pam
+Summary: Settingsd functional plugin for PAM authentication
+Group: System/Libraries
+Requires: %name = %EVR
+%description fmod-pam
 %summary
 
 
 %prep
 %setup
 
+# due missed gudev
+rm -fv configs/settingsd/disks_smart.conf
+rm -fv plugins/functions/fmod_disks_smart.py
+
 %build
-%python_build
+%python3_build
 
 %install
-%python_install
+%python3_install
 # FIXME: Hack to drop out buildroot
-%__subst 's|%buildroot||g' %buildroot%python_sitelibdir/%name/const.py
+%__subst 's|%buildroot||g' %buildroot%python3_sitelibdir/%name/const.py
 
 
 %files
@@ -81,6 +105,7 @@ Requires: %name = %version-%release
 %_sysconfdir/dbus-1/system.d/*.conf
 %dir %_datadir/%name/plugins/*/
 %dir %_datadir/%name/data/*/
+%_datadir/%name/plugins/functions/__pycache__/
 %_datadir/%name/plugins/functions/fmod_common_info.py*
 %_datadir/%name/plugins/functions/fmod_date_time.py*
 %_datadir/%name/plugins/functions/fmod_example.py*
@@ -90,13 +115,14 @@ Requires: %name = %version-%release
 %_datadir/%name/plugins/functions/fmod_settingsd.py*
 %_datadir/%name/plugins/functions/fmod_statistics.py*
 %_datadir/%name/plugins/functions/fmod_system_services.py*
-%python_sitelibdir/%name/
-%python_sitelibdir/*.egg-info
+%python3_sitelibdir/%name/
+%python3_sitelibdir/*.egg-info
 
 
-%files fmod-disks-smart
-%config(noreplace) %_sysconfdir/%name/disks_smart.conf
-%_datadir/%name/plugins/functions/fmod_disks_smart.py*
+# due missed python gudev
+#files fmod-disks-smart
+#config(noreplace) %_sysconfdir/%name/disks_smart.conf
+#_datadir/%name/plugins/functions/fmod_disks_smart.py*
 
 
 %files fmod-ntp-config
@@ -118,8 +144,15 @@ Requires: %name = %version-%release
 %config(noreplace) %_sysconfdir/%name/nss_roles.conf
 %_datadir/%name/plugins/functions/fmod_nss_roles.py*
 
+%files fmod-pam
+#config(noreplace) %_sysconfdir/%name/pam.conf
+%_datadir/%name/plugins/functions/fmod_pam_authentication.py*
 
 %changelog
+* Mon Jan 28 2019 Vitaly Lipatov <lav@altlinux.ru> 0.4-alt1
+- build with python3
+- add fmod-pam
+
 * Fri Feb 04 2011 Devaev Maxim <mdevaev@etersoft.ru> 0.3-alt4
 - d-Bus policy for fmod_nss_roles
 

@@ -1,0 +1,4 @@
+TODO:
+- use epm instead of service/chkconfig
+- use epm instead lsb_release
+- check all external commands

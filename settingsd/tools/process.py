@@ -37,8 +37,8 @@ def execProcess(proc_args_list, proc_input = None, fatal_flag = True,
 		error_text = "Error while execute \"%s\"\nStdout: %s\nStderr: %s\nStdin: %s\nReturn code: %d" % (
 			str(proc_args_list), proc_stdout.strip(), proc_stderr.strip(), proc_input, proc.returncode )
 		if fatal_flag :
+			logger.error("{submod}: "+error_text)
 			raise SubprocessFailure(error_text)
-		logger.error("{submod}: "+error_text)
 
 	logger.debug("{submod}: Child process \"%s\" finished, return_code=%d" % (str(proc_args_list), proc.returncode))
 

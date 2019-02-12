@@ -92,7 +92,9 @@ class SystemService(service.FunctionObject) :
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def status(self) :
-		proc_args_list = ["serv", self.__system_service_name, "status"]
+		proc_args_list = [
+			config.value(SERVICE_NAME, "serv_mgr_command"), self.__system_service_name, "status"
+		]
 		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 
@@ -189,7 +191,8 @@ class Service(service.Service, pyinotify.ThreadedNotifier) :
 	def options(self) :
 		return [
 			(SERVICE_NAME, "initd_dir", "/etc/rc.d/init.d", str),
-			(SERVICE_NAME, "chkconfig_bin", "/sbin/chkconfig", str)
+			(SERVICE_NAME, "chkconfig_bin", "/sbin/chkconfig", str),
+			(SERVICE_NAME, "serv_mgr_command", "serv", str)
 		]
 
 

@@ -5,6 +5,7 @@ import os
 import stat
 import re
 import pyinotify
+from dbus import SystemBus, Interface as DBusInterface
 
 from settingsd import config
 from settingsd import service
@@ -35,6 +36,10 @@ class SystemService(service.FunctionObject) :
 		service.FunctionObject.__init__(self, object_path, service_object)
 
 		self.__system_service_name = system_service_name
+		self._bus = SystemBus()
+		self._systemd_manager = DBusInterface(self._bus.get_object(
+			'org.freedesktop.systemd1', '/org/freedesktop/systemd1'
+		), 'org.freedesktop.systemd1.Manager')
 
 
 	### DBus methods ###
@@ -53,78 +58,33 @@ class SystemService(service.FunctionObject) :
 	def off(self, levels = None) :
 		return self.setLevels(levels, False)
 
-	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
-	def levelsMap(self) :
-		proc_args_list = [config.value(SERVICE_NAME, "chkconfig_bin"), "--list", self.__system_service_name]
-		(proc_stdout, proc_stderr, proc_returncode) = tools.process.execProcess(proc_args_list)
-
-		service_record_list = re.split(r"\s+", proc_stdout.split("\n")[0])
-		levels_list = ["0"]*(len(service_record_list) - 1)
-		for count in xrange(1, len(service_record_list)) :
-			(level, state) = service_record_list[count].split(":")
-			levels_list[int(level)] = ( "1" if state == "on" else "0" )
-
-		return "".join(levels_list)
-
 	###
 
-	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
-	def shortDescription(self) :
-		return "" # TODO: /usr/lib/python2.6/site-packages/scservices/core/servicesinfo.py in RHEL
-
-	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="s")
-	def description(self) :
-		return "" # TODO: /usr/lib/python2.6/site-packages/scservices/core/servicesinfo.py in RHEL
-
-	###
-
-	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="")
 	def start(self) :
 		logger.verbose("{mod}: Request to start service \"%s\"" % (self.__system_service_name))
-		proc_args_list = [ os.path.join(config.value(SERVICE_NAME, "initd_dir"), self.__system_service_name), "start"]
-		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
+		self._systemd_manager.StartUnit(self.__system_service_name + '.service', 'replace')
 
-	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="")
 	def stop(self) :
 		logger.verbose("{mod}: Request to stop service \"%s\"" % (self.__system_service_name))
-		proc_args_list = [ os.path.join(config.value(SERVICE_NAME, "initd_dir"), self.__system_service_name), "stop"]
-		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
+		self._systemd_manager.StopUnit(self.__system_service_name + '.service', 'replace')
 
-	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
-	def status(self) :
-		proc_args_list = [
-			config.value(SERVICE_NAME, "serv_mgr_command"), self.__system_service_name, "status"
-		]
-		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
-
-
-	### Private ###
-
-	def setLevels(self, levels, enabled_flag) :
-		levels = self.validLevels(levels)
-
-		logger.verbose("Request to %s service \"%s\" on runlevels \"%s\"" % ( ( "enable" if enabled_flag else "disable" ),
-			self.__system_service_name, ( levels if levels != None else "default" ) ))
-
-		proc_args_list = ( [config.value(SERVICE_NAME, "chkconfig_bin")] +
-			( ["--level", str(levels)] if levels != None else [] ),
-			self.__system_service_name, ( ["on"] if enabled_flag else ["off"] ) )
-		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
-
-	###
-
-	def validLevels(self, levels) :
-		if type(levels).__name__ in ("str", "String") :
-			if len(levels) == 0 :
-				levels = None
-			for level in levels :
-				if not level in "0123456" :
-					raise validators.ValidatorError("Incorrect item \"%s\" in argument \"%s\"" % (level, levels))
-		elif type (levels).__name__ == "NoneType" :
-			pass
-		else :
-			raise validators.ValidatorError("Incorrect type \"%s\" of argument" % (type(levels).__name__))
-		return levels
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="b")
+	def isActive(self) :
+		unit = DBusInterface(
+			self._bus.get_object(
+				'org.freedesktop.systemd1',
+				str(self._systemd_manager.LoadUnit(self.__system_service_name + '.service'))
+			),
+			'org.freedesktop.systemd1.Unit'
+		)
+		active_state = unit.Get(
+			'org.freedesktop.systemd1.Unit',
+			'ActiveState',
+			dbus_interface='org.freedesktop.DBus.Properties'
+		)
+		return active_state == 'active' or active_state == 'reloading'
 
 
 class SystemServices(service.FunctionObject) :

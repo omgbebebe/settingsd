@@ -7,6 +7,7 @@ from settingsd import config
 from settingsd import service
 from settingsd import shared
 from settingsd.tools.process import execProcess
+from file_read_backwards import FileReadBackwards
 
 
 INTERFACE_NAME = "packageUpdates"
@@ -22,8 +23,6 @@ PACKAGE_REGEX = re.compile(r'^(\S+)/\S+')
 
 MULTIPLE_SPACES_REGEX = re.compile(r'\s{2,}')
 
-HISTORY_BLOCK_SIZE = 2 ** 16 # bytes
-
 
 class PackageUpdates(service.FunctionObject) :
 	@service.functionMethod(INTERFACE_NAME, in_signature="", out_signature="as")
@@ -34,21 +33,12 @@ class PackageUpdates(service.FunctionObject) :
 
 	@service.functionMethod(INTERFACE_NAME, in_signature="", out_signature="i")
 	def get_last_update_date(self):
-		with open('/var/log/apt/history.log', 'r') as apt_history_file:
-			apt_history_file.seek(0, os.SEEK_END)
-			file_size = apt_history_file.tell()
-			full_block_count = file_size // HISTORY_BLOCK_SIZE
-			block = 0
-			while True:
-				offset = 0 if block >= full_block_count else file_size - HISTORY_BLOCK_SIZE * (block + 1)
-				result = self._try_extract_upgrade_date(apt_history_file, offset, file_size)
+		with FileReadBackwards('/var/log/apt/history.log') as apt_history_file:
+			for block in self._read_apt_blocks(apt_history_file):
+				result = self._try_extract_upgrade_date(block)
 				if result:
 					return result.timestamp()
-
-				if block < full_block_count:
-					block += 1
-				else:
-					return 0
+		return 0
 	
 	@service.functionMethod(INTERFACE_NAME, in_signature="", out_signature="")
 	def install_updates(self):
@@ -68,16 +58,15 @@ class PackageUpdates(service.FunctionObject) :
 			fields[parts[0].strip()] = parts[1].strip()
 		return fields
 
-	def _parse_apt_operations(self, blocks):
-		operations = []
-		for block in blocks:
-			fields = self._parse_apt_block(block)
-			if all(key in fields for key in ('Start-Date', 'Commandline', 'End-Date')):
-				operations.append({
-					'startDate': self._parse_date(fields['Start-Date']),
-					'command': self._parse_command(fields['Commandline'])
-				})
-		return operations
+	def _parse_apt_operation(self, block):
+		fields = self._parse_apt_block(block)
+		if all(key in fields for key in ('Start-Date', 'Commandline', 'End-Date')):
+			return {
+				'startDate': self._parse_date(fields['Start-Date']),
+				'command': self._parse_command(fields['Commandline'])
+			}
+		else:
+			raise ValueError('Non-full apt operation block: ' + block)
 
 	def _parse_command(self, commandline):
 		words = [w for w in commandline.split(' ') if len(w) and not w.startswith('-')]
@@ -89,22 +78,24 @@ class PackageUpdates(service.FunctionObject) :
 		date_str = MULTIPLE_SPACES_REGEX.sub(' ', date_str)
 		return datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
 
-	def _read_apt_blocks(self, apt_history_file, offset, block_size):
-		apt_history_file.seek(offset, os.SEEK_SET)
-		data = apt_history_file.read(block_size)
-		return data.split('\n\n')
+	def _read_apt_blocks(self, apt_history_file):
+		block = []
+		for line in apt_history_file:
+			if line == '':
+				if len(block):
+					yield '\n'.join(block[::-1])
+				block = []
+				continue
+			
+			block.append(line)
 
-	def _try_extract_upgrade_date(self, apt_history_file, offset, file_size):
-		limit = max(file_size - offset, HISTORY_BLOCK_SIZE * 2) + 1
-		for block_size in range(HISTORY_BLOCK_SIZE * 2, limit, HISTORY_BLOCK_SIZE):
-			apt_operation_blocks = self._read_apt_blocks(apt_history_file, offset, block_size)
-			apt_operations = self._parse_apt_operations(apt_operation_blocks)
-			if len(apt_operations):
-				break
+	def _try_extract_upgrade_date(self, block):
+		operation = self._parse_apt_operation(block)
 
-		for operation in apt_operations[::-1]:
-			if operation['command'] == 'upgrade':
-				return operation['startDate']
+		if operation['command'] == 'upgrade' or operation['command'] == 'dist-upgrade':
+			return operation['startDate']
+
+		return None
 
 
 class Service(service.Service) :

@@ -29,7 +29,7 @@ NETWORK_SERVICES = {
 
 
 ##### Private classes #####
-class Network(service.FunctionObject) :
+class Network(service.FunctionObject) :	
 	### DBus methods ###
 	@service.functionMethod(NETWORK_METHODS_NAMESPACE, in_signature="s")
 	def dumpCurrentSettings(self, filename):
@@ -39,6 +39,26 @@ class Network(service.FunctionObject) :
 		settings['dns'] = self._get_dns_servers()
 		with open(filename, 'w+') as network_config:
 			network_config.write(dump(settings))
+
+	@service.functionMethod(NETWORK_METHODS_NAMESPACE, out_signature='a{sa{si}}')
+	def getStatistics(self):
+		with IPDB() as ipdb:
+			interfaces = [i.ifname for i in ipdb.interfaces.values()]
+		
+		stats = {}
+
+		for interface_name in interfaces:
+			with open('/sys/class/net/' + interface_name + '/statistics/rx_bytes', 'r') as file:
+				rx = int(file.read())
+			with open('/sys/class/net/' + interface_name + '/statistics/tx_bytes', 'r') as file:
+				tx = int(file.read())
+
+			stats[interface_name] = {
+				'rx': rx,
+				'tx': tx
+			}
+
+		return stats
 
 	@service.functionMethod(NETWORK_METHODS_NAMESPACE, in_signature="s")
 	def reloadNetworkConfig(self, filename):

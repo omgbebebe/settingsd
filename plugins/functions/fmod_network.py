@@ -40,7 +40,7 @@ class Network(service.FunctionObject) :
 		with open(filename, 'w+') as network_config:
 			network_config.write(dump(settings))
 
-	@service.functionMethod(NETWORK_METHODS_NAMESPACE, out_signature='a{sa{si}}')
+	@service.functionMethod(NETWORK_METHODS_NAMESPACE, out_signature='a{sa{st}}')
 	def getStatistics(self):
 		with IPDB() as ipdb:
 			interfaces = [i.ifname for i in ipdb.interfaces.values()]

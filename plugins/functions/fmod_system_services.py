@@ -42,6 +42,11 @@ class SystemServices(service.FunctionObject) :
 	###
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, in_signature="s")
+	def reload(self, name) :
+		logger.verbose("{mod}: Request to reload service \"%s\"" % name)
+		self._systemd_manager.ReloadUnit(name + '.service', 'replace')
+
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, in_signature="s")
 	def start(self, name) :
 		logger.verbose("{mod}: Request to start service \"%s\"" % name)
 		self._systemd_manager.StartUnit(name + '.service', 'replace')

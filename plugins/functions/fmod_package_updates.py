@@ -19,13 +19,13 @@ APT_COMMANDS = (
 	'download', 'changelog', 'build-dep', 'full-upgrade', 'show', 'list',
 	'edit-sources'
 )
-PACKAGE_REGEX = re.compile(r'^(\S+)/\S+')
+PACKAGE_REGEX = re.compile(r'^(\S+)/\S+\s(\S+)')
 
 MULTIPLE_SPACES_REGEX = re.compile(r'\s{2,}')
 
 
 class PackageUpdates(service.FunctionObject) :
-	@service.functionMethod(INTERFACE_NAME, in_signature="", out_signature="as")
+	@service.functionMethod(INTERFACE_NAME, in_signature="", out_signature="aas")
 	def get_available_updates(self):
 		execProcess([APT_EXECUTABLE, 'update'])
 		raw_output, = execProcess([APT_EXECUTABLE, 'list', '--upgradable'])[:1]
@@ -47,7 +47,7 @@ class PackageUpdates(service.FunctionObject) :
 	def _extract_upgradable_packages(self, apt_output):
 		lines = apt_output.split('\n')
 		matches = [PACKAGE_REGEX.match(line) for line in lines]
-		return [m[1] for m in matches if m]
+		return [[m[1], m[2]] for m in matches if m]
 
 	def _parse_apt_block(self, block):
 		fields = {}

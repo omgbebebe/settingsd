@@ -8,6 +8,8 @@ from settingsd import shared
 
 import settingsd.tools as tools
 import settingsd.tools.dbus
+import psutil
+from os import getloadavg
 
 
 ##### Private constants #####
@@ -53,21 +55,22 @@ class Memory(service.FunctionObject) :
 
 	### DBus methods ###
 
-	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="i")
+	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="t")
 	def memoryFull(self) :
-		return self.meminfoSum("MemTotal")
+		return psutil.virtual_memory().total
 
-	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="i")
+	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="t")
 	def memoryFree(self) :
-		return self.meminfoSum("MemFree", "Buffers", "Cached")
+		return psutil.virtual_memory().available
 
-	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="i")
+	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="t")
 	def swapFull(self) :
-		return self.meminfoSum("SwapTotal")
+		return psutil.swap_memory().total
 
-	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="i")
+	@service.functionMethod(MEMORY_METHODS_NAMESPACE, out_signature="t")
 	def swapFree(self) :
-		return self.meminfoSum("SwapFree", "SwapCached")
+		swap = psutil.swap_memory()
+		return swap.total - swap.used
 
 
 	### Private ###
@@ -132,6 +135,23 @@ class Cpu(service.FunctionObject) :
 			return -1
 
 	###
+	@service.functionMethod(CPU_METHODS_NAMESPACE, out_signature="i")
+	def cpuCount(self):
+		return psutil.cpu_count()
+
+	@service.functionMethod(CPU_METHODS_NAMESPACE, out_signature="a{sd}")
+	def cpuTimes(self):
+		times = psutil.cpu_times_percent()
+		return {
+			'iowait': times.iowait,
+			'softirq': times.softirq,
+			'sys': times.system,
+			'user': times.user
+		}
+
+	@service.functionMethod(CPU_METHODS_NAMESPACE, out_signature="ad")
+	def loadAverage(self):
+		return getloadavg()
 
 	@service.functionMethod(CPU_METHODS_NAMESPACE, out_signature="d")
 	def loadPercent(self) :

@@ -17,6 +17,8 @@ import settingsd.tools as tools
 from settingsd.tools.process import execProcess
 import settingsd.tools.editors
 
+from jinja2 import Template
+
 ##### Private constants #####
 SERVICE_NAME = "network"
 
@@ -26,6 +28,30 @@ NETWORK_SERVICES = {
 	'http': (80, 443),
 	'smtp': (25, 465, 587)
 }
+NFTABLES_CONFIG_FILE = '/etc/nftables.conf'
+# jinja2
+NFTABLES_CONFIG_TEMPLATE = Template('''#!/usr/sbin/nft -f
+flush ruleset
+
+table ip filter {
+	chain input {
+		type filter hook input priority 0;
+		{% for name in interfaces -%}
+		iifname {{name}} jump input_{{name}}
+		{% endfor -%}
+		reject with icmp type port-unreachable
+	}
+	{%- for name in interfaces %}
+	chain input_{{name}} {
+		ct state {established,related} accept
+		{% for port in interfaces[name] -%}
+		tcp dport {{port}} {{ 'accept' if interfaces[name][port] else 'drop' }}
+		{% endfor -%}
+		{{ 'accept' if name == 'lo' else 'drop' }}
+	}
+	{%- endfor %}
+}
+''')
 
 
 ##### Private classes #####
@@ -70,6 +96,20 @@ class Network(service.FunctionObject) :
 		if settings.get('dns') is not None:
 			self._set_dns_servers(settings['dns'])
 
+		if settings.get('interfaces') is not None:
+			self._apply_interface_settings(settings['interfaces'])
+
+	def _apply_interface_settings(self, interface_settings):
+		with IPDB() as ipdb:
+			interfaces = [i.ifname for i in ipdb.interfaces.values()]
+
+		port_settings = {}
+		
+		for key in interfaces:
+			port_settings[key] = self._get_port_settings(interface_settings, key)
+
+		self._generate_nftables_config(port_settings)	
+
 	def _dump_interfaces(self):
 		interfaces = {}
 
@@ -84,6 +124,27 @@ class Network(service.FunctionObject) :
 					}
 				}
 		return interfaces
+
+	def _generate_nftables_config(self, settings):
+		config = NFTABLES_CONFIG_TEMPLATE.render(interfaces=settings)
+
+		with open(NFTABLES_CONFIG_FILE, 'w+') as config_file:
+			config_file.write(config)
+	
+	def _get_port_settings(self, interface_settings, key):
+		settings = {}
+		if interface_settings.get(key) is not None:
+			for service in NETWORK_SERVICES:
+				if not service in NETWORK_SERVICES:
+					continue
+				for port in NETWORK_SERVICES[service]:
+					settings[port] = interface_settings[key]['services'].get(service) or False
+		else:
+			# if not set, ban everything
+			for service, ports in NETWORK_SERVICES.items():
+				for port in ports:
+					settings[port] = False
+		return settings
 
 	def _get_dns_servers(self):
 		with open('/etc/resolv.conf', 'r') as resolv_conf:

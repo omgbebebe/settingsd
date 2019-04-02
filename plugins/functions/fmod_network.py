@@ -4,7 +4,7 @@ import socket
 import os
 from pyroute2 import IPDB
 from pyroute2.netlink.rtnl.ifinfmsg import IFF_UP
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, IPv4Network
 from yaml import dump, safe_load
 
 from settingsd import const
@@ -101,6 +101,27 @@ class Network(service.FunctionObject) :
 
 	def _apply_interface_settings(self, interface_settings):
 		with IPDB() as ipdb:
+			for interface in ipdb.interfaces.values():
+				if not interface.ifname in interface_settings:
+					continue
+				
+				if 'address' in interface_settings[interface.ifname]:
+					with interface as interface:
+						already_set = False
+						for addr, mask in interface.ipaddr:
+							prefixlen = IPv4Network('0.0.0.0/' + interface_settings[interface.ifname]['mask']).prefixlen
+							if interface_settings[interface.ifname]['address'] == addr and prefixlen == mask:
+								already_set = True
+								break
+						
+						if not already_set:
+							interface.add_ip(
+								interface_settings[interface.ifname]['address'],
+								IPv4Network('0.0.0.0/' + interface_settings[interface.ifname]['mask']).prefixlen
+							)
+							for addr, mask in interface.ipaddr:
+								interface.del_ip(addr, mask)
+
 			interfaces = [i.ifname for i in ipdb.interfaces.values()]
 
 		port_settings = {}

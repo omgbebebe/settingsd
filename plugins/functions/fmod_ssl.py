@@ -10,11 +10,14 @@ from settingsd import shared
 from settingsd import logger
 from settingsd.tools.process import execProcess, SubprocessFailure
 from os import path
+from configparser import ConfigParser as Cfp
 
-##### Private constants #####
 SERVICE_NAME = "ssl"
 SSL_METHODS_NAMESPACE = "ssl"
-CERTS_DIR = '/etc/opt/drweb.com/certs'
+
+cfg_parser = Cfp()
+cfg_parser.read(const.CONFIGS_DIR + "/ssl" + const.CONFIG_FILE_POSTFIX)
+CERTS_DIR = cfg_parser.get("ssl", "sert_dir")
 CERT_NAME = 'serv'
 PEMFILE = path.join(CERTS_DIR, CERT_NAME + '.pem')
 KEYFILE = path.join(CERTS_DIR, CERT_NAME + '.key')
@@ -29,6 +32,7 @@ CERT_SUBJECT = '/C=RU/ST=1/L=1/O=1/OU=1/CN={}/emailAddress=1'
 
 ##### Private classes #####
 class Ssl(service.FunctionObject) :	
+
 	### DBus methods ###
 	@service.functionMethod(SSL_METHODS_NAMESPACE)
 	def generateCertificate(self):

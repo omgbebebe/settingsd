@@ -108,6 +108,10 @@ setup(
 	packages = packages_list,
 	scripts = scripts_list,
 	data_files = data_files_list,
+	install_requires = [
+		"gudev", 
+		"file_read_backwards"
+	]
 
 	cmdclass = { "install" : SettingsdInstall },
 

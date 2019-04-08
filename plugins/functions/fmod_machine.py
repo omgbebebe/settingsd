@@ -4,13 +4,10 @@
 from settingsd import config
 from settingsd import service
 from settingsd import shared
-from settingsd import logger
 
 import settingsd.tools as tools
-import settingsd.tools.process
 
 import settingsd.validators as validators
-import settingsd.validators.common
 
 
 ##### Private constants #####

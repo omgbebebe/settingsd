@@ -7,15 +7,10 @@ from pyroute2.netlink.rtnl.ifinfmsg import IFF_UP
 from ipaddress import IPv4Address, IPv4Network
 from yaml import dump, safe_load
 
-from settingsd import const
-from settingsd import config
 from settingsd import service
 from settingsd import shared
-from settingsd import logger
 
-import settingsd.tools as tools
 from settingsd.tools.process import execProcess
-import settingsd.tools.editors
 
 from jinja2 import Template
 

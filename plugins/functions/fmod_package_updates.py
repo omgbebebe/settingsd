@@ -1,9 +1,5 @@
-import os
-import errno
 import re
 from datetime import datetime
-from settingsd import const
-from settingsd import config
 from settingsd import service
 from settingsd import shared
 from settingsd.tools.process import execProcess

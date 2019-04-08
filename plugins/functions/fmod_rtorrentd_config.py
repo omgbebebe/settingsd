@@ -2,8 +2,6 @@
 
 
 import os
-import re
-import shutil
 
 from settingsd import const
 from settingsd import config
@@ -11,7 +9,6 @@ from settingsd import service
 from settingsd import shared
 
 import settingsd.tools as tools
-import settingsd.tools.editors
 
 
 ##### Private constants #####

@@ -2,16 +2,11 @@
 
 from dbus import SystemBus, Interface as DBusInterface
 
-from settingsd import config
 from settingsd import service
 from settingsd import shared
 from settingsd import logger
 
-from settingsd import validators
 
-import settingsd.tools as tools
-import settingsd.tools.dbus
-import settingsd.tools.process
 
 
 ##### Private constants #####

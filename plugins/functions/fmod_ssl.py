@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import socket
-import os
 
 from settingsd import const
-from settingsd import config
 from settingsd import service
 from settingsd import shared
-from settingsd import logger
 from settingsd.tools.process import execProcess, SubprocessFailure
 from os import path
 from configparser import ConfigParser as Cfp

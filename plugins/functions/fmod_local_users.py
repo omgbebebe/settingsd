@@ -13,12 +13,8 @@ from settingsd import shared
 from settingsd import logger
 
 import settingsd.validators as validators
-import settingsd.validators.os
 
 import settingsd.tools as tools
-import settingsd.tools.dbus
-import settingsd.tools.process
-import settingsd.tools.editors
 
 
 ##### Private constants #####

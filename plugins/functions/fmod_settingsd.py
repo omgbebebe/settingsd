@@ -7,7 +7,6 @@ from settingsd import service
 from settingsd import shared
 
 import settingsd.tools as tools
-import settingsd.tools.dbus
 
 
 ##### Private constants #####

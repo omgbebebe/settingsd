@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-import os
 import re
 import gudev
-import glib
 
 from settingsd import config
 from settingsd import service
@@ -12,8 +10,6 @@ from settingsd import shared
 from settingsd import logger
 
 import settingsd.tools as tools
-import settingsd.tools.dbus
-import settingsd.tools.process
 
 
 ##### Private constants #####

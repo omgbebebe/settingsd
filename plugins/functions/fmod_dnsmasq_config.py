@@ -2,9 +2,7 @@
 
 
 import os
-import re
 import signal
-import shutil
 
 from settingsd import const
 from settingsd import config
@@ -13,10 +11,8 @@ from settingsd import shared
 from settingsd import logger
 
 import settingsd.validators as validators
-import settingsd.validators.network
 
 import settingsd.tools as tools
-import settingsd.tools.editors
 
 
 ##### Private constants #####

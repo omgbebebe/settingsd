@@ -5,7 +5,6 @@ import os
 import time
 import re
 import hashlib
-import shutil
 
 from settingsd import const
 from settingsd import config
@@ -13,8 +12,6 @@ from settingsd import service
 from settingsd import shared
 
 import settingsd.tools as tools
-import settingsd.tools.process
-import settingsd.tools.editors
 
 
 ##### Private constants #####

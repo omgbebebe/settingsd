@@ -4,10 +4,8 @@
 from settingsd import config
 from settingsd import service
 from settingsd import shared
-from settingsd import logger
 
 import settingsd.tools as tools
-import settingsd.tools.process
 
 
 ##### Private constants #####

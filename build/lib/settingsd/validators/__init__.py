@@ -3,5 +3,4 @@
 
 __all__ = ["common", "network", "os"]
 
-
-
+from .common import ValidatorError

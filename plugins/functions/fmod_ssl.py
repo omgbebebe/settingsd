@@ -4,17 +4,15 @@ import socket
 
 from settingsd import const
 from settingsd import service
+from settingsd import config
 from settingsd import shared
 from settingsd.tools.process import execProcess, SubprocessFailure
 from os import path
-from configparser import ConfigParser as Cfp
 
 SERVICE_NAME = "ssl"
 SSL_METHODS_NAMESPACE = "ssl"
+CERTS_DIR = config.value(SERVICE_NAME, "cert_dir")
 
-cfg_parser = Cfp()
-cfg_parser.read(const.CONFIGS_DIR + "/ssl" + const.CONFIG_FILE_POSTFIX)
-CERTS_DIR = cfg_parser.get("ssl", "sert_dir")
 CERT_NAME = 'serv'
 PEMFILE = path.join(CERTS_DIR, CERT_NAME + '.pem')
 KEYFILE = path.join(CERTS_DIR, CERT_NAME + '.key')

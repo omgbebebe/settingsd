@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bimin/env python
 # -*- coding: utf-8 -*-
 
 
@@ -15,7 +15,7 @@ from settingsd import const
 ##### Private constants #####
 packages_list = ["settingsd", "settingsd/tools", "settingsd/validators"]
 scripts_list = ["settingsd-server.py"]
-
+install_requires = ['file_read_backwards']
 
 #####
 data_files_list = [
@@ -108,10 +108,9 @@ setup(
 	packages = packages_list,
 	scripts = scripts_list,
 	data_files = data_files_list,
-	install_requires = [
-		"gudev", 
+	requires = [
 		"file_read_backwards"
-	]
+	],
 
 	cmdclass = { "install" : SettingsdInstall },
 

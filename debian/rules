@@ -1,0 +1,6 @@
+#!/usr/bin/make -f
+#export DH_VERBOSE=1
+
+%:
+	DEB_BUILD_OPTIONS=nocheck dh $@  --with python3 --with systemd --buildsystem=pybuild
+

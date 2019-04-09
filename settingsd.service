@@ -1,0 +1,14 @@
+[Unit]
+Description=Settingsd-server
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -u /usr/bin/settingsd-server.py
+WorkingDirectory=/usr/bin
+Restart=always
+RestartSec=20
+Environment=PYTHONPATH=vendor
+KillSignal=SIGINT
+[Install]
+WantedBy=multi-user.target

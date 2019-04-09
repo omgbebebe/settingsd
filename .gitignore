@@ -1,2 +1,6 @@
 *.pyc
+debian/.debhelper
+build
+.pybuild
+debian/settingsd
 

@@ -4,6 +4,7 @@
 
 import sys
 import os
+import shutil
 
 from distutils.core import setup
 from distutils.command.install import install
@@ -20,7 +21,7 @@ install_requires = ['file_read_backwards']
 #####
 data_files_list = [
 	("/etc/dbus-1/system.d", ["configs/dbus/org.etersoft.settingsd.conf"]),
-	("/etc/rc.d/init.d", ["init/settingsd"])
+	("/etc/rc.d/init.d", ["init/settingsd"]), ('/lib/systemd/system', ['settingsd.service'])
 ]
 for maps_list_item in ( ("share/settingsd/plugins/functions", "plugins/functions"),
 	("share/settingsd/plugins/actions", "plugins/actions"),
@@ -30,8 +31,8 @@ for maps_list_item in ( ("share/settingsd/plugins/functions", "plugins/functions
 	("share/settingsd/data/customs", "data/customs"),
 	("/etc/settingsd", "configs/settingsd") ) :
 
-	data_files_list.append(( maps_list_item[0], [ os.path.join(maps_list_item[1], item)
-		for item in os.listdir(maps_list_item[1]) if not item in (".gitignore",) ] ))
+	data_files_list.append(( maps_list_item[0], [ os.path.join(maps_list_item[1], item) for item
+		in os.listdir(maps_list_item[1]) if os.path.isfile(maps_list_item[1] + '/'+ item) and item not in (".gitignore", "__pycache__") ] ))
 
 
 #####
@@ -58,11 +59,19 @@ class SettingsdInstall(install) :
 	### Public ###
 
 	def run(self) :
+		self.preInstallHook()
 		install.run(self)
 		self.postInstallHooks()
 
 
 	### Private ###
+
+	def preInstallHook(self):
+		log.info("running pre-install hooks")
+
+		for data_item in data_files_list:
+			if not os.path.exists(self.install_data + "/" + data_item[0]):
+					os.makedirs(self.install_data + "/" + data_item[0])
 
 	def postInstallHooks(self) :
 		# FIXME: This is dirty hack. In normal realization, this code must be moved to build stage
@@ -72,14 +81,15 @@ class SettingsdInstall(install) :
 		const_py_file = open(os.path.join(self.install_libbase, "settingsd/const.py"), "r+")
 		const_py_file_data = const_py_file.read()
 
-		for replaces_list_item in ( ("\"plugins/functions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/plugins/functions"))),
-			("\"plugins/actions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/plugins/actions"))),
-			("\"plugins/customs\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/plugins/customs"))),
-			("\"plugins/functions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/plugins/functions"))),
-			("\"data/functions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/data/functions"))),
-			("\"data/actions\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/data/actions"))),
-			("\"data/customs\"", "\"%s\"" % (os.path.join(self.install_data, "share/settingsd/data/customs"))),
-			("\"configs/settingsd\"", "\"%s\"" % (os.path.join(( self.root if self.root != None else "/" ), "etc/settingsd"))) ) :
+		for replaces_list_item in (
+			("\"plugins/functions\"", "\"%s\"" % "/usr/share/settingsd/plugins/functions"),
+			("\"plugins/actions\"", "\"%s\"" % "/usr/share/settingsd/plugins/actions"),
+			("\"plugins/customs\"", "\"%s\"" % "/usr/share/settingsd/plugins/customs"),
+			("\"plugins/functions\"", "\"%s\"" % "/usr/share/settingsd/plugins/functions"),
+			("\"data/functions\"", "\"%s\"" % "/usr/share/settingsd/data/functions"),
+			("\"data/actions\"", "\"%s\"" % "/usr/share/settingsd/data/actions"),
+			("\"data/customs\"", "\"%s\"" % "/usr/share/settingsd/data/customs"),
+			("\"configs/settingsd\"", "\"%s\"" % "/etc/settingsd") ) :
 				const_py_file_data = const_py_file_data.replace(replaces_list_item[0], replaces_list_item[1])
 
 		const_py_file.truncate()
@@ -89,6 +99,8 @@ class SettingsdInstall(install) :
 		try :
 			const_py_file.close()
 		except : pass
+		
+		shutil.copytree("vendor/file_read_backwards", os.path.join(self.install_libbase, 'file_read_backwards'))
 
 
 ##### Main #####

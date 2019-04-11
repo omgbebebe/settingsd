@@ -3,6 +3,7 @@
 
 from settingsd import config
 from settingsd import service
+from settingsd import logger
 from settingsd import shared
 
 import settingsd.tools as tools
@@ -37,6 +38,8 @@ class CommonInfo(service.FunctionObject) :
 
 	@service.functionMethod(LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
 	def version(self) :
+		import pdb
+		pdb.set_trace
 		return self.lsbOption(LSB_OPTION_VERSION)
 
 	@service.functionMethod(LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
@@ -93,12 +96,19 @@ class CommonInfo(service.FunctionObject) :
 	### Private ###
 
 	def lsbOption(self, option) :
+
 		proc_args_list = [config.value(SERVICE_NAME, "lsb_release_bin"), option]
 		return ":".join(tools.process.execProcess(proc_args_list)[0].split(":")[1:]).strip()
 
+
 	def unameOption(self, option) :
-		proc_args_list = [config.value(SERVICE_NAME, "uname_bin"), option]
-		return tools.process.execProcess(proc_args_list)[0].strip()
+		try:
+			proc_args_list = [config.value(SERVICE_NAME, "uname_bin"), option]
+			return tools.process.execProcess(proc_args_list)[0].strip()
+		except FileNotFoundError:
+			logger.error("Directory /usr/bin/lsb_release does not exist")
+			return "Error: /usr/bin/lsb_release doesn\'t exist"
+
 
 
 ##### Public classes #####

@@ -56,6 +56,8 @@ def customMethod(interface_name, **kwargs_dict) :
 
 def functionMethod(interface_name, **kwargs_dict) :
 	def decorator(function) :
+		import pdb
+		pdb.set_trace
 		return customMethod(tools.dbus.joinMethod(config.value(config.APPLICATION_SECTION, "service_name"),
 			"functions", interface_name), **kwargs_dict)(function)
 	return decorator

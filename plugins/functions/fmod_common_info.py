@@ -38,8 +38,6 @@ class CommonInfo(service.FunctionObject) :
 
 	@service.functionMethod(LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
 	def version(self) :
-		import pdb
-		pdb.set_trace
 		return self.lsbOption(LSB_OPTION_VERSION)
 
 	@service.functionMethod(LSB_RELASE_METHODS_NAMESPACE, out_signature="s")
@@ -96,9 +94,11 @@ class CommonInfo(service.FunctionObject) :
 	### Private ###
 
 	def lsbOption(self, option) :
-
-		proc_args_list = [config.value(SERVICE_NAME, "lsb_release_bin"), option]
-		return ":".join(tools.process.execProcess(proc_args_list)[0].split(":")[1:]).strip()
+		try:
+			proc_args_list = [config.value(SERVICE_NAME, "lsb_release_bin"), option]
+			return ":".join(tools.process.execProcess(proc_args_list)[0].split(":")[1:]).strip()
+		except Exception as e:
+			logger.exception(e)
 
 
 	def unameOption(self, option) :

@@ -51,8 +51,8 @@ class SystemServices(service.FunctionObject) :
 		logger.verbose("{mod}: Request to stop service \"%s\"" % name)
 		self._systemd_manager.StopUnit(name + '.service', 'replace')
 
-	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, in_signature="s", out_signature="b")
-	def isActive(self, name) :
+	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, in_signature="s", out_signature="s")
+	def getActiveState(self, name) :
 		unit = DBusInterface(
 			self._bus.get_object(
 				'org.freedesktop.systemd1',
@@ -65,7 +65,7 @@ class SystemServices(service.FunctionObject) :
 			'ActiveState',
 			dbus_interface='org.freedesktop.DBus.Properties'
 		)
-		return active_state == 'active' or active_state == 'reloading'
+		return active_state
 
 
 class Service(service.Service) :

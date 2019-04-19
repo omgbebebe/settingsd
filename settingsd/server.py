@@ -41,7 +41,14 @@ class Server(object) :
 	###
 
 	def loadModules(self) :
-		for modules_path_list_item in (const.FUNCTIONS_DIR, const.ACTIONS_DIR, const.CUSTOMS_DIR) :
+		mpath = os.environ.get('SETTINGSD_PATH')
+		if mpath is None:
+			additional_module_dirs = []
+		else:
+			additional_module_dirs = [dir for dir in mpath.split(':') if os.path.isdir(dir)]
+		module_dirs = [const.FUNCTIONS_DIR, const.ACTIONS_DIR, const.CUSTOMS_DIR] + additional_module_dirs
+
+		for modules_path_list_item in module_dirs:
 			logger.debug("Processing directory \"%s\"..." % (modules_path_list_item))
 			sys.path.append(modules_path_list_item)
 

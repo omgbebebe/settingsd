@@ -11,6 +11,7 @@ from settingsd import service
 from settingsd import shared
 
 from settingsd.tools.process import execProcess
+import settingsd.tools.templating
 
 from jinja2 import Template
 

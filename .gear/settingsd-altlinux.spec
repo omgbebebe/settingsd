@@ -10,7 +10,7 @@ Packager: Devaev Maxim <mdevaev@etersoft.ru>
 Source: %name-%version.tar
 BuildArch: noarch
 BuildRequires: python-dev
-Requires: python-module-dbus, python-module-pyinotify
+Requires: python3-module-dbus, python3-module-pam, python3-module-pyinotify
 Requires: chkconfig, service, SysVinit, pm-utils, lsb-release, hwclock
 %description
 Extensible service to control the operating system via D-Bus.

@@ -11,15 +11,9 @@ from os import path
 
 SERVICE_NAME = "ssl"
 SSL_METHODS_NAMESPACE = "ssl"
-CERTS_DIR = config.value(SERVICE_NAME, "cert_dir")
 
 CERT_NAME = 'serv'
-PEMFILE = path.join(CERTS_DIR, CERT_NAME + '.pem')
-KEYFILE = path.join(CERTS_DIR, CERT_NAME + '.key')
-CERTFILE = path.join(CERTS_DIR, CERT_NAME + '.crt')
-CSRFILE = path.join(CERTS_DIR, CERT_NAME + '.csr')
-CAFILE = path.join(CERTS_DIR, 'ca.crt')
-CAKEY = path.join(CERTS_DIR, 'ca.key')
+
 DAYS = 3650
 CA_SUBJECT = '/C=RU/ST=1/L=1/O=1/OU=1/CN=1/emailAddress=1'
 CERT_SUBJECT = '/C=RU/ST=1/L=1/O=1/OU=1/CN={}/emailAddress=1'
@@ -27,6 +21,20 @@ CERT_SUBJECT = '/C=RU/ST=1/L=1/O=1/OU=1/CN={}/emailAddress=1'
 
 ##### Private classes #####
 class Ssl(service.FunctionObject) :	
+
+
+	def __init__(self, *args):
+		# setting up constants
+		global CERTS_DIR, PEMFILE, KEYFILE, CERTFILE, CSRFILE, CAFILE, CAKEY
+		CERTS_DIR = config.value(SERVICE_NAME, "cert_dir")
+		PEMFILE = path.join(CERTS_DIR, CERT_NAME + '.pem')
+		KEYFILE = path.join(CERTS_DIR, CERT_NAME + '.key')
+		CERTFILE = path.join(CERTS_DIR, CERT_NAME + '.crt')
+		CSRFILE = path.join(CERTS_DIR, CERT_NAME + '.csr')
+		CAFILE = path.join(CERTS_DIR, 'ca.crt')
+		CAKEY = path.join(CERTS_DIR, 'ca.key')
+
+		super().__init__(*args)
 
 	### DBus methods ###
 	@service.functionMethod(SSL_METHODS_NAMESPACE)

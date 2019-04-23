@@ -16,7 +16,7 @@ class SubprocessFailure(Exception) :
 def execProcess(proc_args_list, proc_input = None, fatal_flag = True, confidential_input_flag = False) :
 	logger.debug("{submod}: Executing child process \"%s\"" % (str(proc_args_list)))
 
-	proc = subprocess.Popen(proc_args_list, shell=True, bufsize=1024, close_fds=True,
+	proc = subprocess.Popen(proc_args_list, bufsize=1024, close_fds=True,
 		stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
 		env={ "LC_ALL" : "C" })
 	(proc_stdout, proc_stderr) = proc.communicate(proc_input)

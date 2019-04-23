@@ -92,7 +92,7 @@ class SystemService(service.FunctionObject) :
 
 	@service.functionMethod(SYSTEM_SERVICE_METHODS_NAMESPACE, out_signature="i")
 	def status(self) :
-		proc_args_list = [ os.path.join(config.value(SERVICE_NAME, "initd_dir"), self.__system_service_name), "status"]
+		proc_args_list = ["serv", self.__system_service_name, "status"]
 		return tools.process.execProcess(proc_args_list, fatal_flag = False)[2]
 
 

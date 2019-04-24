@@ -6,7 +6,7 @@ import os
 import dbus
 import dbus.service
 import dbus.glib
-import gobject
+from gi.repository import GLib
 
 from . import const
 from . import config
@@ -24,8 +24,8 @@ class Server(object) :
 		self.__modules_list = []
 		self.__services_dict = {}
 
-		gobject.threads_init()
-		self.__main_loop = gobject.MainLoop()
+		GLib.threads_init()
+		self.__main_loop = GLib.MainLoop()
 
 
 	### Public ###

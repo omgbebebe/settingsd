@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
+from os import environ
 
 from .. import const
 from .. import config
@@ -13,12 +14,19 @@ class SubprocessFailure(Exception) :
 
 
 ##### Public methods #####
-def execProcess(proc_args_list, proc_input = None, fatal_flag = True, confidential_input_flag = False) :
+def execProcess(proc_args_list, proc_input = None, fatal_flag = True,
+	confidential_input_flag = False, inherit_env=False, shell=False) :
+	if shell and not isinstance(proc_args_list, str):
+		proc_args_list = ' '.join(proc_args_list)
 	logger.debug("{submod}: Executing child process \"%s\"" % (str(proc_args_list)))
+
+	env = { "LC_ALL" : "C" }
+	if inherit_env:
+		env = { **environ, **env }
 
 	proc = subprocess.Popen(proc_args_list, bufsize=1024, close_fds=True,
 		stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-		env={ "LC_ALL" : "C" })
+		env=env, shell=shell)
 	(proc_stdout, proc_stderr) = proc.communicate(proc_input)
 
 	if proc.returncode != 0 :
@@ -35,4 +43,3 @@ def execProcess(proc_args_list, proc_input = None, fatal_flag = True, confidenti
 	logger.debug("{submod}: Child process \"%s\" finished, return_code=%d" % (str(proc_args_list), proc.returncode))
 
 	return (proc_stdout, proc_stderr, proc.returncode)
-

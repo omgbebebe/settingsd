@@ -97,8 +97,10 @@ class CommonInfo(service.FunctionObject) :
 		try:
 			proc_args_list = [config.value(SERVICE_NAME, "lsb_release_bin"), option]
 			return ":".join(tools.process.execProcess(proc_args_list)[0].split(":")[1:]).strip()
-		except Exception as e:
-			logger.exception(e)
+		except FileNotFoundError:
+			logger.error("Directory /usr/bin/lsb_release does not exist")
+			return "Error: /usr/bin/lsb_release doesn\'t exist"
+
 
 
 	def unameOption(self, option) :

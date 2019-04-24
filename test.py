@@ -1,27 +1,45 @@
-import subprocess as sbp
 from unittest import TestCase, main
-import xml.etree.ElementTree as ET
 from pprint import pprint as pp
+from dbus import SystemBus
+
+sep = "\n" + "-"*30 + "\n"
 
 list_ = ["common_info", "date_time", "dnsmasq_config", "example",
- "local_groups", "local_users", "machine", "network", "nss_roles",
+ "local_groups", "local_users", "network", "nss_roles",
   "ntp_config", "package_updates", "rtorrentd_config", "ssl",
    "statistics", "system_services"]
-cmd = "dbus-send --system --type=method_call --print-reply \
-        --dest=org.etersoft.settingsd /org/etersoft/settingsd/functions/{func_name}\
-             org.etersoft.settingsd.functions.{funcName}.{interface}.{method} {args}"
 
-class TestSettingsdMain(TestCase):
-        def test_common_info(self):
-                res = sbp.run(cmd.format(func_name="common_info", funcName="commonInfo", interface="lsbRelease", method="version", args=""), stdout=sbp.PIPE)
-                res = res.stdout.decode('utf-8')
-                print(res)
-    
+class TestSettingsdMain():
+        def __init__(self, *args, **kwargs):
+                self.dbus = SystemBus()
+                self.log_file = open("test_log.log", "w")
+
+        def test_all(self):
+                for module_name in list_:
+                        remote_object = dbus.get_object("org.etersoft.settingsd", "/org/etersoft/settingsd/functions/{}".format(module_name))
+                        remote_object.Introspect()
+                        for method_name, args in remote_object.__dict__['_introspect_method_map'].items():
+                                if args != "" and args !=" ":
+                                        print("Test with arguments:", ".".join((method_name.rsplit(".", 3)[1:])))
+                                try:
+                                        print("Testing: ", ".".join((method_name.rsplit(".", 3)[1:])), "\nProceed test? (y/n)")
+                                        confirmaion = input()
+                                        if confirmaion == "y":
+                                                print("Output: ", remote_object.__getattr__(method_name.rsplit(".", 1)[1])(), sep)
+                                        else:
+                                                print("Skipped...." + sep)
+                                                continue
+                                except Exception as e:
+                                        print(sep, str(e), sep)
+                                        self.log_file.write(sep + str(e) + sep)
+                self.log_file.close()
 
 
+dbus = SystemBus()
 
-if __name__ == '__main__':
-    main()
+
+t = TestSettingsdMain()
+t.test_all()
 
 
 

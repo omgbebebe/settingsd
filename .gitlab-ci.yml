@@ -1,0 +1,13 @@
+image: docker.hub.eterfund.ru:443/drweb/deployment/ubuntu:18.04
+stages: 
+  - build 
+build:
+    stage: build
+    script: 
+      - debuild -us -uc || exit 1
+      - mkdir -p packages 
+      - cp -r  ../settingsd*.deb packages/
+    artifacts:
+        paths:
+          - packages/*.deb
+        expire_in: 1 month

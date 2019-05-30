@@ -29,7 +29,7 @@ NFTABLES_CONFIG_FILE = '/etc/nftables.conf'
 NFTABLES_CONFIG_TEMPLATE = Template('''#!/usr/sbin/nft -f
 flush ruleset
 
-table ip filter {
+table inet filter {
 	chain input {
 		type filter hook input priority 0;
 		{% for name in interfaces -%}
@@ -47,6 +47,7 @@ table ip filter {
 	}
 	{%- endfor %}
 }
+
 ''')
 
 

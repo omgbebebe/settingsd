@@ -1,5 +1,8 @@
+%def_without rtorrentd
+%def_without pam
+
 Name: settingsd
-Version: 0.4
+Version: 1.0
 Release: alt1
 
 Summary: Settingsd - extensible service to control the operating system via D-Bus
@@ -15,6 +18,7 @@ Source: %name-%version.tar
 
 BuildArch: noarch
 
+BuildRequires(pre): rpm-build-python3
 BuildRequires: python3-dev
 
 %add_python3_path %_datadir/%name/plugins/
@@ -101,7 +105,9 @@ rm -fv plugins/functions/fmod_disks_smart.py
 %_bindir/settingsd-server.py
 %dir %_sysconfdir/%name/
 %config(noreplace) %_sysconfdir/%name/main.conf
+%config(noreplace) %_sysconfdir/%name/ssl.conf
 %_initddir/%name
+%_unitdir/%name.service
 %_sysconfdir/dbus-1/system.d/*.conf
 %dir %_datadir/%name/plugins/*/
 %dir %_datadir/%name/data/*/
@@ -112,9 +118,12 @@ rm -fv plugins/functions/fmod_disks_smart.py
 %_datadir/%name/plugins/functions/fmod_local_users.py*
 %_datadir/%name/plugins/functions/fmod_local_groups.py*
 %_datadir/%name/plugins/functions/fmod_machine.py*
+%_datadir/%name/plugins/functions/fmod_network.py*
+%_datadir/%name/plugins/functions/fmod_package_updates.py*
 %_datadir/%name/plugins/functions/fmod_settingsd.py*
 %_datadir/%name/plugins/functions/fmod_statistics.py*
 %_datadir/%name/plugins/functions/fmod_system_services.py*
+%_datadir/%name/plugins/functions/fmod_ssl.py*
 %python3_sitelibdir/%name/
 %python3_sitelibdir/*.egg-info
 
@@ -134,21 +143,26 @@ rm -fv plugins/functions/fmod_disks_smart.py
 %config(noreplace) %_sysconfdir/%name/dnsmasq_config.conf
 %_datadir/%name/plugins/functions/fmod_dnsmasq_config.py*
 
-
+%if_with rtorrentd
 %files fmod-rtorrentd-config
 %config(noreplace) %_sysconfdir/%name/rtorrentd_config.conf
 %_datadir/%name/plugins/functions/fmod_rtorrentd_config.py*
-
+%endif
 
 %files fmod-nss-roles
 %config(noreplace) %_sysconfdir/%name/nss_roles.conf
 %_datadir/%name/plugins/functions/fmod_nss_roles.py*
 
-%files fmod-pam
+%if_with pam
+%files pam
 #config(noreplace) %_sysconfdir/%name/pam.conf
 %_datadir/%name/plugins/functions/fmod_pam_authentication.py*
+%endif
 
 %changelog
+* Mon Jun 03 2019 Vitaly Lipatov <lav@altlinux.ru> 1.0-alt1
+- build version 1.0
+
 * Mon Jan 28 2019 Vitaly Lipatov <lav@altlinux.ru> 0.4-alt1
 - build with python3
 - add fmod-pam

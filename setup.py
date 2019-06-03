@@ -100,8 +100,6 @@ class SettingsdInstall(install) :
 			const_py_file.close()
 		except : pass
 		
-		shutil.copytree("vendor/file_read_backwards", os.path.join(self.install_libbase, 'file_read_backwards'))
-
 
 ##### Main #####
 setup(

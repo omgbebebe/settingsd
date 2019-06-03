@@ -105,13 +105,13 @@ class SettingsdInstall(install) :
 setup(
 	name = const.MY_NAME,
 	version = const.VERSION,
-	url = "http://etersoft.ru/", # FIXME: Add project url
-	license = "GPL",
+	url = "https://github.com/Etersoft/settingsd",
+	license = "LGPL 2.1 or later",
 
 	author = "Devaev Maxim",
 	author_email = "mdevaev@etersoft.ru",
-	maintainer = "Devaev Maxim",
-	maintainer_email = "mdevaev@etersoft.ru",
+	maintainer = "Vitaly Lipatov",
+	maintainer_email = "lav@etersoft.ru",
 
 	description = "Settingsd - extensible service to control the operating system",
 

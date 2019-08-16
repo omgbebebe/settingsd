@@ -3,4 +3,5 @@ debian/.debhelper
 build
 .pybuild
 debian/settingsd
-
+.venv/
+.vscode/
